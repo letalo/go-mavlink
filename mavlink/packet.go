@@ -19,16 +19,15 @@ type Packet struct {
 	Checksum uint16
 }
 
-func NewPacket(systemID, componentID uint8, message Message) (packet *Packet) {
-	componentPacketSequences[componentID]++
+func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *Packet) {
 	return &Packet{
 		Header: Header{
 			FrameStart:     FRAME_START,
-			PayloadLength:  message.Size(),
-			PacketSequence: componentPacketSequences[componentID],
+			PayloadLength:  message.MsgSize(),
+			PacketSequence: sequence,
 			SystemID:       systemID,
 			ComponentID:    componentID,
-			MessageID:      message.ID(),
+			MessageID:      message.MsgID(),
 		},
 		Message: message,
 	}
@@ -49,7 +48,7 @@ func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
 	if err != nil {
 		return n, err
 	}
-	n += int64(packet.Message.Size())
+	n += int64(packet.Message.MsgSize())
 
 	packet.Checksum = hash.Sum()
 

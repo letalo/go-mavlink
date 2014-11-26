@@ -19,51 +19,12 @@ type Protocol struct {
 
 	XMLName  xml.Name  `xml:"mavlink"`
 	Version  string    `xml:"version"`
+	Include  string    `xml:"include"`
 	Enums    []Enum    `xml:"enums>enum"`
 	Messages []Message `xml:"messages>message"`
 }
 
-type Enum struct {
-	Name        string      `xml:"name,attr"`
-	Description string      `xml:"description"`
-	Entries     []EnumEntry `xml:"entry"`
-}
-
-type EnumEntry struct {
-	Value       uint8            `xml:"value,attr"`
-	Name        string           `xml:"name,attr"`
-	Description string           `xml:"description"`
-	Params      []EnumEntryParam `xml:"param"`
-}
-
-type EnumEntryParam struct {
-	Index       uint8  `xml:"index,attr"`
-	Description string `xml:",innerxml"`
-}
-
-type Message struct {
-	ID          uint8          `xml:"id,attr"`
-	Name        string         `xml:"name,attr"`
-	Description string         `xml:"description"`
-	Fields      []MessageField `xml:"field"`
-	Size        int
-}
-
-type MessageField struct {
-	Type        string `xml:"type,attr"`
-	Name        string `xml:"name,attr"`
-	Description string `xml:",innerxml"`
-}
-
-func main() {
-	var (
-		protocol Protocol
-		goFormat bool
-	)
-	flag.StringVar(&protocol.Name, "proto", "common", "Protocol name. One of the XML definitions.")
-	flag.BoolVar(&goFormat, "fmt", true, "Call go fmt on the result file")
-	flag.Parse()
-
+func (protocol *Protocol) parse() {
 	protocol.StringSizes = make(map[int]bool)
 
 	err := dry.FileUnmarshallXML(fmt.Sprintf("definitions/%s.xml", protocol.Name), &protocol)
@@ -104,6 +65,50 @@ func main() {
 			}
 		}
 	}
+}
+
+type Enum struct {
+	Name        string      `xml:"name,attr"`
+	Description string      `xml:"description"`
+	Entries     []EnumEntry `xml:"entry"`
+}
+
+type EnumEntry struct {
+	Value       uint8            `xml:"value,attr"`
+	Name        string           `xml:"name,attr"`
+	Description string           `xml:"description"`
+	Params      []EnumEntryParam `xml:"param"`
+}
+
+type EnumEntryParam struct {
+	Index       uint8  `xml:"index,attr"`
+	Description string `xml:",innerxml"`
+}
+
+type Message struct {
+	ID          uint8          `xml:"id,attr"`
+	Name        string         `xml:"name,attr"`
+	Description string         `xml:"description"`
+	Fields      []MessageField `xml:"field"`
+	Size        int
+}
+
+type MessageField struct {
+	Type        string `xml:"type,attr"`
+	Name        string `xml:"name,attr"`
+	Description string `xml:",innerxml"`
+}
+
+func main() {
+	var (
+		protocol Protocol
+		goFormat bool
+	)
+	flag.StringVar(&protocol.Name, "proto", "pixhawk", "Protocol name. One of the XML definitions.")
+	flag.BoolVar(&goFormat, "fmt", true, "Call go fmt on the result file")
+	flag.Parse()
+
+	protocol.parse()
 
 	templ := template.Must(template.ParseFiles("go.template"))
 
@@ -111,7 +116,7 @@ func main() {
 
 	buf := bytes.NewBuffer(nil)
 
-	err = templ.Execute(buf, &protocol)
+	err := templ.Execute(buf, &protocol)
 	if err != nil {
 		panic(err)
 	}

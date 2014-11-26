@@ -22,13 +22,8 @@ var (
 	MessageCRSs     *[256]byte
 )
 
-var (
-	componentPacketSequences [256]uint8
-)
-
-func Send(writer io.Writer, systemID, componentID uint8, message Message) error {
-	packet := NewPacket(systemID, componentID, message)
-	_, err := packet.WriteTo(writer)
+func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
+	_, err := NewPacket(systemID, componentID, sequence, message).WriteTo(writer)
 	return err
 }
 
@@ -68,7 +63,7 @@ func Receive(reader io.Reader) (*Packet, error) {
 	if msg == nil {
 		return nil, ErrUnknownMessageID(packet.Header.MessageID)
 	}
-	if packet.Header.PayloadLength != msg.Size() {
+	if packet.Header.PayloadLength != msg.MsgSize() {
 		return nil, ErrInvalidPayloadLength(packet.Header.PayloadLength)
 	}
 
