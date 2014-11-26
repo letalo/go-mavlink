@@ -18,7 +18,7 @@ const ({{range .Entries}}
 {{range .Messages}}
 // {{.Description}}
 type {{.Name}} struct { {{range .Fields}}
-	{{.Name}} {{.Type}}{{end}}
+	{{.Name}} {{.Type}} // {{.Description}}{{end}}
 }
 
 func (self *{{.Name}}) MsgID() uint8 {

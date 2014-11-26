@@ -452,12 +452,12 @@ const (
 
 // The heartbeat message shows that a system is present and responding. The type of the MAV and Autopilot hardware allow the receiving system to treat further messages from this system appropriate (e.g. by laying out the user interface based on the autopilot).
 type Heartbeat struct {
-	Type           uint8
-	Autopilot      uint8
-	BaseMode       uint8
-	CustomMode     uint32
-	SystemStatus   uint8
-	MavlinkVersion uint8
+	Type           uint8  // Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
+	Autopilot      uint8  // Autopilot type / class. defined in MAV_AUTOPILOT ENUM
+	BaseMode       uint8  // System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
+	CustomMode     uint32 // A bitfield for use for autopilot-specific flags.
+	SystemStatus   uint8  // System status flag, see MAV_STATE ENUM
+	MavlinkVersion uint8  // MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
 }
 
 func (self *Heartbeat) MsgID() uint8 {
@@ -474,19 +474,19 @@ func (self *Heartbeat) MsgSize() uint8 {
 
 // The general system state. If the system is following the MAVLink standard, the system state is mainly defined by three orthogonal states/modes: The system mode, which is either LOCKED (motors shut down and locked), MANUAL (system under RC control), GUIDED (system with autonomous position control, position setpoint controlled manually) or AUTO (system guided by path/waypoint planner). The NAV_MODE defined the current flight state: LIFTOFF (often an open-loop maneuver), LANDING, WAYPOINTS or VECTOR. This represents the internal navigation state machine. The system status shows wether the system is currently active or not and if an emergency occured. During the CRITICAL and EMERGENCY states the MAV is still considered to be active, but should start emergency procedures autonomously. After a failure occured it should first move from active to critical to allow manual intervention and then move to emergency after a certain timeout.
 type SysStatus struct {
-	OnboardControlSensorsPresent uint32
-	OnboardControlSensorsEnabled uint32
-	OnboardControlSensorsHealth  uint32
-	Load                         uint16
-	VoltageBattery               uint16
-	CurrentBattery               int16
-	BatteryRemaining             int8
-	DropRateComm                 uint16
-	ErrorsComm                   uint16
-	ErrorsCount1                 uint16
-	ErrorsCount2                 uint16
-	ErrorsCount3                 uint16
-	ErrorsCount4                 uint16
+	OnboardControlSensorsPresent uint32 // Bitmask showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
+	OnboardControlSensorsEnabled uint32 // Bitmask showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
+	OnboardControlSensorsHealth  uint32 // Bitmask showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
+	Load                         uint16 // Maximum usage in percent of the mainloop time, (0%: 0, 100%: 1000) should be always below 1000
+	VoltageBattery               uint16 // Battery voltage, in millivolts (1 = 1 millivolt)
+	CurrentBattery               int16  // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+	BatteryRemaining             int8   // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot estimate the remaining battery
+	DropRateComm                 uint16 // Communication drops in percent, (0%: 0, 100%: 10'000), (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)
+	ErrorsComm                   uint16 // Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)
+	ErrorsCount1                 uint16 // Autopilot-specific errors
+	ErrorsCount2                 uint16 // Autopilot-specific errors
+	ErrorsCount3                 uint16 // Autopilot-specific errors
+	ErrorsCount4                 uint16 // Autopilot-specific errors
 }
 
 func (self *SysStatus) MsgID() uint8 {
@@ -503,8 +503,8 @@ func (self *SysStatus) MsgSize() uint8 {
 
 // The system time is the time of the master clock, typically the computer clock of the main onboard computer.
 type SystemTime struct {
-	TimeUnixUsec uint64
-	TimeBootMs   uint32
+	TimeUnixUsec uint64 // Timestamp of the master clock in microseconds since UNIX epoch.
+	TimeBootMs   uint32 // Timestamp of the component clock since boot time in milliseconds.
 }
 
 func (self *SystemTime) MsgID() uint8 {
@@ -521,10 +521,10 @@ func (self *SystemTime) MsgSize() uint8 {
 
 // A ping message either requesting or responding to a ping. This allows to measure the system latencies, including serial port, radio modem and UDP connections.
 type Ping struct {
-	TimeUsec        uint64
-	Seq             uint32
-	TargetSystem    uint8
-	TargetComponent uint8
+	TimeUsec        uint64 // Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009)
+	Seq             uint32 // PING sequence
+	TargetSystem    uint8  // 0: request ping from all receiving systems, if greater than 0: message is a ping response and number is the system id of the requesting system
+	TargetComponent uint8  // 0: request ping from all receiving components, if greater than 0: message is a ping response and number is the system id of the requesting system
 }
 
 func (self *Ping) MsgID() uint8 {
@@ -541,10 +541,10 @@ func (self *Ping) MsgSize() uint8 {
 
 // Request to control this MAV
 type ChangeOperatorControl struct {
-	TargetSystem   uint8
-	ControlRequest uint8
-	Version        uint8
-	Passkey        Char25
+	TargetSystem   uint8  // System the GCS requests control for
+	ControlRequest uint8  // 0: request control of this MAV, 1: Release control of this MAV
+	Version        uint8  // 0: key as plaintext, 1-255: future, different hashing/encryption variants. The GCS should in general use the safest mode possible initially and then gradually move down the encryption level if it gets a NACK message indicating an encryption mismatch.
+	Passkey        Char25 // Password / Key, depending on version plaintext or encrypted. 25 or less characters, NULL terminated. The characters may involve A-Z, a-z, 0-9, and "!?,.-"
 }
 
 func (self *ChangeOperatorControl) MsgID() uint8 {
@@ -561,9 +561,9 @@ func (self *ChangeOperatorControl) MsgSize() uint8 {
 
 // Accept / deny control of this MAV
 type ChangeOperatorControlAck struct {
-	GcsSystemId    uint8
-	ControlRequest uint8
-	Ack            uint8
+	GcsSystemId    uint8 // ID of the GCS this message
+	ControlRequest uint8 // 0: request control of this MAV, 1: Release control of this MAV
+	Ack            uint8 // 0: ACK, 1: NACK: Wrong passkey, 2: NACK: Unsupported passkey encryption method, 3: NACK: Already under control
 }
 
 func (self *ChangeOperatorControlAck) MsgID() uint8 {
@@ -580,7 +580,7 @@ func (self *ChangeOperatorControlAck) MsgSize() uint8 {
 
 // Emit an encrypted signature / key identifying this system. PLEASE NOTE: This protocol has been kept simple, so transmitting the key requires an encrypted channel for true safety.
 type AuthKey struct {
-	Key Char32
+	Key Char32 // key
 }
 
 func (self *AuthKey) MsgID() uint8 {
@@ -597,9 +597,9 @@ func (self *AuthKey) MsgSize() uint8 {
 
 // Set the system mode, as defined by enum MAV_MODE. There is no target component id as the mode is by definition for the overall aircraft, not only for one component.
 type SetMode struct {
-	TargetSystem uint8
-	BaseMode     uint8
-	CustomMode   uint32
+	TargetSystem uint8  // The system setting the mode
+	BaseMode     uint8  // The new base mode
+	CustomMode   uint32 // The new autopilot-specific mode. This field can be ignored by an autopilot.
 }
 
 func (self *SetMode) MsgID() uint8 {
@@ -616,10 +616,10 @@ func (self *SetMode) MsgSize() uint8 {
 
 // Request to read the onboard parameter with the param_id string id. Onboard parameters are stored as key[const char*] -> value[float]. This allows to send a parameter to any other component (such as the GCS) without the need of previous knowledge of possible parameter names. Thus the same GCS can store different parameters for different autopilots. See also http://qgroundcontrol.org/parameter_interface for a full documentation of QGroundControl and IMU code.
 type ParamRequestRead struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	ParamId         Char16
-	ParamIndex      int16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	ParamId         Char16 // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
+	ParamIndex      int16  // Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored)
 }
 
 func (self *ParamRequestRead) MsgID() uint8 {
@@ -636,8 +636,8 @@ func (self *ParamRequestRead) MsgSize() uint8 {
 
 // Request all parameters of this component. After his request, all parameters are emitted.
 type ParamRequestList struct {
-	TargetSystem    uint8
-	TargetComponent uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *ParamRequestList) MsgID() uint8 {
@@ -654,11 +654,11 @@ func (self *ParamRequestList) MsgSize() uint8 {
 
 // Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout.
 type ParamValue struct {
-	ParamId    Char16
-	ParamValue float32
-	ParamType  uint8
-	ParamCount uint16
-	ParamIndex uint16
+	ParamId    Char16  // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
+	ParamValue float32 // Onboard parameter value
+	ParamType  uint8   // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
+	ParamCount uint16  // Total number of onboard parameters
+	ParamIndex uint16  // Index of this onboard parameter
 }
 
 func (self *ParamValue) MsgID() uint8 {
@@ -675,11 +675,11 @@ func (self *ParamValue) MsgSize() uint8 {
 
 // Set a parameter value TEMPORARILY to RAM. It will be reset to default on system reboot. Send the ACTION MAV_ACTION_STORAGE_WRITE to PERMANENTLY write the RAM contents to EEPROM. IMPORTANT: The receiving component should acknowledge the new parameter value by sending a param_value message to all communication partners. This will also ensure that multiple GCS all have an up-to-date list of all parameters. If the sending GCS did not receive a PARAM_VALUE message within its timeout time, it should re-send the PARAM_SET message.
 type ParamSet struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	ParamId         Char16
-	ParamValue      float32
-	ParamType       uint8
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	ParamId         Char16  // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
+	ParamValue      float32 // Onboard parameter value
+	ParamType       uint8   // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
 }
 
 func (self *ParamSet) MsgID() uint8 {
@@ -697,16 +697,16 @@ func (self *ParamSet) MsgSize() uint8 {
 // The global position, as returned by the Global Positioning System (GPS). This is
 //                 NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
 type GpsRawInt struct {
-	TimeUsec          uint64
-	FixType           uint8
-	Lat               int32
-	Lon               int32
-	Alt               int32
-	Eph               uint16
-	Epv               uint16
-	Vel               uint16
-	Cog               uint16
-	SatellitesVisible uint8
+	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	FixType           uint8  // 0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS, 5: RTK. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+	Lat               int32  // Latitude (WGS84), in degrees * 1E7
+	Lon               int32  // Longitude (WGS84), in degrees * 1E7
+	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+	Vel               uint16 // GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
+	Cog               uint16 // Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
+	SatellitesVisible uint8  // Number of satellites visible. If unknown, set to 255
 }
 
 func (self *GpsRawInt) MsgID() uint8 {
@@ -723,12 +723,12 @@ func (self *GpsRawInt) MsgSize() uint8 {
 
 // The positioning status, as reported by GPS. This message is intended to display status information about each satellite visible to the receiver. See message GLOBAL_POSITION for the global position estimate. This message can contain information for up to 20 satellites.
 type GpsStatus struct {
-	SatellitesVisible  uint8
-	SatellitePrn       [20]uint8
-	SatelliteUsed      [20]uint8
-	SatelliteElevation [20]uint8
-	SatelliteAzimuth   [20]uint8
-	SatelliteSnr       [20]uint8
+	SatellitesVisible  uint8     // Number of satellites visible
+	SatellitePrn       [20]uint8 // Global satellite ID
+	SatelliteUsed      [20]uint8 // 0: Satellite not used, 1: used for localization
+	SatelliteElevation [20]uint8 // Elevation (0: right on top of receiver, 90: on the horizon) of satellite
+	SatelliteAzimuth   [20]uint8 // Direction of satellite, 0: 0 deg, 255: 360 deg.
+	SatelliteSnr       [20]uint8 // Signal to noise ratio of satellite
 }
 
 func (self *GpsStatus) MsgID() uint8 {
@@ -745,16 +745,16 @@ func (self *GpsStatus) MsgSize() uint8 {
 
 // The RAW IMU readings for the usual 9DOF sensor setup. This message should contain the scaled values to the described units
 type ScaledImu struct {
-	TimeBootMs uint32
-	Xacc       int16
-	Yacc       int16
-	Zacc       int16
-	Xgyro      int16
-	Ygyro      int16
-	Zgyro      int16
-	Xmag       int16
-	Ymag       int16
-	Zmag       int16
+	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
+	Xacc       int16  // X acceleration (mg)
+	Yacc       int16  // Y acceleration (mg)
+	Zacc       int16  // Z acceleration (mg)
+	Xgyro      int16  // Angular speed around X axis (millirad /sec)
+	Ygyro      int16  // Angular speed around Y axis (millirad /sec)
+	Zgyro      int16  // Angular speed around Z axis (millirad /sec)
+	Xmag       int16  // X Magnetic field (milli tesla)
+	Ymag       int16  // Y Magnetic field (milli tesla)
+	Zmag       int16  // Z Magnetic field (milli tesla)
 }
 
 func (self *ScaledImu) MsgID() uint8 {
@@ -771,16 +771,16 @@ func (self *ScaledImu) MsgSize() uint8 {
 
 // The RAW IMU readings for the usual 9DOF sensor setup. This message should always contain the true raw values without any scaling to allow data capture and system debugging.
 type RawImu struct {
-	TimeUsec uint64
-	Xacc     int16
-	Yacc     int16
-	Zacc     int16
-	Xgyro    int16
-	Ygyro    int16
-	Zgyro    int16
-	Xmag     int16
-	Ymag     int16
-	Zmag     int16
+	TimeUsec uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	Xacc     int16  // X acceleration (raw)
+	Yacc     int16  // Y acceleration (raw)
+	Zacc     int16  // Z acceleration (raw)
+	Xgyro    int16  // Angular speed around X axis (raw)
+	Ygyro    int16  // Angular speed around Y axis (raw)
+	Zgyro    int16  // Angular speed around Z axis (raw)
+	Xmag     int16  // X Magnetic field (raw)
+	Ymag     int16  // Y Magnetic field (raw)
+	Zmag     int16  // Z Magnetic field (raw)
 }
 
 func (self *RawImu) MsgID() uint8 {
@@ -797,11 +797,11 @@ func (self *RawImu) MsgSize() uint8 {
 
 // The RAW pressure readings for the typical setup of one absolute pressure and one differential pressure sensor. The sensor values should be the raw, UNSCALED ADC values.
 type RawPressure struct {
-	TimeUsec    uint64
-	PressAbs    int16
-	PressDiff1  int16
-	PressDiff2  int16
-	Temperature int16
+	TimeUsec    uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	PressAbs    int16  // Absolute pressure (raw)
+	PressDiff1  int16  // Differential pressure 1 (raw)
+	PressDiff2  int16  // Differential pressure 2 (raw)
+	Temperature int16  // Raw Temperature measurement (raw)
 }
 
 func (self *RawPressure) MsgID() uint8 {
@@ -818,10 +818,10 @@ func (self *RawPressure) MsgSize() uint8 {
 
 // The pressure readings for the typical setup of one absolute and differential pressure sensor. The units are as specified in each field.
 type ScaledPressure struct {
-	TimeBootMs  uint32
-	PressAbs    float32
-	PressDiff   float32
-	Temperature int16
+	TimeBootMs  uint32  // Timestamp (milliseconds since system boot)
+	PressAbs    float32 // Absolute pressure (hectopascal)
+	PressDiff   float32 // Differential pressure 1 (hectopascal)
+	Temperature int16   // Temperature measurement (0.01 degrees celsius)
 }
 
 func (self *ScaledPressure) MsgID() uint8 {
@@ -838,13 +838,13 @@ func (self *ScaledPressure) MsgSize() uint8 {
 
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right).
 type Attitude struct {
-	TimeBootMs uint32
-	Roll       float32
-	Pitch      float32
-	Yaw        float32
-	Rollspeed  float32
-	Pitchspeed float32
-	Yawspeed   float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	Roll       float32 // Roll angle (rad, -pi..+pi)
+	Pitch      float32 // Pitch angle (rad, -pi..+pi)
+	Yaw        float32 // Yaw angle (rad, -pi..+pi)
+	Rollspeed  float32 // Roll angular speed (rad/s)
+	Pitchspeed float32 // Pitch angular speed (rad/s)
+	Yawspeed   float32 // Yaw angular speed (rad/s)
 }
 
 func (self *Attitude) MsgID() uint8 {
@@ -861,14 +861,14 @@ func (self *Attitude) MsgSize() uint8 {
 
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 type AttitudeQuaternion struct {
-	TimeBootMs uint32
-	Q1         float32
-	Q2         float32
-	Q3         float32
-	Q4         float32
-	Rollspeed  float32
-	Pitchspeed float32
-	Yawspeed   float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	Q1         float32 // Quaternion component 1, w (1 in null-rotation)
+	Q2         float32 // Quaternion component 2, x (0 in null-rotation)
+	Q3         float32 // Quaternion component 3, y (0 in null-rotation)
+	Q4         float32 // Quaternion component 4, z (0 in null-rotation)
+	Rollspeed  float32 // Roll angular speed (rad/s)
+	Pitchspeed float32 // Pitch angular speed (rad/s)
+	Yawspeed   float32 // Yaw angular speed (rad/s)
 }
 
 func (self *AttitudeQuaternion) MsgID() uint8 {
@@ -885,13 +885,13 @@ func (self *AttitudeQuaternion) MsgSize() uint8 {
 
 // The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
 type LocalPositionNed struct {
-	TimeBootMs uint32
-	X          float32
-	Y          float32
-	Z          float32
-	Vx         float32
-	Vy         float32
-	Vz         float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	X          float32 // X Position
+	Y          float32 // Y Position
+	Z          float32 // Z Position
+	Vx         float32 // X Speed
+	Vy         float32 // Y Speed
+	Vz         float32 // Z Speed
 }
 
 func (self *LocalPositionNed) MsgID() uint8 {
@@ -909,15 +909,15 @@ func (self *LocalPositionNed) MsgSize() uint8 {
 // The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It
 //                is designed as scaled integer message since the resolution of float is not sufficient.
 type GlobalPositionInt struct {
-	TimeBootMs  uint32
-	Lat         int32
-	Lon         int32
-	Alt         int32
-	RelativeAlt int32
-	Vx          int16
-	Vy          int16
-	Vz          int16
-	Hdg         uint16
+	TimeBootMs  uint32 // Timestamp (milliseconds since system boot)
+	Lat         int32  // Latitude, expressed as * 1E7
+	Lon         int32  // Longitude, expressed as * 1E7
+	Alt         int32  // Altitude in meters, expressed as * 1000 (millimeters), WGS84 (not AMSL)
+	RelativeAlt int32  // Altitude above ground in meters, expressed as * 1000 (millimeters)
+	Vx          int16  // Ground X Speed (Latitude), expressed as m/s * 100
+	Vy          int16  // Ground Y Speed (Longitude), expressed as m/s * 100
+	Vz          int16  // Ground Z Speed (Altitude), expressed as m/s * 100
+	Hdg         uint16 // Compass heading in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
 }
 
 func (self *GlobalPositionInt) MsgID() uint8 {
@@ -934,17 +934,17 @@ func (self *GlobalPositionInt) MsgSize() uint8 {
 
 // The scaled values of the RC channels received. (-100%) -10000, (0%) 0, (100%) 10000. Channels that are inactive should be set to UINT16_MAX.
 type RcChannelsScaled struct {
-	TimeBootMs  uint32
-	Port        uint8
-	Chan1Scaled int16
-	Chan2Scaled int16
-	Chan3Scaled int16
-	Chan4Scaled int16
-	Chan5Scaled int16
-	Chan6Scaled int16
-	Chan7Scaled int16
-	Chan8Scaled int16
-	Rssi        uint8
+	TimeBootMs  uint32 // Timestamp (milliseconds since system boot)
+	Port        uint8  // Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
+	Chan1Scaled int16  // RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan2Scaled int16  // RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan3Scaled int16  // RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan4Scaled int16  // RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan5Scaled int16  // RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan6Scaled int16  // RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan7Scaled int16  // RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Chan8Scaled int16  // RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
+	Rssi        uint8  // Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
 }
 
 func (self *RcChannelsScaled) MsgID() uint8 {
@@ -961,17 +961,17 @@ func (self *RcChannelsScaled) MsgSize() uint8 {
 
 // The RAW values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 type RcChannelsRaw struct {
-	TimeBootMs uint32
-	Port       uint8
-	Chan1Raw   uint16
-	Chan2Raw   uint16
-	Chan3Raw   uint16
-	Chan4Raw   uint16
-	Chan5Raw   uint16
-	Chan6Raw   uint16
-	Chan7Raw   uint16
-	Chan8Raw   uint16
-	Rssi       uint8
+	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
+	Port       uint8  // Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows for more than 8 servos.
+	Chan1Raw   uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan2Raw   uint16 // RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan3Raw   uint16 // RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan4Raw   uint16 // RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan5Raw   uint16 // RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan6Raw   uint16 // RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan7Raw   uint16 // RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan8Raw   uint16 // RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Rssi       uint8  // Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
 }
 
 func (self *RcChannelsRaw) MsgID() uint8 {
@@ -988,16 +988,16 @@ func (self *RcChannelsRaw) MsgSize() uint8 {
 
 // The RAW values of the servo outputs (for RC input from the remote, use the RC_CHANNELS messages). The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%.
 type ServoOutputRaw struct {
-	TimeUsec  uint32
-	Port      uint8
-	Servo1Raw uint16
-	Servo2Raw uint16
-	Servo3Raw uint16
-	Servo4Raw uint16
-	Servo5Raw uint16
-	Servo6Raw uint16
-	Servo7Raw uint16
-	Servo8Raw uint16
+	TimeUsec  uint32 // Timestamp (microseconds since system boot)
+	Port      uint8  // Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.
+	Servo1Raw uint16 // Servo output 1 value, in microseconds
+	Servo2Raw uint16 // Servo output 2 value, in microseconds
+	Servo3Raw uint16 // Servo output 3 value, in microseconds
+	Servo4Raw uint16 // Servo output 4 value, in microseconds
+	Servo5Raw uint16 // Servo output 5 value, in microseconds
+	Servo6Raw uint16 // Servo output 6 value, in microseconds
+	Servo7Raw uint16 // Servo output 7 value, in microseconds
+	Servo8Raw uint16 // Servo output 8 value, in microseconds
 }
 
 func (self *ServoOutputRaw) MsgID() uint8 {
@@ -1014,10 +1014,10 @@ func (self *ServoOutputRaw) MsgSize() uint8 {
 
 // Request a partial list of mission items from the system/component. http://qgroundcontrol.org/mavlink/waypoint_protocol. If start and end index are the same, just send one waypoint.
 type MissionRequestPartialList struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	StartIndex      int16
-	EndIndex        int16
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	StartIndex      int16 // Start index, 0 by default
+	EndIndex        int16 // End index, -1 by default (-1: send list to end). Else a valid index of the list
 }
 
 func (self *MissionRequestPartialList) MsgID() uint8 {
@@ -1034,10 +1034,10 @@ func (self *MissionRequestPartialList) MsgSize() uint8 {
 
 // This message is sent to the MAV to write a partial list. If start index == end index, only one item will be transmitted / updated. If the start index is NOT 0 and above the current list size, this request should be REJECTED!
 type MissionWritePartialList struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	StartIndex      int16
-	EndIndex        int16
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	StartIndex      int16 // Start index, 0 by default and smaller / equal to the largest index of the current onboard list.
+	EndIndex        int16 // End index, equal or greater than start index.
 }
 
 func (self *MissionWritePartialList) MsgID() uint8 {
@@ -1055,20 +1055,20 @@ func (self *MissionWritePartialList) MsgSize() uint8 {
 // Message encoding a mission item. This message is emitted to announce
 //                 the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See also http://qgroundcontrol.org/mavlink/waypoint_protocol.
 type MissionItem struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Seq             uint16
-	Frame           uint8
-	Command         uint16
-	Current         uint8
-	Autocontinue    uint8
-	Param1          float32
-	Param2          float32
-	Param3          float32
-	Param4          float32
-	X               float32
-	Y               float32
-	Z               float32
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Seq             uint16  // Sequence
+	Frame           uint8   // The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h
+	Command         uint16  // The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs
+	Current         uint8   // false:0, true:1
+	Autocontinue    uint8   // autocontinue to next wp
+	Param1          float32 // PARAM1, see MAV_CMD enum
+	Param2          float32 // PARAM2, see MAV_CMD enum
+	Param3          float32 // PARAM3, see MAV_CMD enum
+	Param4          float32 // PARAM4, see MAV_CMD enum
+	X               float32 // PARAM5 / local: x position, global: latitude
+	Y               float32 // PARAM6 / y position: global: longitude
+	Z               float32 // PARAM7 / z position: global: altitude (relative or absolute, depending on frame.
 }
 
 func (self *MissionItem) MsgID() uint8 {
@@ -1085,9 +1085,9 @@ func (self *MissionItem) MsgSize() uint8 {
 
 // Request the information of the mission item with the sequence number seq. The response of the system to this message should be a MISSION_ITEM message. http://qgroundcontrol.org/mavlink/waypoint_protocol
 type MissionRequest struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Seq             uint16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Seq             uint16 // Sequence
 }
 
 func (self *MissionRequest) MsgID() uint8 {
@@ -1104,9 +1104,9 @@ func (self *MissionRequest) MsgSize() uint8 {
 
 // Set the mission item with sequence number seq as current item. This means that the MAV will continue to this mission item on the shortest path (not following the mission items in-between).
 type MissionSetCurrent struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Seq             uint16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Seq             uint16 // Sequence
 }
 
 func (self *MissionSetCurrent) MsgID() uint8 {
@@ -1123,7 +1123,7 @@ func (self *MissionSetCurrent) MsgSize() uint8 {
 
 // Message that announces the sequence number of the current active mission item. The MAV will fly towards this mission item.
 type MissionCurrent struct {
-	Seq uint16
+	Seq uint16 // Sequence
 }
 
 func (self *MissionCurrent) MsgID() uint8 {
@@ -1140,8 +1140,8 @@ func (self *MissionCurrent) MsgSize() uint8 {
 
 // Request the overall list of mission items from the system/component.
 type MissionRequestList struct {
-	TargetSystem    uint8
-	TargetComponent uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *MissionRequestList) MsgID() uint8 {
@@ -1158,9 +1158,9 @@ func (self *MissionRequestList) MsgSize() uint8 {
 
 // This message is emitted as response to MISSION_REQUEST_LIST by the MAV and to initiate a write transaction. The GCS can then request the individual mission item based on the knowledge of the total number of MISSIONs.
 type MissionCount struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Count           uint16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Count           uint16 // Number of mission items in the sequence
 }
 
 func (self *MissionCount) MsgID() uint8 {
@@ -1177,8 +1177,8 @@ func (self *MissionCount) MsgSize() uint8 {
 
 // Delete all mission items at once.
 type MissionClearAll struct {
-	TargetSystem    uint8
-	TargetComponent uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *MissionClearAll) MsgID() uint8 {
@@ -1195,7 +1195,7 @@ func (self *MissionClearAll) MsgSize() uint8 {
 
 // A certain mission item has been reached. The system will either hold this position (or circle on the orbit) or (if the autocontinue on the WP was set) continue to the next MISSION.
 type MissionItemReached struct {
-	Seq uint16
+	Seq uint16 // Sequence
 }
 
 func (self *MissionItemReached) MsgID() uint8 {
@@ -1212,9 +1212,9 @@ func (self *MissionItemReached) MsgSize() uint8 {
 
 // Ack message during MISSION handling. The type field states if this message is a positive ack (type=0) or if an error happened (type=non-zero).
 type MissionAck struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Type            uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	Type            uint8 // See MAV_MISSION_RESULT enum
 }
 
 func (self *MissionAck) MsgID() uint8 {
@@ -1231,10 +1231,10 @@ func (self *MissionAck) MsgSize() uint8 {
 
 // As local waypoints exist, the global MISSION reference allows to transform between the local coordinate frame and the global (GPS) coordinate frame. This can be necessary when e.g. in- and outdoor settings are connected and the MAV should move from in- to outdoor.
 type SetGpsGlobalOrigin struct {
-	TargetSystem uint8
-	Latitude     int32
-	Longitude    int32
-	Altitude     int32
+	TargetSystem uint8 // System ID
+	Latitude     int32 // Latitude (WGS84), in degrees * 1E7
+	Longitude    int32 // Longitude (WGS84, in degrees * 1E7
+	Altitude     int32 // Altitude (WGS84), in meters * 1000 (positive for up)
 }
 
 func (self *SetGpsGlobalOrigin) MsgID() uint8 {
@@ -1251,9 +1251,9 @@ func (self *SetGpsGlobalOrigin) MsgSize() uint8 {
 
 // Once the MAV sets a new GPS-Local correspondence, this message announces the origin (0,0,0) position
 type GpsGlobalOrigin struct {
-	Latitude  int32
-	Longitude int32
-	Altitude  int32
+	Latitude  int32 // Latitude (WGS84), in degrees * 1E7
+	Longitude int32 // Longitude (WGS84), in degrees * 1E7
+	Altitude  int32 // Altitude (WGS84), in meters * 1000 (positive for up)
 }
 
 func (self *GpsGlobalOrigin) MsgID() uint8 {
@@ -1270,15 +1270,15 @@ func (self *GpsGlobalOrigin) MsgSize() uint8 {
 
 // Set a safety zone (volume), which is defined by two corners of a cube. This message can be used to tell the MAV which setpoints/MISSIONs to accept and which to reject. Safety areas are often enforced by national or competition regulations.
 type SafetySetAllowedArea struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Frame           uint8
-	P1x             float32
-	P1y             float32
-	P1z             float32
-	P2x             float32
-	P2y             float32
-	P2z             float32
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Frame           uint8   // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
+	P1x             float32 // x position 1 / Latitude 1
+	P1y             float32 // y position 1 / Longitude 1
+	P1z             float32 // z position 1 / Altitude 1
+	P2x             float32 // x position 2 / Latitude 2
+	P2y             float32 // y position 2 / Longitude 2
+	P2z             float32 // z position 2 / Altitude 2
 }
 
 func (self *SafetySetAllowedArea) MsgID() uint8 {
@@ -1295,13 +1295,13 @@ func (self *SafetySetAllowedArea) MsgSize() uint8 {
 
 // Read out the safety zone the MAV currently assumes.
 type SafetyAllowedArea struct {
-	Frame uint8
-	P1x   float32
-	P1y   float32
-	P1z   float32
-	P2x   float32
-	P2y   float32
-	P2z   float32
+	Frame uint8   // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
+	P1x   float32 // x position 1 / Latitude 1
+	P1y   float32 // y position 1 / Longitude 1
+	P1z   float32 // z position 1 / Altitude 1
+	P2x   float32 // x position 2 / Latitude 2
+	P2y   float32 // y position 2 / Longitude 2
+	P2z   float32 // z position 2 / Altitude 2
 }
 
 func (self *SafetyAllowedArea) MsgID() uint8 {
@@ -1318,12 +1318,12 @@ func (self *SafetyAllowedArea) MsgSize() uint8 {
 
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 type AttitudeQuaternionCov struct {
-	TimeBootMs uint32
-	Q          [4]float32
-	Rollspeed  float32
-	Pitchspeed float32
-	Yawspeed   float32
-	Covariance [9]float32
+	TimeBootMs uint32     // Timestamp (milliseconds since system boot)
+	Q          [4]float32 // Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)
+	Rollspeed  float32    // Roll angular speed (rad/s)
+	Pitchspeed float32    // Pitch angular speed (rad/s)
+	Yawspeed   float32    // Yaw angular speed (rad/s)
+	Covariance [9]float32 // Attitude covariance
 }
 
 func (self *AttitudeQuaternionCov) MsgID() uint8 {
@@ -1340,14 +1340,14 @@ func (self *AttitudeQuaternionCov) MsgSize() uint8 {
 
 // Outputs of the APM navigation controller. The primary use of this message is to check the response and signs of the controller before actual flight and to assist with tuning controller parameters.
 type NavControllerOutput struct {
-	NavRoll       float32
-	NavPitch      float32
-	NavBearing    int16
-	TargetBearing int16
-	WpDist        uint16
-	AltError      float32
-	AspdError     float32
-	XtrackError   float32
+	NavRoll       float32 // Current desired roll in degrees
+	NavPitch      float32 // Current desired pitch in degrees
+	NavBearing    int16   // Current desired heading in degrees
+	TargetBearing int16   // Bearing to current MISSION/target in degrees
+	WpDist        uint16  // Distance to active MISSION in meters
+	AltError      float32 // Current altitude error in meters
+	AspdError     float32 // Current airspeed error in meters/second
+	XtrackError   float32 // Current crosstrack error on x-y plane in meters
 }
 
 func (self *NavControllerOutput) MsgID() uint8 {
@@ -1364,17 +1364,17 @@ func (self *NavControllerOutput) MsgSize() uint8 {
 
 // The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset.
 type GlobalPositionIntCov struct {
-	TimeBootMs    uint32
-	TimeUtc       uint64
-	EstimatorType uint8
-	Lat           int32
-	Lon           int32
-	Alt           int32
-	RelativeAlt   int32
-	Vx            float32
-	Vy            float32
-	Vz            float32
-	Covariance    [36]float32
+	TimeBootMs    uint32      // Timestamp (milliseconds since system boot)
+	TimeUtc       uint64      // Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.
+	EstimatorType uint8       // Class id of the estimator this estimate originated from.
+	Lat           int32       // Latitude, expressed as degrees * 1E7
+	Lon           int32       // Longitude, expressed as degrees * 1E7
+	Alt           int32       // Altitude in meters, expressed as * 1000 (millimeters), above MSL
+	RelativeAlt   int32       // Altitude above ground in meters, expressed as * 1000 (millimeters)
+	Vx            float32     // Ground X Speed (Latitude), expressed as m/s
+	Vy            float32     // Ground Y Speed (Longitude), expressed as m/s
+	Vz            float32     // Ground Z Speed (Altitude), expressed as m/s
+	Covariance    [36]float32 // Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
 }
 
 func (self *GlobalPositionIntCov) MsgID() uint8 {
@@ -1391,16 +1391,16 @@ func (self *GlobalPositionIntCov) MsgSize() uint8 {
 
 // The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
 type LocalPositionNedCov struct {
-	TimeBootMs    uint32
-	TimeUtc       uint64
-	EstimatorType uint8
-	X             float32
-	Y             float32
-	Z             float32
-	Vx            float32
-	Vy            float32
-	Vz            float32
-	Covariance    [36]float32
+	TimeBootMs    uint32      // Timestamp (milliseconds since system boot)
+	TimeUtc       uint64      // Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.
+	EstimatorType uint8       // Class id of the estimator this estimate originated from.
+	X             float32     // X Position
+	Y             float32     // Y Position
+	Z             float32     // Z Position
+	Vx            float32     // X Speed
+	Vy            float32     // Y Speed
+	Vz            float32     // Z Speed
+	Covariance    [36]float32 // Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
 }
 
 func (self *LocalPositionNedCov) MsgID() uint8 {
@@ -1417,27 +1417,27 @@ func (self *LocalPositionNedCov) MsgSize() uint8 {
 
 // The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 type RcChannels struct {
-	TimeBootMs uint32
-	Chancount  uint8
-	Chan1Raw   uint16
-	Chan2Raw   uint16
-	Chan3Raw   uint16
-	Chan4Raw   uint16
-	Chan5Raw   uint16
-	Chan6Raw   uint16
-	Chan7Raw   uint16
-	Chan8Raw   uint16
-	Chan9Raw   uint16
-	Chan10Raw  uint16
-	Chan11Raw  uint16
-	Chan12Raw  uint16
-	Chan13Raw  uint16
-	Chan14Raw  uint16
-	Chan15Raw  uint16
-	Chan16Raw  uint16
-	Chan17Raw  uint16
-	Chan18Raw  uint16
-	Rssi       uint8
+	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
+	Chancount  uint8  // Total number of RC channels being received. This can be larger than 18, indicating that more channels are available but not given in this message. This value should be 0 when no RC channels are available.
+	Chan1Raw   uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan2Raw   uint16 // RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan3Raw   uint16 // RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan4Raw   uint16 // RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan5Raw   uint16 // RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan6Raw   uint16 // RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan7Raw   uint16 // RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan8Raw   uint16 // RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan9Raw   uint16 // RC channel 9 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan10Raw  uint16 // RC channel 10 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan11Raw  uint16 // RC channel 11 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan12Raw  uint16 // RC channel 12 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan13Raw  uint16 // RC channel 13 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan14Raw  uint16 // RC channel 14 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan15Raw  uint16 // RC channel 15 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan16Raw  uint16 // RC channel 16 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan17Raw  uint16 // RC channel 17 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Chan18Raw  uint16 // RC channel 18 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+	Rssi       uint8  // Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
 }
 
 func (self *RcChannels) MsgID() uint8 {
@@ -1454,11 +1454,11 @@ func (self *RcChannels) MsgSize() uint8 {
 
 //
 type RequestDataStream struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	ReqStreamId     uint8
-	ReqMessageRate  uint16
-	StartStop       uint8
+	TargetSystem    uint8  // The target requested to send the message stream.
+	TargetComponent uint8  // The target requested to send the message stream.
+	ReqStreamId     uint8  // The ID of the requested data stream
+	ReqMessageRate  uint16 // The requested interval between two messages of this type
+	StartStop       uint8  // 1 to start sending, 0 to stop sending.
 }
 
 func (self *RequestDataStream) MsgID() uint8 {
@@ -1475,9 +1475,9 @@ func (self *RequestDataStream) MsgSize() uint8 {
 
 //
 type DataStream struct {
-	StreamId    uint8
-	MessageRate uint16
-	OnOff       uint8
+	StreamId    uint8  // The ID of the requested data stream
+	MessageRate uint16 // The requested interval between two messages of this type
+	OnOff       uint8  // 1 stream is enabled, 0 stream is stopped.
 }
 
 func (self *DataStream) MsgID() uint8 {
@@ -1494,12 +1494,12 @@ func (self *DataStream) MsgSize() uint8 {
 
 // This message provides an API for manually controlling the vehicle using standard joystick axes nomenclature, along with a joystick-like input device. Unused axes can be disabled an buttons are also transmit as boolean values of their
 type ManualControl struct {
-	Target  uint8
-	X       int16
-	Y       int16
-	Z       int16
-	R       int16
-	Buttons uint16
+	Target  uint8  // The system to be controlled.
+	X       int16  // X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
+	Y       int16  // Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
+	Z       int16  // Z-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a separate slider movement with maximum being 1000 and minimum being -1000 on a joystick and the thrust of a vehicle.
+	R       int16  // R-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to a twisting of the joystick, with counter-clockwise being 1000 and clockwise being -1000, and the yaw of a vehicle.
+	Buttons uint16 // A bitfield corresponding to the joystick buttons' current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 1.
 }
 
 func (self *ManualControl) MsgID() uint8 {
@@ -1516,16 +1516,16 @@ func (self *ManualControl) MsgSize() uint8 {
 
 // The RAW values of the RC channels sent to the MAV to override info received from the RC radio. A value of UINT16_MAX means no change to that channel. A value of 0 means control of that channel should be released back to the RC radio. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 type RcChannelsOverride struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Chan1Raw        uint16
-	Chan2Raw        uint16
-	Chan3Raw        uint16
-	Chan4Raw        uint16
-	Chan5Raw        uint16
-	Chan6Raw        uint16
-	Chan7Raw        uint16
-	Chan8Raw        uint16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Chan1Raw        uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan2Raw        uint16 // RC channel 2 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan3Raw        uint16 // RC channel 3 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan4Raw        uint16 // RC channel 4 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan5Raw        uint16 // RC channel 5 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan6Raw        uint16 // RC channel 6 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan7Raw        uint16 // RC channel 7 value, in microseconds. A value of UINT16_MAX means to ignore this field.
+	Chan8Raw        uint16 // RC channel 8 value, in microseconds. A value of UINT16_MAX means to ignore this field.
 }
 
 func (self *RcChannelsOverride) MsgID() uint8 {
@@ -1543,20 +1543,20 @@ func (self *RcChannelsOverride) MsgSize() uint8 {
 // Message encoding a mission item. This message is emitted to announce
 //                 the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See alsohttp://qgroundcontrol.org/mavlink/waypoint_protocol.
 type MissionItemInt struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Seq             uint16
-	Frame           uint8
-	Command         uint16
-	Current         uint8
-	Autocontinue    uint8
-	Param1          float32
-	Param2          float32
-	Param3          float32
-	Param4          float32
-	X               int32
-	Y               int32
-	Z               float32
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Seq             uint16  // Waypoint ID (sequence number). Starts at zero. Increases monotonically for each waypoint, no gaps in the sequence (0,1,2,3,4).
+	Frame           uint8   // The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h
+	Command         uint16  // The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs
+	Current         uint8   // false:0, true:1
+	Autocontinue    uint8   // autocontinue to next wp
+	Param1          float32 // PARAM1, see MAV_CMD enum
+	Param2          float32 // PARAM2, see MAV_CMD enum
+	Param3          float32 // PARAM3, see MAV_CMD enum
+	Param4          float32 // PARAM4, see MAV_CMD enum
+	X               int32   // PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7
+	Y               int32   // PARAM6 / y position: local: x position in meters * 1e4, global: longitude in degrees *10^7
+	Z               float32 // PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
 }
 
 func (self *MissionItemInt) MsgID() uint8 {
@@ -1573,12 +1573,12 @@ func (self *MissionItemInt) MsgSize() uint8 {
 
 // Metrics typically displayed on a HUD for fixed wing aircraft
 type VfrHud struct {
-	Airspeed    float32
-	Groundspeed float32
-	Heading     int16
-	Throttle    uint16
-	Alt         float32
-	Climb       float32
+	Airspeed    float32 // Current airspeed in m/s
+	Groundspeed float32 // Current ground speed in m/s
+	Heading     int16   // Current heading in degrees, in compass units (0..360, 0=north)
+	Throttle    uint16  // Current throttle setting in integer percent, 0 to 100
+	Alt         float32 // Current altitude (MSL), in meters
+	Climb       float32 // Current climb rate in meters/second
 }
 
 func (self *VfrHud) MsgID() uint8 {
@@ -1595,19 +1595,19 @@ func (self *VfrHud) MsgSize() uint8 {
 
 // Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value.
 type CommandInt struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Frame           uint8
-	Command         uint16
-	Current         uint8
-	Autocontinue    uint8
-	Param1          float32
-	Param2          float32
-	Param3          float32
-	Param4          float32
-	X               int32
-	Y               int32
-	Z               float32
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Frame           uint8   // The coordinate system of the COMMAND. see MAV_FRAME in mavlink_types.h
+	Command         uint16  // The scheduled action for the mission item. see MAV_CMD in common.xml MAVLink specs
+	Current         uint8   // false:0, true:1
+	Autocontinue    uint8   // autocontinue to next wp
+	Param1          float32 // PARAM1, see MAV_CMD enum
+	Param2          float32 // PARAM2, see MAV_CMD enum
+	Param3          float32 // PARAM3, see MAV_CMD enum
+	Param4          float32 // PARAM4, see MAV_CMD enum
+	X               int32   // PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7
+	Y               int32   // PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7
+	Z               float32 // PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
 }
 
 func (self *CommandInt) MsgID() uint8 {
@@ -1624,17 +1624,17 @@ func (self *CommandInt) MsgSize() uint8 {
 
 // Send a command with up to seven parameters to the MAV
 type CommandLong struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Command         uint16
-	Confirmation    uint8
-	Param1          float32
-	Param2          float32
-	Param3          float32
-	Param4          float32
-	Param5          float32
-	Param6          float32
-	Param7          float32
+	TargetSystem    uint8   // System which should execute the command
+	TargetComponent uint8   // Component which should execute the command, 0 for all components
+	Command         uint16  // Command ID, as defined by MAV_CMD enum.
+	Confirmation    uint8   // 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command)
+	Param1          float32 // Parameter 1, as defined by MAV_CMD enum.
+	Param2          float32 // Parameter 2, as defined by MAV_CMD enum.
+	Param3          float32 // Parameter 3, as defined by MAV_CMD enum.
+	Param4          float32 // Parameter 4, as defined by MAV_CMD enum.
+	Param5          float32 // Parameter 5, as defined by MAV_CMD enum.
+	Param6          float32 // Parameter 6, as defined by MAV_CMD enum.
+	Param7          float32 // Parameter 7, as defined by MAV_CMD enum.
 }
 
 func (self *CommandLong) MsgID() uint8 {
@@ -1651,8 +1651,8 @@ func (self *CommandLong) MsgSize() uint8 {
 
 // Report status of a command. Includes feedback wether the command was executed.
 type CommandAck struct {
-	Command uint16
-	Result  uint8
+	Command uint16 // Command ID, as defined by MAV_CMD enum.
+	Result  uint8  // See MAV_RESULT enum
 }
 
 func (self *CommandAck) MsgID() uint8 {
@@ -1669,13 +1669,13 @@ func (self *CommandAck) MsgSize() uint8 {
 
 // Setpoint in roll, pitch, yaw and thrust from the operator
 type ManualSetpoint struct {
-	TimeBootMs           uint32
-	Roll                 float32
-	Pitch                float32
-	Yaw                  float32
-	Thrust               float32
-	ModeSwitch           uint8
-	ManualOverrideSwitch uint8
+	TimeBootMs           uint32  // Timestamp in milliseconds since system boot
+	Roll                 float32 // Desired roll rate in radians per second
+	Pitch                float32 // Desired pitch rate in radians per second
+	Yaw                  float32 // Desired yaw rate in radians per second
+	Thrust               float32 // Collective thrust, normalized to 0 .. 1
+	ModeSwitch           uint8   // Flight mode switch position, 0.. 255
+	ManualOverrideSwitch uint8   // Override mode switch position, 0.. 255
 }
 
 func (self *ManualSetpoint) MsgID() uint8 {
@@ -1692,15 +1692,15 @@ func (self *ManualSetpoint) MsgSize() uint8 {
 
 // Set the vehicle attitude and body angular rates.
 type SetAttitudeTarget struct {
-	TimeBootMs      uint32
-	TargetSystem    uint8
-	TargetComponent uint8
-	TypeMask        uint8
-	Q               [4]float32
-	BodyRollRate    float32
-	BodyPitchRate   float32
-	BodyYawRate     float32
-	Thrust          float32
+	TimeBootMs      uint32     // Timestamp in milliseconds since system boot
+	TargetSystem    uint8      // System ID
+	TargetComponent uint8      // Component ID
+	TypeMask        uint8      // Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 6: reserved, bit 7: throttle, bit 8: attitude
+	Q               [4]float32 // Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+	BodyRollRate    float32    // Body roll rate in radians per second
+	BodyPitchRate   float32    // Body roll rate in radians per second
+	BodyYawRate     float32    // Body roll rate in radians per second
+	Thrust          float32    // Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
 }
 
 func (self *SetAttitudeTarget) MsgID() uint8 {
@@ -1717,13 +1717,13 @@ func (self *SetAttitudeTarget) MsgSize() uint8 {
 
 // Set the vehicle attitude and body angular rates.
 type AttitudeTarget struct {
-	TimeBootMs    uint32
-	TypeMask      uint8
-	Q             [4]float32
-	BodyRollRate  float32
-	BodyPitchRate float32
-	BodyYawRate   float32
-	Thrust        float32
+	TimeBootMs    uint32     // Timestamp in milliseconds since system boot
+	TypeMask      uint8      // Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 7: reserved, bit 8: attitude
+	Q             [4]float32 // Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+	BodyRollRate  float32    // Body roll rate in radians per second
+	BodyPitchRate float32    // Body roll rate in radians per second
+	BodyYawRate   float32    // Body roll rate in radians per second
+	Thrust        float32    // Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
 }
 
 func (self *AttitudeTarget) MsgID() uint8 {
@@ -1740,22 +1740,22 @@ func (self *AttitudeTarget) MsgSize() uint8 {
 
 // Set vehicle position, velocity and acceleration setpoint in local frame.
 type SetPositionTargetLocalNed struct {
-	TimeBootMs      uint32
-	TargetSystem    uint8
-	TargetComponent uint8
-	CoordinateFrame uint8
-	TypeMask        uint16
-	X               float32
-	Y               float32
-	Z               float32
-	Vx              float32
-	Vy              float32
-	Vz              float32
-	Afx             float32
-	Afy             float32
-	Afz             float32
-	Yaw             float32
-	YawRate         float32
+	TimeBootMs      uint32  // Timestamp in milliseconds since system boot
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	CoordinateFrame uint8   // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+	X               float32 // X Position in NED frame in meters
+	Y               float32 // Y Position in NED frame in meters
+	Z               float32 // Z Position in NED frame in meters (note, altitude is negative in NED)
+	Vx              float32 // X velocity in NED frame in meter / s
+	Vy              float32 // Y velocity in NED frame in meter / s
+	Vz              float32 // Z velocity in NED frame in meter / s
+	Afx             float32 // X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afy             float32 // Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afz             float32 // Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Yaw             float32 // yaw setpoint in rad
+	YawRate         float32 // yaw rate setpoint in rad/s
 }
 
 func (self *SetPositionTargetLocalNed) MsgID() uint8 {
@@ -1772,20 +1772,20 @@ func (self *SetPositionTargetLocalNed) MsgSize() uint8 {
 
 // Set vehicle position, velocity and acceleration setpoint in local frame.
 type PositionTargetLocalNed struct {
-	TimeBootMs      uint32
-	CoordinateFrame uint8
-	TypeMask        uint16
-	X               float32
-	Y               float32
-	Z               float32
-	Vx              float32
-	Vy              float32
-	Vz              float32
-	Afx             float32
-	Afy             float32
-	Afz             float32
-	Yaw             float32
-	YawRate         float32
+	TimeBootMs      uint32  // Timestamp in milliseconds since system boot
+	CoordinateFrame uint8   // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+	X               float32 // X Position in NED frame in meters
+	Y               float32 // Y Position in NED frame in meters
+	Z               float32 // Z Position in NED frame in meters (note, altitude is negative in NED)
+	Vx              float32 // X velocity in NED frame in meter / s
+	Vy              float32 // Y velocity in NED frame in meter / s
+	Vz              float32 // Z velocity in NED frame in meter / s
+	Afx             float32 // X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afy             float32 // Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afz             float32 // Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Yaw             float32 // yaw setpoint in rad
+	YawRate         float32 // yaw rate setpoint in rad/s
 }
 
 func (self *PositionTargetLocalNed) MsgID() uint8 {
@@ -1802,22 +1802,22 @@ func (self *PositionTargetLocalNed) MsgSize() uint8 {
 
 // Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
 type SetPositionTargetGlobalInt struct {
-	TimeBootMs      uint32
-	TargetSystem    uint8
-	TargetComponent uint8
-	CoordinateFrame uint8
-	TypeMask        uint16
-	LatInt          int32
-	LonInt          int32
-	Alt             float32
-	Vx              float32
-	Vy              float32
-	Vz              float32
-	Afx             float32
-	Afy             float32
-	Afz             float32
-	Yaw             float32
-	YawRate         float32
+	TimeBootMs      uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	CoordinateFrame uint8   // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+	LatInt          int32   // X Position in WGS84 frame in 1e7 * meters
+	LonInt          int32   // Y Position in WGS84 frame in 1e7 * meters
+	Alt             float32 // Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+	Vx              float32 // X velocity in NED frame in meter / s
+	Vy              float32 // Y velocity in NED frame in meter / s
+	Vz              float32 // Z velocity in NED frame in meter / s
+	Afx             float32 // X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afy             float32 // Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afz             float32 // Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Yaw             float32 // yaw setpoint in rad
+	YawRate         float32 // yaw rate setpoint in rad/s
 }
 
 func (self *SetPositionTargetGlobalInt) MsgID() uint8 {
@@ -1834,20 +1834,20 @@ func (self *SetPositionTargetGlobalInt) MsgSize() uint8 {
 
 // Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
 type PositionTargetGlobalInt struct {
-	TimeBootMs      uint32
-	CoordinateFrame uint8
-	TypeMask        uint16
-	LatInt          int32
-	LonInt          int32
-	Alt             float32
-	Vx              float32
-	Vy              float32
-	Vz              float32
-	Afx             float32
-	Afy             float32
-	Afz             float32
-	Yaw             float32
-	YawRate         float32
+	TimeBootMs      uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
+	CoordinateFrame uint8   // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+	LatInt          int32   // X Position in WGS84 frame in 1e7 * meters
+	LonInt          int32   // Y Position in WGS84 frame in 1e7 * meters
+	Alt             float32 // Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+	Vx              float32 // X velocity in NED frame in meter / s
+	Vy              float32 // Y velocity in NED frame in meter / s
+	Vz              float32 // Z velocity in NED frame in meter / s
+	Afx             float32 // X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afy             float32 // Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Afz             float32 // Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+	Yaw             float32 // yaw setpoint in rad
+	YawRate         float32 // yaw rate setpoint in rad/s
 }
 
 func (self *PositionTargetGlobalInt) MsgID() uint8 {
@@ -1864,13 +1864,13 @@ func (self *PositionTargetGlobalInt) MsgSize() uint8 {
 
 // The offset in X, Y, Z and yaw between the LOCAL_POSITION_NED messages of MAV X and the global coordinate frame in NED coordinates. Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
 type LocalPositionNedSystemGlobalOffset struct {
-	TimeBootMs uint32
-	X          float32
-	Y          float32
-	Z          float32
-	Roll       float32
-	Pitch      float32
-	Yaw        float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	X          float32 // X Position
+	Y          float32 // Y Position
+	Z          float32 // Z Position
+	Roll       float32 // Roll
+	Pitch      float32 // Pitch
+	Yaw        float32 // Yaw
 }
 
 func (self *LocalPositionNedSystemGlobalOffset) MsgID() uint8 {
@@ -1887,22 +1887,22 @@ func (self *LocalPositionNedSystemGlobalOffset) MsgSize() uint8 {
 
 // DEPRECATED PACKET! Suffers from missing airspeed fields and singularities due to Euler angles. Please use HIL_STATE_QUATERNION instead. Sent from simulation to autopilot. This packet is useful for high throughput applications such as hardware in the loop simulations.
 type HilState struct {
-	TimeUsec   uint64
-	Roll       float32
-	Pitch      float32
-	Yaw        float32
-	Rollspeed  float32
-	Pitchspeed float32
-	Yawspeed   float32
-	Lat        int32
-	Lon        int32
-	Alt        int32
-	Vx         int16
-	Vy         int16
-	Vz         int16
-	Xacc       int16
-	Yacc       int16
-	Zacc       int16
+	TimeUsec   uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	Roll       float32 // Roll angle (rad)
+	Pitch      float32 // Pitch angle (rad)
+	Yaw        float32 // Yaw angle (rad)
+	Rollspeed  float32 // Body frame roll / phi angular speed (rad/s)
+	Pitchspeed float32 // Body frame pitch / theta angular speed (rad/s)
+	Yawspeed   float32 // Body frame yaw / psi angular speed (rad/s)
+	Lat        int32   // Latitude, expressed as * 1E7
+	Lon        int32   // Longitude, expressed as * 1E7
+	Alt        int32   // Altitude in meters, expressed as * 1000 (millimeters)
+	Vx         int16   // Ground X Speed (Latitude), expressed as m/s * 100
+	Vy         int16   // Ground Y Speed (Longitude), expressed as m/s * 100
+	Vz         int16   // Ground Z Speed (Altitude), expressed as m/s * 100
+	Xacc       int16   // X acceleration (mg)
+	Yacc       int16   // Y acceleration (mg)
+	Zacc       int16   // Z acceleration (mg)
 }
 
 func (self *HilState) MsgID() uint8 {
@@ -1919,17 +1919,17 @@ func (self *HilState) MsgSize() uint8 {
 
 // Sent from autopilot to simulation. Hardware in the loop control outputs
 type HilControls struct {
-	TimeUsec      uint64
-	RollAilerons  float32
-	PitchElevator float32
-	YawRudder     float32
-	Throttle      float32
-	Aux1          float32
-	Aux2          float32
-	Aux3          float32
-	Aux4          float32
-	Mode          uint8
-	NavMode       uint8
+	TimeUsec      uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	RollAilerons  float32 // Control output -1 .. 1
+	PitchElevator float32 // Control output -1 .. 1
+	YawRudder     float32 // Control output -1 .. 1
+	Throttle      float32 // Throttle 0 .. 1
+	Aux1          float32 // Aux 1, -1 .. 1
+	Aux2          float32 // Aux 2, -1 .. 1
+	Aux3          float32 // Aux 3, -1 .. 1
+	Aux4          float32 // Aux 4, -1 .. 1
+	Mode          uint8   // System mode (MAV_MODE)
+	NavMode       uint8   // Navigation mode (MAV_NAV_MODE)
 }
 
 func (self *HilControls) MsgID() uint8 {
@@ -1946,20 +1946,20 @@ func (self *HilControls) MsgSize() uint8 {
 
 // Sent from simulation to autopilot. The RAW values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 type HilRcInputsRaw struct {
-	TimeUsec  uint64
-	Chan1Raw  uint16
-	Chan2Raw  uint16
-	Chan3Raw  uint16
-	Chan4Raw  uint16
-	Chan5Raw  uint16
-	Chan6Raw  uint16
-	Chan7Raw  uint16
-	Chan8Raw  uint16
-	Chan9Raw  uint16
-	Chan10Raw uint16
-	Chan11Raw uint16
-	Chan12Raw uint16
-	Rssi      uint8
+	TimeUsec  uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	Chan1Raw  uint16 // RC channel 1 value, in microseconds
+	Chan2Raw  uint16 // RC channel 2 value, in microseconds
+	Chan3Raw  uint16 // RC channel 3 value, in microseconds
+	Chan4Raw  uint16 // RC channel 4 value, in microseconds
+	Chan5Raw  uint16 // RC channel 5 value, in microseconds
+	Chan6Raw  uint16 // RC channel 6 value, in microseconds
+	Chan7Raw  uint16 // RC channel 7 value, in microseconds
+	Chan8Raw  uint16 // RC channel 8 value, in microseconds
+	Chan9Raw  uint16 // RC channel 9 value, in microseconds
+	Chan10Raw uint16 // RC channel 10 value, in microseconds
+	Chan11Raw uint16 // RC channel 11 value, in microseconds
+	Chan12Raw uint16 // RC channel 12 value, in microseconds
+	Rssi      uint8  // Receive signal strength indicator, 0: 0%, 255: 100%
 }
 
 func (self *HilRcInputsRaw) MsgID() uint8 {
@@ -1976,14 +1976,14 @@ func (self *HilRcInputsRaw) MsgSize() uint8 {
 
 // Optical flow from a flow sensor (e.g. optical mouse sensor)
 type OpticalFlow struct {
-	TimeUsec       uint64
-	SensorId       uint8
-	FlowX          int16
-	FlowY          int16
-	FlowCompMX     float32
-	FlowCompMY     float32
-	Quality        uint8
-	GroundDistance float32
+	TimeUsec       uint64  // Timestamp (UNIX)
+	SensorId       uint8   // Sensor ID
+	FlowX          int16   // Flow in pixels * 10 in x-sensor direction (dezi-pixels)
+	FlowY          int16   // Flow in pixels * 10 in y-sensor direction (dezi-pixels)
+	FlowCompMX     float32 // Flow in meters in x-sensor direction, angular-speed compensated
+	FlowCompMY     float32 // Flow in meters in y-sensor direction, angular-speed compensated
+	Quality        uint8   // Optical flow quality / confidence. 0: bad, 255: maximum quality
+	GroundDistance float32 // Ground distance in meters. Positive value: distance known. Negative value: Unknown distance
 }
 
 func (self *OpticalFlow) MsgID() uint8 {
@@ -2000,13 +2000,13 @@ func (self *OpticalFlow) MsgSize() uint8 {
 
 //
 type GlobalVisionPositionEstimate struct {
-	Usec  uint64
-	X     float32
-	Y     float32
-	Z     float32
-	Roll  float32
-	Pitch float32
-	Yaw   float32
+	Usec  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	X     float32 // Global X position
+	Y     float32 // Global Y position
+	Z     float32 // Global Z position
+	Roll  float32 // Roll angle in rad
+	Pitch float32 // Pitch angle in rad
+	Yaw   float32 // Yaw angle in rad
 }
 
 func (self *GlobalVisionPositionEstimate) MsgID() uint8 {
@@ -2023,13 +2023,13 @@ func (self *GlobalVisionPositionEstimate) MsgSize() uint8 {
 
 //
 type VisionPositionEstimate struct {
-	Usec  uint64
-	X     float32
-	Y     float32
-	Z     float32
-	Roll  float32
-	Pitch float32
-	Yaw   float32
+	Usec  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	X     float32 // Global X position
+	Y     float32 // Global Y position
+	Z     float32 // Global Z position
+	Roll  float32 // Roll angle in rad
+	Pitch float32 // Pitch angle in rad
+	Yaw   float32 // Yaw angle in rad
 }
 
 func (self *VisionPositionEstimate) MsgID() uint8 {
@@ -2046,10 +2046,10 @@ func (self *VisionPositionEstimate) MsgSize() uint8 {
 
 //
 type VisionSpeedEstimate struct {
-	Usec uint64
-	X    float32
-	Y    float32
-	Z    float32
+	Usec uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	X    float32 // Global X speed
+	Y    float32 // Global Y speed
+	Z    float32 // Global Z speed
 }
 
 func (self *VisionSpeedEstimate) MsgID() uint8 {
@@ -2066,13 +2066,13 @@ func (self *VisionSpeedEstimate) MsgSize() uint8 {
 
 //
 type ViconPositionEstimate struct {
-	Usec  uint64
-	X     float32
-	Y     float32
-	Z     float32
-	Roll  float32
-	Pitch float32
-	Yaw   float32
+	Usec  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	X     float32 // Global X position
+	Y     float32 // Global Y position
+	Z     float32 // Global Z position
+	Roll  float32 // Roll angle in rad
+	Pitch float32 // Pitch angle in rad
+	Yaw   float32 // Yaw angle in rad
 }
 
 func (self *ViconPositionEstimate) MsgID() uint8 {
@@ -2089,21 +2089,21 @@ func (self *ViconPositionEstimate) MsgSize() uint8 {
 
 // The IMU readings in SI units in NED body frame
 type HighresImu struct {
-	TimeUsec      uint64
-	Xacc          float32
-	Yacc          float32
-	Zacc          float32
-	Xgyro         float32
-	Ygyro         float32
-	Zgyro         float32
-	Xmag          float32
-	Ymag          float32
-	Zmag          float32
-	AbsPressure   float32
-	DiffPressure  float32
-	PressureAlt   float32
-	Temperature   float32
-	FieldsUpdated uint16
+	TimeUsec      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	Xacc          float32 // X acceleration (m/s^2)
+	Yacc          float32 // Y acceleration (m/s^2)
+	Zacc          float32 // Z acceleration (m/s^2)
+	Xgyro         float32 // Angular speed around X axis (rad / sec)
+	Ygyro         float32 // Angular speed around Y axis (rad / sec)
+	Zgyro         float32 // Angular speed around Z axis (rad / sec)
+	Xmag          float32 // X Magnetic field (Gauss)
+	Ymag          float32 // Y Magnetic field (Gauss)
+	Zmag          float32 // Z Magnetic field (Gauss)
+	AbsPressure   float32 // Absolute pressure in millibar
+	DiffPressure  float32 // Differential pressure in millibar
+	PressureAlt   float32 // Altitude calculated from pressure
+	Temperature   float32 // Temperature in degrees celsius
+	FieldsUpdated uint16  // Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature
 }
 
 func (self *HighresImu) MsgID() uint8 {
@@ -2120,18 +2120,18 @@ func (self *HighresImu) MsgSize() uint8 {
 
 // Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)
 type OpticalFlowRad struct {
-	TimeUsec            uint64
-	SensorId            uint8
-	IntegrationTimeUs   uint32
-	IntegratedX         float32
-	IntegratedY         float32
-	IntegratedXgyro     float32
-	IntegratedYgyro     float32
-	IntegratedZgyro     float32
-	Temperature         int16
-	Quality             uint8
-	TimeDeltaDistanceUs uint32
-	Distance            float32
+	TimeUsec            uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	SensorId            uint8   // Sensor ID
+	IntegrationTimeUs   uint32  // Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.
+	IntegratedX         float32 // Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)
+	IntegratedY         float32 // Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)
+	IntegratedXgyro     float32 // RH rotation around X axis (rad)
+	IntegratedYgyro     float32 // RH rotation around Y axis (rad)
+	IntegratedZgyro     float32 // RH rotation around Z axis (rad)
+	Temperature         int16   // Temperature * 100 in centi-degrees Celsius
+	Quality             uint8   // Optical flow quality / confidence. 0: no valid flow, 255: maximum quality
+	TimeDeltaDistanceUs uint32  // Time in microseconds since the distance was sampled.
+	Distance            float32 // Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.
 }
 
 func (self *OpticalFlowRad) MsgID() uint8 {
@@ -2148,21 +2148,21 @@ func (self *OpticalFlowRad) MsgSize() uint8 {
 
 // The IMU readings in SI units in NED body frame
 type HilSensor struct {
-	TimeUsec      uint64
-	Xacc          float32
-	Yacc          float32
-	Zacc          float32
-	Xgyro         float32
-	Ygyro         float32
-	Zgyro         float32
-	Xmag          float32
-	Ymag          float32
-	Zmag          float32
-	AbsPressure   float32
-	DiffPressure  float32
-	PressureAlt   float32
-	Temperature   float32
-	FieldsUpdated uint32
+	TimeUsec      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	Xacc          float32 // X acceleration (m/s^2)
+	Yacc          float32 // Y acceleration (m/s^2)
+	Zacc          float32 // Z acceleration (m/s^2)
+	Xgyro         float32 // Angular speed around X axis in body frame (rad / sec)
+	Ygyro         float32 // Angular speed around Y axis in body frame (rad / sec)
+	Zgyro         float32 // Angular speed around Z axis in body frame (rad / sec)
+	Xmag          float32 // X Magnetic field (Gauss)
+	Ymag          float32 // Y Magnetic field (Gauss)
+	Zmag          float32 // Z Magnetic field (Gauss)
+	AbsPressure   float32 // Absolute pressure in millibar
+	DiffPressure  float32 // Differential pressure (airspeed) in millibar
+	PressureAlt   float32 // Altitude calculated from pressure
+	Temperature   float32 // Temperature in degrees celsius
+	FieldsUpdated uint32  // Bitmask for fields that have updated since last message, bit 0 = xacc, bit 12: temperature
 }
 
 func (self *HilSensor) MsgID() uint8 {
@@ -2179,27 +2179,27 @@ func (self *HilSensor) MsgSize() uint8 {
 
 // Status of simulation environment, if used
 type SimState struct {
-	Q1         float32
-	Q2         float32
-	Q3         float32
-	Q4         float32
-	Roll       float32
-	Pitch      float32
-	Yaw        float32
-	Xacc       float32
-	Yacc       float32
-	Zacc       float32
-	Xgyro      float32
-	Ygyro      float32
-	Zgyro      float32
-	Lat        float32
-	Lon        float32
-	Alt        float32
-	StdDevHorz float32
-	StdDevVert float32
-	Vn         float32
-	Ve         float32
-	Vd         float32
+	Q1         float32 // True attitude quaternion component 1, w (1 in null-rotation)
+	Q2         float32 // True attitude quaternion component 2, x (0 in null-rotation)
+	Q3         float32 // True attitude quaternion component 3, y (0 in null-rotation)
+	Q4         float32 // True attitude quaternion component 4, z (0 in null-rotation)
+	Roll       float32 // Attitude roll expressed as Euler angles, not recommended except for human-readable outputs
+	Pitch      float32 // Attitude pitch expressed as Euler angles, not recommended except for human-readable outputs
+	Yaw        float32 // Attitude yaw expressed as Euler angles, not recommended except for human-readable outputs
+	Xacc       float32 // X acceleration m/s/s
+	Yacc       float32 // Y acceleration m/s/s
+	Zacc       float32 // Z acceleration m/s/s
+	Xgyro      float32 // Angular speed around X axis rad/s
+	Ygyro      float32 // Angular speed around Y axis rad/s
+	Zgyro      float32 // Angular speed around Z axis rad/s
+	Lat        float32 // Latitude in degrees
+	Lon        float32 // Longitude in degrees
+	Alt        float32 // Altitude in meters
+	StdDevHorz float32 // Horizontal position standard deviation
+	StdDevVert float32 // Vertical position standard deviation
+	Vn         float32 // True velocity in m/s in NORTH direction in earth-fixed NED frame
+	Ve         float32 // True velocity in m/s in EAST direction in earth-fixed NED frame
+	Vd         float32 // True velocity in m/s in DOWN direction in earth-fixed NED frame
 }
 
 func (self *SimState) MsgID() uint8 {
@@ -2216,13 +2216,13 @@ func (self *SimState) MsgSize() uint8 {
 
 // Status generated by radio
 type RadioStatus struct {
-	Rssi     uint8
-	Remrssi  uint8
-	Txbuf    uint8
-	Noise    uint8
-	Remnoise uint8
-	Rxerrors uint16
-	Fixed    uint16
+	Rssi     uint8  // local signal strength
+	Remrssi  uint8  // remote signal strength
+	Txbuf    uint8  // how full the tx buffer is as a percentage
+	Noise    uint8  // background noise level
+	Remnoise uint8  // remote background noise level
+	Rxerrors uint16 // receive errors
+	Fixed    uint16 // count of error corrected packets
 }
 
 func (self *RadioStatus) MsgID() uint8 {
@@ -2239,10 +2239,10 @@ func (self *RadioStatus) MsgSize() uint8 {
 
 // File transfer message
 type FileTransferProtocol struct {
-	TargetNetwork   uint8
-	TargetSystem    uint8
-	TargetComponent uint8
-	Payload         [251]uint8
+	TargetNetwork   uint8      // Network ID (0 for broadcast)
+	TargetSystem    uint8      // System ID (0 for broadcast)
+	TargetComponent uint8      // Component ID (0 for broadcast)
+	Payload         [251]uint8 // Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.
 }
 
 func (self *FileTransferProtocol) MsgID() uint8 {
@@ -2259,8 +2259,8 @@ func (self *FileTransferProtocol) MsgSize() uint8 {
 
 // Time synchronization message.
 type Timesync struct {
-	Tc1 int64
-	Ts1 int64
+	Tc1 int64 // Time sync timestamp 1
+	Ts1 int64 // Time sync timestamp 2
 }
 
 func (self *Timesync) MsgID() uint8 {
@@ -2278,19 +2278,19 @@ func (self *Timesync) MsgSize() uint8 {
 // The global position, as returned by the Global Positioning System (GPS). This is
 //                  NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
 type HilGps struct {
-	TimeUsec          uint64
-	FixType           uint8
-	Lat               int32
-	Lon               int32
-	Alt               int32
-	Eph               uint16
-	Epv               uint16
-	Vel               uint16
-	Vn                int16
-	Ve                int16
-	Vd                int16
-	Cog               uint16
-	SatellitesVisible uint8
+	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	FixType           uint8  // 0-1: no fix, 2: 2D fix, 3: 3D fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+	Lat               int32  // Latitude (WGS84), in degrees * 1E7
+	Lon               int32  // Longitude (WGS84), in degrees * 1E7
+	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: 65535
+	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: 65535
+	Vel               uint16 // GPS ground speed (m/s * 100). If unknown, set to: 65535
+	Vn                int16  // GPS velocity in cm/s in NORTH direction in earth-fixed NED frame
+	Ve                int16  // GPS velocity in cm/s in EAST direction in earth-fixed NED frame
+	Vd                int16  // GPS velocity in cm/s in DOWN direction in earth-fixed NED frame
+	Cog               uint16 // Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: 65535
+	SatellitesVisible uint8  // Number of satellites visible. If unknown, set to 255
 }
 
 func (self *HilGps) MsgID() uint8 {
@@ -2307,18 +2307,18 @@ func (self *HilGps) MsgSize() uint8 {
 
 // Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)
 type HilOpticalFlow struct {
-	TimeUsec            uint64
-	SensorId            uint8
-	IntegrationTimeUs   uint32
-	IntegratedX         float32
-	IntegratedY         float32
-	IntegratedXgyro     float32
-	IntegratedYgyro     float32
-	IntegratedZgyro     float32
-	Temperature         int16
-	Quality             uint8
-	TimeDeltaDistanceUs uint32
-	Distance            float32
+	TimeUsec            uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
+	SensorId            uint8   // Sensor ID
+	IntegrationTimeUs   uint32  // Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.
+	IntegratedX         float32 // Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)
+	IntegratedY         float32 // Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)
+	IntegratedXgyro     float32 // RH rotation around X axis (rad)
+	IntegratedYgyro     float32 // RH rotation around Y axis (rad)
+	IntegratedZgyro     float32 // RH rotation around Z axis (rad)
+	Temperature         int16   // Temperature * 100 in centi-degrees Celsius
+	Quality             uint8   // Optical flow quality / confidence. 0: no valid flow, 255: maximum quality
+	TimeDeltaDistanceUs uint32  // Time in microseconds since the distance was sampled.
+	Distance            float32 // Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.
 }
 
 func (self *HilOpticalFlow) MsgID() uint8 {
@@ -2335,22 +2335,22 @@ func (self *HilOpticalFlow) MsgSize() uint8 {
 
 // Sent from simulation to autopilot, avoids in contrast to HIL_STATE singularities. This packet is useful for high throughput applications such as hardware in the loop simulations.
 type HilStateQuaternion struct {
-	TimeUsec           uint64
-	AttitudeQuaternion [4]float32
-	Rollspeed          float32
-	Pitchspeed         float32
-	Yawspeed           float32
-	Lat                int32
-	Lon                int32
-	Alt                int32
-	Vx                 int16
-	Vy                 int16
-	Vz                 int16
-	IndAirspeed        uint16
-	TrueAirspeed       uint16
-	Xacc               int16
-	Yacc               int16
-	Zacc               int16
+	TimeUsec           uint64     // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	AttitudeQuaternion [4]float32 // Vehicle attitude expressed as normalized quaternion in w, x, y, z order (with 1 0 0 0 being the null-rotation)
+	Rollspeed          float32    // Body frame roll / phi angular speed (rad/s)
+	Pitchspeed         float32    // Body frame pitch / theta angular speed (rad/s)
+	Yawspeed           float32    // Body frame yaw / psi angular speed (rad/s)
+	Lat                int32      // Latitude, expressed as * 1E7
+	Lon                int32      // Longitude, expressed as * 1E7
+	Alt                int32      // Altitude in meters, expressed as * 1000 (millimeters)
+	Vx                 int16      // Ground X Speed (Latitude), expressed as m/s * 100
+	Vy                 int16      // Ground Y Speed (Longitude), expressed as m/s * 100
+	Vz                 int16      // Ground Z Speed (Altitude), expressed as m/s * 100
+	IndAirspeed        uint16     // Indicated airspeed, expressed as m/s * 100
+	TrueAirspeed       uint16     // True airspeed, expressed as m/s * 100
+	Xacc               int16      // X acceleration (mg)
+	Yacc               int16      // Y acceleration (mg)
+	Zacc               int16      // Z acceleration (mg)
 }
 
 func (self *HilStateQuaternion) MsgID() uint8 {
@@ -2367,16 +2367,16 @@ func (self *HilStateQuaternion) MsgSize() uint8 {
 
 // The RAW IMU readings for secondary 9DOF sensor setup. This message should contain the scaled values to the described units
 type ScaledImu2 struct {
-	TimeBootMs uint32
-	Xacc       int16
-	Yacc       int16
-	Zacc       int16
-	Xgyro      int16
-	Ygyro      int16
-	Zgyro      int16
-	Xmag       int16
-	Ymag       int16
-	Zmag       int16
+	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
+	Xacc       int16  // X acceleration (mg)
+	Yacc       int16  // Y acceleration (mg)
+	Zacc       int16  // Z acceleration (mg)
+	Xgyro      int16  // Angular speed around X axis (millirad /sec)
+	Ygyro      int16  // Angular speed around Y axis (millirad /sec)
+	Zgyro      int16  // Angular speed around Z axis (millirad /sec)
+	Xmag       int16  // X Magnetic field (milli tesla)
+	Ymag       int16  // Y Magnetic field (milli tesla)
+	Zmag       int16  // Z Magnetic field (milli tesla)
 }
 
 func (self *ScaledImu2) MsgID() uint8 {
@@ -2393,10 +2393,10 @@ func (self *ScaledImu2) MsgSize() uint8 {
 
 // Request a list of available logs. On some systems calling this may stop on-board logging until LOG_REQUEST_END is called.
 type LogRequestList struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Start           uint16
-	End             uint16
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Start           uint16 // First log id (0 for first available)
+	End             uint16 // Last log id (0xffff for last available)
 }
 
 func (self *LogRequestList) MsgID() uint8 {
@@ -2413,11 +2413,11 @@ func (self *LogRequestList) MsgSize() uint8 {
 
 // Reply to LOG_REQUEST_LIST
 type LogEntry struct {
-	Id         uint16
-	NumLogs    uint16
-	LastLogNum uint16
-	TimeUtc    uint32
-	Size       uint32
+	Id         uint16 // Log id
+	NumLogs    uint16 // Total number of logs
+	LastLogNum uint16 // High log number
+	TimeUtc    uint32 // UTC timestamp of log in seconds since 1970, or 0 if not available
+	Size       uint32 // Size of the log (may be approximate) in bytes
 }
 
 func (self *LogEntry) MsgID() uint8 {
@@ -2434,11 +2434,11 @@ func (self *LogEntry) MsgSize() uint8 {
 
 // Request a chunk of a log
 type LogRequestData struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Id              uint16
-	Ofs             uint32
-	Count           uint32
+	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Id              uint16 // Log id (from LOG_ENTRY reply)
+	Ofs             uint32 // Offset into the log
+	Count           uint32 // Number of bytes
 }
 
 func (self *LogRequestData) MsgID() uint8 {
@@ -2455,10 +2455,10 @@ func (self *LogRequestData) MsgSize() uint8 {
 
 // Reply to LOG_REQUEST_DATA
 type LogData struct {
-	Id    uint16
-	Ofs   uint32
-	Count uint8
-	Data  [90]uint8
+	Id    uint16    // Log id (from LOG_ENTRY reply)
+	Ofs   uint32    // Offset into the log
+	Count uint8     // Number of bytes (zero for end of log)
+	Data  [90]uint8 // log data
 }
 
 func (self *LogData) MsgID() uint8 {
@@ -2475,8 +2475,8 @@ func (self *LogData) MsgSize() uint8 {
 
 // Erase all logs
 type LogErase struct {
-	TargetSystem    uint8
-	TargetComponent uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *LogErase) MsgID() uint8 {
@@ -2493,8 +2493,8 @@ func (self *LogErase) MsgSize() uint8 {
 
 // Stop log transfer and resume normal logging
 type LogRequestEnd struct {
-	TargetSystem    uint8
-	TargetComponent uint8
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *LogRequestEnd) MsgID() uint8 {
@@ -2511,10 +2511,10 @@ func (self *LogRequestEnd) MsgSize() uint8 {
 
 // data for injecting into the onboard GPS (used for DGPS)
 type GpsInjectData struct {
-	TargetSystem    uint8
-	TargetComponent uint8
-	Len             uint8
-	Data            [110]uint8
+	TargetSystem    uint8      // System ID
+	TargetComponent uint8      // Component ID
+	Len             uint8      // data length
+	Data            [110]uint8 // raw data (110 is enough for 12 satellites of RTCMv2)
 }
 
 func (self *GpsInjectData) MsgID() uint8 {
@@ -2531,18 +2531,18 @@ func (self *GpsInjectData) MsgSize() uint8 {
 
 // Second GPS data. Coordinate frame is right-handed, Z-axis up (GPS frame).
 type Gps2Raw struct {
-	TimeUsec          uint64
-	FixType           uint8
-	Lat               int32
-	Lon               int32
-	Alt               int32
-	Eph               uint16
-	Epv               uint16
-	Vel               uint16
-	Cog               uint16
-	SatellitesVisible uint8
-	DgpsNumch         uint8
-	DgpsAge           uint32
+	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+	FixType           uint8  // 0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS fix, 5: RTK Fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+	Lat               int32  // Latitude (WGS84), in degrees * 1E7
+	Lon               int32  // Longitude (WGS84), in degrees * 1E7
+	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+	Vel               uint16 // GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
+	Cog               uint16 // Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
+	SatellitesVisible uint8  // Number of satellites visible. If unknown, set to 255
+	DgpsNumch         uint8  // Number of DGPS satellites
+	DgpsAge           uint32 // Age of DGPS info
 }
 
 func (self *Gps2Raw) MsgID() uint8 {
@@ -2559,9 +2559,9 @@ func (self *Gps2Raw) MsgSize() uint8 {
 
 // Power supply status
 type PowerStatus struct {
-	Vcc    uint16
-	Vservo uint16
-	Flags  uint16
+	Vcc    uint16 // 5V rail voltage in millivolts
+	Vservo uint16 // servo rail voltage in millivolts
+	Flags  uint16 // power supply status flags (see MAV_POWER_STATUS enum)
 }
 
 func (self *PowerStatus) MsgID() uint8 {
@@ -2578,12 +2578,12 @@ func (self *PowerStatus) MsgSize() uint8 {
 
 // Control a serial port. This can be used for raw access to an onboard serial peripheral such as a GPS or telemetry radio. It is designed to make it possible to update the devices firmware via MAVLink messages or change the devices settings. A message with zero bytes can be used to change just the baudrate.
 type SerialControl struct {
-	Device   uint8
-	Flags    uint8
-	Timeout  uint16
-	Baudrate uint32
-	Count    uint8
-	Data     [70]uint8
+	Device   uint8     // See SERIAL_CONTROL_DEV enum
+	Flags    uint8     // See SERIAL_CONTROL_FLAG enum
+	Timeout  uint16    // Timeout for reply data in milliseconds
+	Baudrate uint32    // Baudrate of transfer. Zero means no change.
+	Count    uint8     // how many bytes in this transfer
+	Data     [70]uint8 // serial data
 }
 
 func (self *SerialControl) MsgID() uint8 {
@@ -2600,19 +2600,19 @@ func (self *SerialControl) MsgSize() uint8 {
 
 // RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
 type GpsRtk struct {
-	TimeLastBaselineMs uint32
-	RtkReceiverId      uint8
-	Wn                 uint16
-	Tow                uint32
-	RtkHealth          uint8
-	RtkRate            uint8
-	Nsats              uint8
-	BaselineCoordsType uint8
-	BaselineAMm        int32
-	BaselineBMm        int32
-	BaselineCMm        int32
-	Accuracy           uint32
-	IarNumHypotheses   int32
+	TimeLastBaselineMs uint32 // Time since boot of last baseline message received in ms.
+	RtkReceiverId      uint8  // Identification of connected RTK receiver.
+	Wn                 uint16 // GPS Week Number of last baseline
+	Tow                uint32 // GPS Time of Week of last baseline
+	RtkHealth          uint8  // GPS-specific health report for RTK data.
+	RtkRate            uint8  // Rate of baseline messages being received by GPS, in HZ
+	Nsats              uint8  // Current number of sats used for RTK calculation.
+	BaselineCoordsType uint8  // Coordinate system of baseline. 0 == ECEF, 1 == NED
+	BaselineAMm        int32  // Current baseline in ECEF x or NED north component in mm.
+	BaselineBMm        int32  // Current baseline in ECEF y or NED east component in mm.
+	BaselineCMm        int32  // Current baseline in ECEF z or NED down component in mm.
+	Accuracy           uint32 // Current estimate of baseline accuracy.
+	IarNumHypotheses   int32  // Current number of integer ambiguity hypotheses.
 }
 
 func (self *GpsRtk) MsgID() uint8 {
@@ -2629,19 +2629,19 @@ func (self *GpsRtk) MsgSize() uint8 {
 
 // RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
 type Gps2Rtk struct {
-	TimeLastBaselineMs uint32
-	RtkReceiverId      uint8
-	Wn                 uint16
-	Tow                uint32
-	RtkHealth          uint8
-	RtkRate            uint8
-	Nsats              uint8
-	BaselineCoordsType uint8
-	BaselineAMm        int32
-	BaselineBMm        int32
-	BaselineCMm        int32
-	Accuracy           uint32
-	IarNumHypotheses   int32
+	TimeLastBaselineMs uint32 // Time since boot of last baseline message received in ms.
+	RtkReceiverId      uint8  // Identification of connected RTK receiver.
+	Wn                 uint16 // GPS Week Number of last baseline
+	Tow                uint32 // GPS Time of Week of last baseline
+	RtkHealth          uint8  // GPS-specific health report for RTK data.
+	RtkRate            uint8  // Rate of baseline messages being received by GPS, in HZ
+	Nsats              uint8  // Current number of sats used for RTK calculation.
+	BaselineCoordsType uint8  // Coordinate system of baseline. 0 == ECEF, 1 == NED
+	BaselineAMm        int32  // Current baseline in ECEF x or NED north component in mm.
+	BaselineBMm        int32  // Current baseline in ECEF y or NED east component in mm.
+	BaselineCMm        int32  // Current baseline in ECEF z or NED down component in mm.
+	Accuracy           uint32 // Current estimate of baseline accuracy.
+	IarNumHypotheses   int32  // Current number of integer ambiguity hypotheses.
 }
 
 func (self *Gps2Rtk) MsgID() uint8 {
@@ -2658,13 +2658,13 @@ func (self *Gps2Rtk) MsgSize() uint8 {
 
 //
 type DataTransmissionHandshake struct {
-	Type       uint8
-	Size       uint32
-	Width      uint16
-	Height     uint16
-	Packets    uint16
-	Payload    uint8
-	JpgQuality uint8
+	Type       uint8  // type of requested/acknowledged data (as defined in ENUM DATA_TYPES in mavlink/include/mavlink_types.h)
+	Size       uint32 // total data size in bytes (set on ACK only)
+	Width      uint16 // Width of a matrix or image
+	Height     uint16 // Height of a matrix or image
+	Packets    uint16 // number of packets beeing sent (set on ACK only)
+	Payload    uint8  // payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only)
+	JpgQuality uint8  // JPEG quality out of [1,100]
 }
 
 func (self *DataTransmissionHandshake) MsgID() uint8 {
@@ -2681,8 +2681,8 @@ func (self *DataTransmissionHandshake) MsgSize() uint8 {
 
 //
 type EncapsulatedData struct {
-	Seqnr uint16
-	Data  [253]uint8
+	Seqnr uint16     // sequence number (starting with 0 on every transmission)
+	Data  [253]uint8 // image data bytes
 }
 
 func (self *EncapsulatedData) MsgID() uint8 {
@@ -2699,14 +2699,14 @@ func (self *EncapsulatedData) MsgSize() uint8 {
 
 //
 type DistanceSensor struct {
-	TimeBootMs      uint32
-	MinDistance     uint16
-	MaxDistance     uint16
-	CurrentDistance uint16
-	Type            uint8
-	Id              uint8
-	Orientation     uint8
-	Covariance      uint8
+	TimeBootMs      uint32 // Time since system boot
+	MinDistance     uint16 // Minimum distance the sensor can measure in centimeters
+	MaxDistance     uint16 // Maximum distance the sensor can measure in centimeters
+	CurrentDistance uint16 // Current distance reading
+	Type            uint8  // Type from MAV_DISTANCE_SENSOR enum.
+	Id              uint8  // Onboard ID of the sensor
+	Orientation     uint8  // Direction the sensor faces from FIXME enum.
+	Covariance      uint8  // Measurement covariance in centimeters, 0 for unknown / invalid readings
 }
 
 func (self *DistanceSensor) MsgID() uint8 {
@@ -2723,10 +2723,10 @@ func (self *DistanceSensor) MsgSize() uint8 {
 
 // Request for terrain data and terrain status
 type TerrainRequest struct {
-	Lat         int32
-	Lon         int32
-	GridSpacing uint16
-	Mask        uint64
+	Lat         int32  // Latitude of SW corner of first grid (degrees *10^7)
+	Lon         int32  // Longitude of SW corner of first grid (in degrees *10^7)
+	GridSpacing uint16 // Grid spacing in meters
+	Mask        uint64 // Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
 }
 
 func (self *TerrainRequest) MsgID() uint8 {
@@ -2743,11 +2743,11 @@ func (self *TerrainRequest) MsgSize() uint8 {
 
 // Terrain data sent from GCS. The lat/lon and grid_spacing must be the same as a lat/lon from a TERRAIN_REQUEST
 type TerrainData struct {
-	Lat         int32
-	Lon         int32
-	GridSpacing uint16
-	Gridbit     uint8
-	Data        [16]int16
+	Lat         int32     // Latitude of SW corner of first grid (degrees *10^7)
+	Lon         int32     // Longitude of SW corner of first grid (in degrees *10^7)
+	GridSpacing uint16    // Grid spacing in meters
+	Gridbit     uint8     // bit within the terrain request mask
+	Data        [16]int16 // Terrain data in meters AMSL
 }
 
 func (self *TerrainData) MsgID() uint8 {
@@ -2764,8 +2764,8 @@ func (self *TerrainData) MsgSize() uint8 {
 
 // Request that the vehicle report terrain height at the given location. Used by GCS to check if vehicle has all terrain data needed for a mission.
 type TerrainCheck struct {
-	Lat int32
-	Lon int32
+	Lat int32 // Latitude (degrees *10^7)
+	Lon int32 // Longitude (degrees *10^7)
 }
 
 func (self *TerrainCheck) MsgID() uint8 {
@@ -2782,13 +2782,13 @@ func (self *TerrainCheck) MsgSize() uint8 {
 
 // Response from a TERRAIN_CHECK request
 type TerrainReport struct {
-	Lat           int32
-	Lon           int32
-	Spacing       uint16
-	TerrainHeight float32
-	CurrentHeight float32
-	Pending       uint16
-	Loaded        uint16
+	Lat           int32   // Latitude (degrees *10^7)
+	Lon           int32   // Longitude (degrees *10^7)
+	Spacing       uint16  // grid spacing (zero if terrain at this location unavailable)
+	TerrainHeight float32 // Terrain height in meters AMSL
+	CurrentHeight float32 // Current vehicle height above lat/lon terrain height (meters)
+	Pending       uint16  // Number of 4x4 terrain blocks waiting to be received or read from disk
+	Loaded        uint16  // Number of 4x4 terrain blocks in memory
 }
 
 func (self *TerrainReport) MsgID() uint8 {
@@ -2805,15 +2805,15 @@ func (self *TerrainReport) MsgSize() uint8 {
 
 // Battery information
 type BatteryStatus struct {
-	Id               uint8
-	BatteryFunction  uint8
-	Type             uint8
-	Temperature      int16
-	Voltages         [10]uint16
-	CurrentBattery   int16
-	CurrentConsumed  int32
-	EnergyConsumed   int32
-	BatteryRemaining int8
+	Id               uint8      // Battery ID
+	BatteryFunction  uint8      // Function of the battery
+	Type             uint8      // Type (chemistry) of the battery
+	Temperature      int16      // Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.
+	Voltages         [10]uint16 // Battery voltage of cells, in millivolts (1 = 1 millivolt)
+	CurrentBattery   int16      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+	CurrentConsumed  int32      // Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
+	EnergyConsumed   int32      // Consumed energy, in 100*Joules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
+	BatteryRemaining int8       // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot does not estimate the remaining battery
 }
 
 func (self *BatteryStatus) MsgID() uint8 {
@@ -2830,9 +2830,9 @@ func (self *BatteryStatus) MsgSize() uint8 {
 
 // Version and capability of autopilot software
 type AutopilotVersion struct {
-	Capabilities  uint64
-	Version       uint32
-	CustomVersion [8]uint8
+	Capabilities  uint64   // bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)
+	Version       uint32   // Firmware version number
+	CustomVersion [8]uint8 // Custom version field, commonly the first 8 bytes (16 characters) of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
 }
 
 func (self *AutopilotVersion) MsgID() uint8 {
@@ -2849,11 +2849,11 @@ func (self *AutopilotVersion) MsgSize() uint8 {
 
 // Message implementing parts of the V2 payload specs in V1 frames for transitional support.
 type V2Extension struct {
-	TargetNetwork   uint8
-	TargetSystem    uint8
-	TargetComponent uint8
-	MessageType     uint16
-	Payload         [249]uint8
+	TargetNetwork   uint8      // Network ID (0 for broadcast)
+	TargetSystem    uint8      // System ID (0 for broadcast)
+	TargetComponent uint8      // Component ID (0 for broadcast)
+	MessageType     uint16     // A code that identifies the software component that understands this message (analogous to usb device classes or mime type strings).  If this code is less than 32768, it is considered a 'registered' protocol extension and the corresponding entry should be added to https://github.com/mavlink/mavlink/extension-message-ids.xml.  Software creators can register blocks of message IDs as needed (useful for GCS specific metadata, etc...). Message_types greater than 32767 are considered local experiments and should not be checked in to any widely distributed codebase.
+	Payload         [249]uint8 // Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.
 }
 
 func (self *V2Extension) MsgID() uint8 {
@@ -2870,10 +2870,10 @@ func (self *V2Extension) MsgSize() uint8 {
 
 // Send raw controller memory. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 type MemoryVect struct {
-	Address uint16
-	Ver     uint8
-	Type    uint8
-	Value   [32]int8
+	Address uint16   // Starting address of the debug variables
+	Ver     uint8    // Version code of the type variable. 0=unknown, type ignored and assumed int16_t. 1=as below
+	Type    uint8    // Type code of the memory variables. for ver = 1: 0=16 x int16_t, 1=16 x uint16_t, 2=16 x Q15, 3=16 x 1Q14
+	Value   [32]int8 // Memory contents at specified address
 }
 
 func (self *MemoryVect) MsgID() uint8 {
@@ -2890,11 +2890,11 @@ func (self *MemoryVect) MsgSize() uint8 {
 
 //
 type DebugVect struct {
-	Name     Char10
-	TimeUsec uint64
-	X        float32
-	Y        float32
-	Z        float32
+	Name     Char10  // Name
+	TimeUsec uint64  // Timestamp
+	X        float32 // x
+	Y        float32 // y
+	Z        float32 // z
 }
 
 func (self *DebugVect) MsgID() uint8 {
@@ -2911,9 +2911,9 @@ func (self *DebugVect) MsgSize() uint8 {
 
 // Send a key-value pair as float. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 type NamedValueFloat struct {
-	TimeBootMs uint32
-	Name       Char10
-	Value      float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	Name       Char10  // Name of the debug variable
+	Value      float32 // Floating point value
 }
 
 func (self *NamedValueFloat) MsgID() uint8 {
@@ -2930,9 +2930,9 @@ func (self *NamedValueFloat) MsgSize() uint8 {
 
 // Send a key-value pair as integer. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 type NamedValueInt struct {
-	TimeBootMs uint32
-	Name       Char10
-	Value      int32
+	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
+	Name       Char10 // Name of the debug variable
+	Value      int32  // Signed integer value
 }
 
 func (self *NamedValueInt) MsgID() uint8 {
@@ -2949,8 +2949,8 @@ func (self *NamedValueInt) MsgSize() uint8 {
 
 // Status text message. These messages are printed in yellow in the COMM console of QGroundControl. WARNING: They consume quite some bandwidth, so use only for important status and error messages. If implemented wisely, these messages are buffered on the MCU and sent only at a limited rate (e.g. 10 Hz).
 type Statustext struct {
-	Severity uint8
-	Text     Char50
+	Severity uint8  // Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
+	Text     Char50 // Status text message, without null termination character
 }
 
 func (self *Statustext) MsgID() uint8 {
@@ -2967,9 +2967,9 @@ func (self *Statustext) MsgSize() uint8 {
 
 // Send a debug value. The index is used to discriminate between values. These values show up in the plot of QGroundControl as DEBUG N.
 type Debug struct {
-	TimeBootMs uint32
-	Ind        uint8
-	Value      float32
+	TimeBootMs uint32  // Timestamp (milliseconds since system boot)
+	Ind        uint8   // index of debug variable
+	Value      float32 // DEBUG value
 }
 
 func (self *Debug) MsgID() uint8 {
