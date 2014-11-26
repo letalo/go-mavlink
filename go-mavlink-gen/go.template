@@ -1,0 +1,52 @@
+package {{.Name}}
+
+////////////////////////////////////////////////////////////////////////////////
+// Enums
+////////////////////////////////////////////////////////////////////////////////
+
+{{range .Enums}}
+// {{.Name}}: {{.Description}}
+const ({{range .Entries}}
+	{{.Name}} = {{.Value}} // {{.Description}}{{end}}
+)
+{{end}}
+
+////////////////////////////////////////////////////////////////////////////////
+// Messages
+////////////////////////////////////////////////////////////////////////////////
+
+{{range .Messages}}
+// {{.Description}}
+type {{.Name}} struct { {{range .Fields}}
+	{{.Name}} {{.Type}}{{end}}
+}
+
+func (self *{{.Name}}) MsgID() uint8 {
+	return {{.ID}}
+}
+
+func (self *{{.Name}}) MsgName() string {
+	return "{{.Name}}"
+}
+
+func (self *{{.Name}}) MsgSize() uint8 {
+	return {{.Size}}
+}
+{{end}}
+
+////////////////////////////////////////////////////////////////////////////////
+// String Helpers
+////////////////////////////////////////////////////////////////////////////////
+
+{{range $size, $_ := .StringSizes}}
+type Char{{print $size}}[{{print $size}}]byte
+
+func (chars *Char{{print $size}}) String() string {
+	i := 0
+	for chars[i] != 0 && i < len(chars) {
+		i++
+	}
+	return string(chars[:i])
+}
+{{end}}
+
