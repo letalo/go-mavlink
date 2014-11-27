@@ -1,3 +1,17 @@
+// MAVLINK_CRC_EXTRA MAVLINK_MESSAGE_CRCS
+// Field reordering
+// Message size calc
+// def message_checksum(msg):
+//     '''calculate a 8-bit checksum of the key fields of a message, so we
+//        can detect incompatible XML changes'''
+//     crc = mavutil.x25crc(msg.name + ' ')
+//     for f in msg.ordered_fields:
+//         crc.accumulate(f.type + ' ')
+//         crc.accumulate(f.name + ' ')
+//         if f.array_length:
+//             crc.accumulate(chr(f.array_length))
+//     return (crc.crc&0xFF) ^ (crc.crc>>8) 
+
 package main
 
 import (
@@ -6,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"go/format"
+	"os"
 	"strconv"
 	"strings"
 	"text/template"
@@ -14,8 +29,9 @@ import (
 )
 
 type Protocol struct {
-	Name        string
-	StringSizes map[int]bool
+	Name             string
+	StringSizes      map[int]bool
+	IncludedProtocol *Protocol
 
 	XMLName  xml.Name  `xml:"mavlink"`
 	Version  string    `xml:"version"`
@@ -24,12 +40,21 @@ type Protocol struct {
 	Messages []Message `xml:"messages>message"`
 }
 
+func (protocol *Protocol) IncludeName() string {
+	return strings.TrimSuffix(strings.ToLower(protocol.Include), ".xml")
+}
+
 func (protocol *Protocol) parse() {
 	protocol.StringSizes = make(map[int]bool)
 
 	err := dry.FileUnmarshallXML(fmt.Sprintf("definitions/%s.xml", protocol.Name), &protocol)
 	if err != nil {
 		panic(err)
+	}
+
+	if protocol.Include != "" {
+		protocol.IncludedProtocol = &Protocol{Name: protocol.IncludeName()}
+		protocol.IncludedProtocol.parse()
 	}
 
 	for i := range protocol.Enums {
@@ -43,7 +68,7 @@ func (protocol *Protocol) parse() {
 
 	for i := range protocol.Messages {
 		message := &protocol.Messages[i]
-		message.Name = dry.StringToUpperCamelCase(message.Name)
+		message.Name = dry.StringToUpperCamelCase(message.NameUpper)
 		message.Description = strings.Replace(message.Description, "\n", "\n// ", -1)
 		// message.Description = strings.Replace(message.Description, "\t", "", -1)
 		for j := range message.Fields {
@@ -54,7 +79,8 @@ func (protocol *Protocol) parse() {
 				"_t", "",
 				"_mavlink_version", "",
 				"char", "byte",
-				"float", "float32")
+				"float", "float32",
+				"double", "float64")
 			if index := strings.IndexByte(field.Type, '['); index != -1 {
 				field.Type = field.Type[index:] + field.Type[:index]
 			}
@@ -87,7 +113,8 @@ type EnumEntryParam struct {
 
 type Message struct {
 	ID          uint8          `xml:"id,attr"`
-	Name        string         `xml:"name,attr"`
+	Name        string         `xml:"-"`
+	NameUpper   string         `xml:"name,attr"`
 	Description string         `xml:"description"`
 	Fields      []MessageField `xml:"field"`
 	Size        int
@@ -104,7 +131,7 @@ func main() {
 		protocol Protocol
 		goFormat bool
 	)
-	flag.StringVar(&protocol.Name, "proto", "pixhawk", "Protocol name. One of the XML definitions.")
+	flag.StringVar(&protocol.Name, "protocol", "common", "Protocol name. One of the XML definitions.")
 	flag.BoolVar(&goFormat, "fmt", true, "Call go fmt on the result file")
 	flag.Parse()
 
@@ -129,7 +156,10 @@ func main() {
 		}
 	}
 
-	goFilename := fmt.Sprintf("../mavlink/%s/%s.go", protocol.Name, protocol.Name)
+	pkgDir := fmt.Sprintf("../mavlink/%s", protocol.Name)
+	goFilename := fmt.Sprintf("%s/%s.go", pkgDir, protocol.Name)
+
+	os.Mkdir(pkgDir, 0770)
 
 	err = dry.FileSetBytes(goFilename, data)
 	if err != nil {

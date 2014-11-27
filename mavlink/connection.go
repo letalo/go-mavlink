@@ -5,14 +5,14 @@ import (
 )
 
 type Connection struct {
-	io.ReadWriteCloser
+	io.ReadWriter
 	localComponentSeq  [256]uint8
 	remoteComponentSeq [256]uint8
 	systemID           uint8
 }
 
-func NewConnection(wrappedConn io.ReadWriteCloser, systemID uint8) *Connection {
-	return &Connection{ReadWriteCloser: wrappedConn, systemID: systemID}
+func NewConnection(wrappedConn io.ReadWriter, systemID uint8) *Connection {
+	return &Connection{ReadWriter: wrappedConn, systemID: systemID}
 }
 
 func (conn *Connection) Send(componentID uint8, message Message) error {
@@ -31,4 +31,11 @@ func (conn *Connection) Receive() (packet *Packet, loss int, err error) {
 		loss = 255 - loss
 	}
 	return packet, loss, nil
+}
+
+func (conn *Connection) Close() error {
+	if closer, ok := conn.ReadWriter.(io.Closer); ok {
+		return closer.Close()
+	}
+	return nil
 }

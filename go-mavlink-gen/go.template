@@ -1,5 +1,25 @@
 package {{.Name}}
 
+import (
+	"github.com/SpaceLeap/go-mavlink/mavlink" {{if .Include}}
+	_ "github.com/SpaceLeap/go-mavlink/mavlink/{{.IncludeName}}"{{end}}
+)
+
+const (
+	PROTOCOL_NAME    = "{{.Name}}"
+	PROTOCOL_VERSION = "{{.Version}}"
+	PROTOCOL_INCLUDE = "{{.Include}}"
+)
+
+func init() {
+	mavlink.ProtocolName = PROTOCOL_NAME
+	mavlink.ProtocolVersion = PROTOCOL_VERSION
+	// mavlink.MessageCRSs = nil
+
+	{{range .Messages}}
+	mavlink.NewMessage[{{.ID}}] = func() mavlink.Message { return new({{.Name}}) }{{end}}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Enums
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +47,10 @@ func (self *{{.Name}}) MsgID() uint8 {
 
 func (self *{{.Name}}) MsgName() string {
 	return "{{.Name}}"
+}
+
+func (self *{{.Name}}) MsgNameUpper() string {
+	return "{{.NameUpper}}"
 }
 
 func (self *{{.Name}}) MsgSize() uint8 {

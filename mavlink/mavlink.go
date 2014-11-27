@@ -2,7 +2,6 @@ package mavlink
 
 import (
 	"encoding/binary"
-	"errors"
 	"io"
 	"log"
 
@@ -18,7 +17,7 @@ const (
 var (
 	ProtocolName    string
 	ProtocolVersion string
-	NewMessage      NewMessageFunc
+	NewMessage      [256]func() Message
 	MessageCRSs     *[256]byte
 )
 
@@ -28,10 +27,6 @@ func Send(writer io.Writer, systemID, componentID, sequence uint8, message Messa
 }
 
 func Receive(reader io.Reader) (*Packet, error) {
-	if NewMessage == nil {
-		return nil, errors.New("No protocol definition imported")
-	}
-
 	var packet Packet
 
 	// Slice bytes are pointer to packet.Header,
@@ -59,7 +54,7 @@ func Receive(reader io.Reader) (*Packet, error) {
 
 	// to do: check component sequence
 
-	msg := NewMessage(packet.Header.MessageID)
+	msg := NewMessage[packet.Header.MessageID]()
 	if msg == nil {
 		return nil, ErrUnknownMessageID(packet.Header.MessageID)
 	}

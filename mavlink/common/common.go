@@ -1,5 +1,130 @@
 package common
 
+import (
+	"github.com/SpaceLeap/go-mavlink/mavlink"
+)
+
+const (
+	PROTOCOL_NAME    = "common"
+	PROTOCOL_VERSION = "3"
+)
+
+func init() {
+	mavlink.ProtocolName = PROTOCOL_NAME
+	mavlink.ProtocolVersion = PROTOCOL_VERSION
+	// mavlink.MessageCRSs = nil
+
+	mavlink.NewMessage[0] = func() mavlink.Message { return new(Heartbeat) }
+	mavlink.NewMessage[1] = func() mavlink.Message { return new(SysStatus) }
+	mavlink.NewMessage[2] = func() mavlink.Message { return new(SystemTime) }
+	mavlink.NewMessage[4] = func() mavlink.Message { return new(Ping) }
+	mavlink.NewMessage[5] = func() mavlink.Message { return new(ChangeOperatorControl) }
+	mavlink.NewMessage[6] = func() mavlink.Message { return new(ChangeOperatorControlAck) }
+	mavlink.NewMessage[7] = func() mavlink.Message { return new(AuthKey) }
+	mavlink.NewMessage[11] = func() mavlink.Message { return new(SetMode) }
+	mavlink.NewMessage[20] = func() mavlink.Message { return new(ParamRequestRead) }
+	mavlink.NewMessage[21] = func() mavlink.Message { return new(ParamRequestList) }
+	mavlink.NewMessage[22] = func() mavlink.Message { return new(ParamValue) }
+	mavlink.NewMessage[23] = func() mavlink.Message { return new(ParamSet) }
+	mavlink.NewMessage[24] = func() mavlink.Message { return new(GpsRawInt) }
+	mavlink.NewMessage[25] = func() mavlink.Message { return new(GpsStatus) }
+	mavlink.NewMessage[26] = func() mavlink.Message { return new(ScaledImu) }
+	mavlink.NewMessage[27] = func() mavlink.Message { return new(RawImu) }
+	mavlink.NewMessage[28] = func() mavlink.Message { return new(RawPressure) }
+	mavlink.NewMessage[29] = func() mavlink.Message { return new(ScaledPressure) }
+	mavlink.NewMessage[30] = func() mavlink.Message { return new(Attitude) }
+	mavlink.NewMessage[31] = func() mavlink.Message { return new(AttitudeQuaternion) }
+	mavlink.NewMessage[32] = func() mavlink.Message { return new(LocalPositionNed) }
+	mavlink.NewMessage[33] = func() mavlink.Message { return new(GlobalPositionInt) }
+	mavlink.NewMessage[34] = func() mavlink.Message { return new(RcChannelsScaled) }
+	mavlink.NewMessage[35] = func() mavlink.Message { return new(RcChannelsRaw) }
+	mavlink.NewMessage[36] = func() mavlink.Message { return new(ServoOutputRaw) }
+	mavlink.NewMessage[37] = func() mavlink.Message { return new(MissionRequestPartialList) }
+	mavlink.NewMessage[38] = func() mavlink.Message { return new(MissionWritePartialList) }
+	mavlink.NewMessage[39] = func() mavlink.Message { return new(MissionItem) }
+	mavlink.NewMessage[40] = func() mavlink.Message { return new(MissionRequest) }
+	mavlink.NewMessage[41] = func() mavlink.Message { return new(MissionSetCurrent) }
+	mavlink.NewMessage[42] = func() mavlink.Message { return new(MissionCurrent) }
+	mavlink.NewMessage[43] = func() mavlink.Message { return new(MissionRequestList) }
+	mavlink.NewMessage[44] = func() mavlink.Message { return new(MissionCount) }
+	mavlink.NewMessage[45] = func() mavlink.Message { return new(MissionClearAll) }
+	mavlink.NewMessage[46] = func() mavlink.Message { return new(MissionItemReached) }
+	mavlink.NewMessage[47] = func() mavlink.Message { return new(MissionAck) }
+	mavlink.NewMessage[48] = func() mavlink.Message { return new(SetGpsGlobalOrigin) }
+	mavlink.NewMessage[49] = func() mavlink.Message { return new(GpsGlobalOrigin) }
+	mavlink.NewMessage[54] = func() mavlink.Message { return new(SafetySetAllowedArea) }
+	mavlink.NewMessage[55] = func() mavlink.Message { return new(SafetyAllowedArea) }
+	mavlink.NewMessage[61] = func() mavlink.Message { return new(AttitudeQuaternionCov) }
+	mavlink.NewMessage[62] = func() mavlink.Message { return new(NavControllerOutput) }
+	mavlink.NewMessage[63] = func() mavlink.Message { return new(GlobalPositionIntCov) }
+	mavlink.NewMessage[64] = func() mavlink.Message { return new(LocalPositionNedCov) }
+	mavlink.NewMessage[65] = func() mavlink.Message { return new(RcChannels) }
+	mavlink.NewMessage[66] = func() mavlink.Message { return new(RequestDataStream) }
+	mavlink.NewMessage[67] = func() mavlink.Message { return new(DataStream) }
+	mavlink.NewMessage[69] = func() mavlink.Message { return new(ManualControl) }
+	mavlink.NewMessage[70] = func() mavlink.Message { return new(RcChannelsOverride) }
+	mavlink.NewMessage[73] = func() mavlink.Message { return new(MissionItemInt) }
+	mavlink.NewMessage[74] = func() mavlink.Message { return new(VfrHud) }
+	mavlink.NewMessage[75] = func() mavlink.Message { return new(CommandInt) }
+	mavlink.NewMessage[76] = func() mavlink.Message { return new(CommandLong) }
+	mavlink.NewMessage[77] = func() mavlink.Message { return new(CommandAck) }
+	mavlink.NewMessage[81] = func() mavlink.Message { return new(ManualSetpoint) }
+	mavlink.NewMessage[82] = func() mavlink.Message { return new(SetAttitudeTarget) }
+	mavlink.NewMessage[83] = func() mavlink.Message { return new(AttitudeTarget) }
+	mavlink.NewMessage[84] = func() mavlink.Message { return new(SetPositionTargetLocalNed) }
+	mavlink.NewMessage[85] = func() mavlink.Message { return new(PositionTargetLocalNed) }
+	mavlink.NewMessage[86] = func() mavlink.Message { return new(SetPositionTargetGlobalInt) }
+	mavlink.NewMessage[87] = func() mavlink.Message { return new(PositionTargetGlobalInt) }
+	mavlink.NewMessage[89] = func() mavlink.Message { return new(LocalPositionNedSystemGlobalOffset) }
+	mavlink.NewMessage[90] = func() mavlink.Message { return new(HilState) }
+	mavlink.NewMessage[91] = func() mavlink.Message { return new(HilControls) }
+	mavlink.NewMessage[92] = func() mavlink.Message { return new(HilRcInputsRaw) }
+	mavlink.NewMessage[100] = func() mavlink.Message { return new(OpticalFlow) }
+	mavlink.NewMessage[101] = func() mavlink.Message { return new(GlobalVisionPositionEstimate) }
+	mavlink.NewMessage[102] = func() mavlink.Message { return new(VisionPositionEstimate) }
+	mavlink.NewMessage[103] = func() mavlink.Message { return new(VisionSpeedEstimate) }
+	mavlink.NewMessage[104] = func() mavlink.Message { return new(ViconPositionEstimate) }
+	mavlink.NewMessage[105] = func() mavlink.Message { return new(HighresImu) }
+	mavlink.NewMessage[106] = func() mavlink.Message { return new(OpticalFlowRad) }
+	mavlink.NewMessage[107] = func() mavlink.Message { return new(HilSensor) }
+	mavlink.NewMessage[108] = func() mavlink.Message { return new(SimState) }
+	mavlink.NewMessage[109] = func() mavlink.Message { return new(RadioStatus) }
+	mavlink.NewMessage[110] = func() mavlink.Message { return new(FileTransferProtocol) }
+	mavlink.NewMessage[111] = func() mavlink.Message { return new(Timesync) }
+	mavlink.NewMessage[113] = func() mavlink.Message { return new(HilGps) }
+	mavlink.NewMessage[114] = func() mavlink.Message { return new(HilOpticalFlow) }
+	mavlink.NewMessage[115] = func() mavlink.Message { return new(HilStateQuaternion) }
+	mavlink.NewMessage[116] = func() mavlink.Message { return new(ScaledImu2) }
+	mavlink.NewMessage[117] = func() mavlink.Message { return new(LogRequestList) }
+	mavlink.NewMessage[118] = func() mavlink.Message { return new(LogEntry) }
+	mavlink.NewMessage[119] = func() mavlink.Message { return new(LogRequestData) }
+	mavlink.NewMessage[120] = func() mavlink.Message { return new(LogData) }
+	mavlink.NewMessage[121] = func() mavlink.Message { return new(LogErase) }
+	mavlink.NewMessage[122] = func() mavlink.Message { return new(LogRequestEnd) }
+	mavlink.NewMessage[123] = func() mavlink.Message { return new(GpsInjectData) }
+	mavlink.NewMessage[124] = func() mavlink.Message { return new(Gps2Raw) }
+	mavlink.NewMessage[125] = func() mavlink.Message { return new(PowerStatus) }
+	mavlink.NewMessage[126] = func() mavlink.Message { return new(SerialControl) }
+	mavlink.NewMessage[127] = func() mavlink.Message { return new(GpsRtk) }
+	mavlink.NewMessage[128] = func() mavlink.Message { return new(Gps2Rtk) }
+	mavlink.NewMessage[130] = func() mavlink.Message { return new(DataTransmissionHandshake) }
+	mavlink.NewMessage[131] = func() mavlink.Message { return new(EncapsulatedData) }
+	mavlink.NewMessage[132] = func() mavlink.Message { return new(DistanceSensor) }
+	mavlink.NewMessage[133] = func() mavlink.Message { return new(TerrainRequest) }
+	mavlink.NewMessage[134] = func() mavlink.Message { return new(TerrainData) }
+	mavlink.NewMessage[135] = func() mavlink.Message { return new(TerrainCheck) }
+	mavlink.NewMessage[136] = func() mavlink.Message { return new(TerrainReport) }
+	mavlink.NewMessage[147] = func() mavlink.Message { return new(BatteryStatus) }
+	mavlink.NewMessage[148] = func() mavlink.Message { return new(AutopilotVersion) }
+	mavlink.NewMessage[248] = func() mavlink.Message { return new(V2Extension) }
+	mavlink.NewMessage[249] = func() mavlink.Message { return new(MemoryVect) }
+	mavlink.NewMessage[250] = func() mavlink.Message { return new(DebugVect) }
+	mavlink.NewMessage[251] = func() mavlink.Message { return new(NamedValueFloat) }
+	mavlink.NewMessage[252] = func() mavlink.Message { return new(NamedValueInt) }
+	mavlink.NewMessage[253] = func() mavlink.Message { return new(Statustext) }
+	mavlink.NewMessage[254] = func() mavlink.Message { return new(Debug) }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Enums
 ////////////////////////////////////////////////////////////////////////////////
