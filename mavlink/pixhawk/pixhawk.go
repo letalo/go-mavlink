@@ -2,13 +2,13 @@ package pixhawk
 
 import (
 	"github.com/SpaceLeap/go-mavlink/mavlink"
-	_ "github.com/SpaceLeap/go-mavlink/mavlink/common"
+	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
 
 const (
 	PROTOCOL_NAME    = "pixhawk"
 	PROTOCOL_VERSION = ""
-	PROTOCOL_INCLUDE = "common.xml"
+	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
 func init() {
@@ -61,12 +61,12 @@ const (
 
 //
 type SetCamShutter struct {
-	CamNo      uint8   // Camera id
-	CamMode    uint8   // Camera mode: 0 = auto, 1 = manual
-	TriggerPin uint8   // Trigger pin, 0-3 for PtGrey FireFly
-	Interval   uint16  // Shutter interval, in microseconds
-	Exposure   uint16  // Exposure time, in microseconds
 	Gain       float32 // Camera gain
+	Exposure   uint16  // Exposure time, in microseconds
+	Interval   uint16  // Shutter interval, in microseconds
+	TriggerPin uint8   // Trigger pin, 0-3 for PtGrey FireFly
+	CamMode    uint8   // Camera mode: 0 = auto, 1 = manual
+	CamNo      uint8   // Camera id
 }
 
 func (self *SetCamShutter) MsgID() uint8 {
@@ -88,17 +88,17 @@ func (self *SetCamShutter) MsgSize() uint8 {
 //
 type ImageTriggered struct {
 	Timestamp uint64  // Timestamp
-	Seq       uint32  // IMU seq
-	Roll      float32 // Roll angle in rad
-	Pitch     float32 // Pitch angle in rad
-	Yaw       float32 // Yaw angle in rad
-	LocalZ    float32 // Local frame Z coordinate (height over ground)
-	Lat       float32 // GPS X coordinate
-	Lon       float32 // GPS Y coordinate
-	Alt       float32 // Global frame altitude
-	GroundX   float32 // Ground truth X
-	GroundY   float32 // Ground truth Y
 	GroundZ   float32 // Ground truth Z
+	GroundY   float32 // Ground truth Y
+	GroundX   float32 // Ground truth X
+	Alt       float32 // Global frame altitude
+	Lon       float32 // GPS Y coordinate
+	Lat       float32 // GPS X coordinate
+	LocalZ    float32 // Local frame Z coordinate (height over ground)
+	Yaw       float32 // Yaw angle in rad
+	Pitch     float32 // Pitch angle in rad
+	Roll      float32 // Roll angle in rad
+	Seq       uint32  // IMU seq
 }
 
 func (self *ImageTriggered) MsgID() uint8 {
@@ -140,29 +140,29 @@ func (self *ImageTriggerControl) MsgSize() uint8 {
 
 //
 type ImageAvailable struct {
-	CamId       uint64  // Camera id
-	CamNo       uint8   // Camera # (starts with 0)
-	Timestamp   uint64  // Timestamp
 	ValidUntil  uint64  // Until which timestamp this buffer will stay valid
-	ImgSeq      uint32  // The image sequence number
-	ImgBufIndex uint32  // Position of the image in the buffer, starts with 0
-	Width       uint16  // Image width
-	Height      uint16  // Image height
-	Depth       uint16  // Image depth
-	Channels    uint8   // Image channels
-	Key         uint32  // Shared memory area key
-	Exposure    uint32  // Exposure time, in microseconds
-	Gain        float32 // Camera gain
-	Roll        float32 // Roll angle in rad
-	Pitch       float32 // Pitch angle in rad
-	Yaw         float32 // Yaw angle in rad
-	LocalZ      float32 // Local frame Z coordinate (height over ground)
-	Lat         float32 // GPS X coordinate
-	Lon         float32 // GPS Y coordinate
-	Alt         float32 // Global frame altitude
-	GroundX     float32 // Ground truth X
-	GroundY     float32 // Ground truth Y
+	Timestamp   uint64  // Timestamp
+	CamId       uint64  // Camera id
 	GroundZ     float32 // Ground truth Z
+	GroundY     float32 // Ground truth Y
+	GroundX     float32 // Ground truth X
+	Alt         float32 // Global frame altitude
+	Lon         float32 // GPS Y coordinate
+	Lat         float32 // GPS X coordinate
+	LocalZ      float32 // Local frame Z coordinate (height over ground)
+	Yaw         float32 // Yaw angle in rad
+	Pitch       float32 // Pitch angle in rad
+	Roll        float32 // Roll angle in rad
+	Gain        float32 // Camera gain
+	Exposure    uint32  // Exposure time, in microseconds
+	Key         uint32  // Shared memory area key
+	ImgBufIndex uint32  // Position of the image in the buffer, starts with 0
+	ImgSeq      uint32  // The image sequence number
+	Depth       uint16  // Image depth
+	Height      uint16  // Image height
+	Width       uint16  // Image width
+	Channels    uint8   // Image channels
+	CamNo       uint8   // Camera # (starts with 0)
 }
 
 func (self *ImageAvailable) MsgID() uint8 {
@@ -183,12 +183,12 @@ func (self *ImageAvailable) MsgSize() uint8 {
 
 // Message sent to the MAV to set a new offset from the currently controlled position
 type SetPositionControlOffset struct {
-	TargetSystem    uint8   // System ID
-	TargetComponent uint8   // Component ID
-	X               float32 // x position offset
-	Y               float32 // y position offset
-	Z               float32 // z position offset
 	Yaw             float32 // yaw orientation offset in radians, 0 = NORTH
+	Z               float32 // z position offset
+	Y               float32 // y position offset
+	X               float32 // x position offset
+	TargetComponent uint8   // Component ID
+	TargetSystem    uint8   // System ID
 }
 
 func (self *SetPositionControlOffset) MsgID() uint8 {
@@ -209,11 +209,11 @@ func (self *SetPositionControlOffset) MsgSize() uint8 {
 
 //
 type PositionControlSetpoint struct {
-	Id  uint16  // ID of waypoint, 0 for plain position
-	X   float32 // x position
-	Y   float32 // y position
-	Z   float32 // z position
 	Yaw float32 // yaw orientation in radians, 0 = NORTH
+	Z   float32 // z position
+	Y   float32 // y position
+	X   float32 // x position
+	Id  uint16  // ID of waypoint, 0 for plain position
 }
 
 func (self *PositionControlSetpoint) MsgID() uint8 {
@@ -234,13 +234,13 @@ func (self *PositionControlSetpoint) MsgSize() uint8 {
 
 //
 type Marker struct {
-	Id    uint16  // ID
-	X     float32 // x position
-	Y     float32 // y position
-	Z     float32 // z position
-	Roll  float32 // roll orientation
-	Pitch float32 // pitch orientation
 	Yaw   float32 // yaw orientation
+	Pitch float32 // pitch orientation
+	Roll  float32 // roll orientation
+	Z     float32 // z position
+	Y     float32 // y position
+	X     float32 // x position
+	Id    uint16  // ID
 }
 
 func (self *Marker) MsgID() uint8 {
@@ -261,13 +261,13 @@ func (self *Marker) MsgSize() uint8 {
 
 //
 type RawAux struct {
-	Adc1 uint16 // ADC1 (J405 ADC3, LPC2148 AD0.6)
-	Adc2 uint16 // ADC2 (J405 ADC5, LPC2148 AD0.2)
-	Adc3 uint16 // ADC3 (J405 ADC6, LPC2148 AD0.1)
-	Adc4 uint16 // ADC4 (J405 ADC7, LPC2148 AD1.3)
-	Vbat uint16 // Battery voltage
-	Temp int16  // Temperature (degrees celcius)
 	Baro int32  // Barometric pressure (hecto Pascal)
+	Temp int16  // Temperature (degrees celcius)
+	Vbat uint16 // Battery voltage
+	Adc4 uint16 // ADC4 (J405 ADC7, LPC2148 AD1.3)
+	Adc3 uint16 // ADC3 (J405 ADC6, LPC2148 AD0.1)
+	Adc2 uint16 // ADC2 (J405 ADC5, LPC2148 AD0.2)
+	Adc1 uint16 // ADC1 (J405 ADC3, LPC2148 AD0.6)
 }
 
 func (self *RawAux) MsgID() uint8 {
@@ -288,8 +288,8 @@ func (self *RawAux) MsgSize() uint8 {
 
 //
 type WatchdogHeartbeat struct {
-	WatchdogId   uint16 // Watchdog ID
 	ProcessCount uint16 // Number of processes
+	WatchdogId   uint16 // Watchdog ID
 }
 
 func (self *WatchdogHeartbeat) MsgID() uint8 {
@@ -310,11 +310,11 @@ func (self *WatchdogHeartbeat) MsgSize() uint8 {
 
 //
 type WatchdogProcessInfo struct {
-	WatchdogId uint16  // Watchdog ID
-	ProcessId  uint16  // Process ID
-	Name       Char100 // Process name
-	Arguments  Char147 // Process arguments
 	Timeout    int32   // Timeout (seconds)
+	ProcessId  uint16  // Process ID
+	WatchdogId uint16  // Watchdog ID
+	Arguments  Char147 // Process arguments
+	Name       Char100 // Process name
 }
 
 func (self *WatchdogProcessInfo) MsgID() uint8 {
@@ -335,12 +335,12 @@ func (self *WatchdogProcessInfo) MsgSize() uint8 {
 
 //
 type WatchdogProcessStatus struct {
-	WatchdogId uint16 // Watchdog ID
-	ProcessId  uint16 // Process ID
-	State      uint8  // Is running / finished / suspended / crashed
-	Muted      uint8  // Is muted
 	Pid        int32  // PID
 	Crashes    uint16 // Number of crashes
+	ProcessId  uint16 // Process ID
+	WatchdogId uint16 // Watchdog ID
+	Muted      uint8  // Is muted
+	State      uint8  // Is running / finished / suspended / crashed
 }
 
 func (self *WatchdogProcessStatus) MsgID() uint8 {
@@ -361,10 +361,10 @@ func (self *WatchdogProcessStatus) MsgSize() uint8 {
 
 //
 type WatchdogCommand struct {
-	TargetSystemId uint8  // Target system ID
-	WatchdogId     uint16 // Watchdog ID
 	ProcessId      uint16 // Process ID
+	WatchdogId     uint16 // Watchdog ID
 	CommandId      uint8  // Command ID
+	TargetSystemId uint8  // Target system ID
 }
 
 func (self *WatchdogCommand) MsgID() uint8 {
@@ -385,10 +385,10 @@ func (self *WatchdogCommand) MsgSize() uint8 {
 
 //
 type PatternDetected struct {
-	Type       uint8   // 0: Pattern, 1: Letter
 	Confidence float32 // Confidence of detection
-	File       Char100 // Pattern file name
 	Detected   uint8   // Accepted as true detection, 0 no, 1 yes
+	File       Char100 // Pattern file name
+	Type       uint8   // 0: Pattern, 1: Letter
 }
 
 func (self *PatternDetected) MsgID() uint8 {
@@ -412,14 +412,14 @@ func (self *PatternDetected) MsgSize() uint8 {
 //                 the POI on a map.
 //
 type PointOfInterest struct {
-	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
-	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
-	CoordinateSystem uint8   // 0: global, 1:local
-	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
-	X                float32 // X Position
-	Y                float32 // Y Position
 	Z                float32 // Z Position
+	Y                float32 // Y Position
+	X                float32 // X Position
+	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
 	Name             Char26  // POI name
+	CoordinateSystem uint8   // 0: global, 1:local
+	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
+	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
 }
 
 func (self *PointOfInterest) MsgID() uint8 {
@@ -443,17 +443,17 @@ func (self *PointOfInterest) MsgSize() uint8 {
 //                 the POI on a map.
 //
 type PointOfInterestConnection struct {
-	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
-	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
-	CoordinateSystem uint8   // 0: global, 1:local
-	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
-	Xp1              float32 // X1 Position
-	Yp1              float32 // Y1 Position
-	Zp1              float32 // Z1 Position
-	Xp2              float32 // X2 Position
-	Yp2              float32 // Y2 Position
 	Zp2              float32 // Z2 Position
+	Yp2              float32 // Y2 Position
+	Xp2              float32 // X2 Position
+	Zp1              float32 // Z1 Position
+	Yp1              float32 // Y1 Position
+	Xp1              float32 // X1 Position
+	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
 	Name             Char26  // POI connection name
+	CoordinateSystem uint8   // 0: global, 1:local
+	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
+	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
 }
 
 func (self *PointOfInterestConnection) MsgID() uint8 {
@@ -474,14 +474,14 @@ func (self *PointOfInterestConnection) MsgSize() uint8 {
 
 //
 type BriefFeature struct {
-	X                     float32   // x position in m
-	Y                     float32   // y position in m
-	Z                     float32   // z position in m
-	OrientationAssignment uint8     // Orientation assignment 0: false, 1:true
-	Size                  uint16    // Size in pixels
-	Orientation           uint16    // Orientation
-	Descriptor            [32]uint8 // Descriptor
 	Response              float32   // Harris operator response at this location
+	Z                     float32   // z position in m
+	Y                     float32   // y position in m
+	X                     float32   // x position in m
+	Orientation           uint16    // Orientation
+	Size                  uint16    // Size in pixels
+	Descriptor            [32]uint8 // Descriptor
+	OrientationAssignment uint8     // Orientation assignment 0: false, 1:true
 }
 
 func (self *BriefFeature) MsgID() uint8 {
@@ -502,15 +502,15 @@ func (self *BriefFeature) MsgSize() uint8 {
 
 //
 type AttitudeControl struct {
-	Target       uint8   // The system to be controlled
-	Roll         float32 // roll
-	Pitch        float32 // pitch
-	Yaw          float32 // yaw
 	Thrust       float32 // thrust
-	RollManual   uint8   // roll control enabled auto:0, manual:1
-	PitchManual  uint8   // pitch auto:0, manual:1
-	YawManual    uint8   // yaw auto:0, manual:1
+	Yaw          float32 // yaw
+	Pitch        float32 // pitch
+	Roll         float32 // roll
 	ThrustManual uint8   // thrust auto:0, manual:1
+	YawManual    uint8   // yaw auto:0, manual:1
+	PitchManual  uint8   // pitch auto:0, manual:1
+	RollManual   uint8   // roll control enabled auto:0, manual:1
+	Target       uint8   // The system to be controlled
 }
 
 func (self *AttitudeControl) MsgID() uint8 {
@@ -531,18 +531,18 @@ func (self *AttitudeControl) MsgSize() uint8 {
 
 //
 type DetectionStats struct {
-	Detections        uint32  // Number of detections
-	ClusterIters      uint32  // Number of cluster iterations
-	BestScore         float32 // Best score
-	BestLat           int32   // Latitude of the best detection * 1E7
-	BestLon           int32   // Longitude of the best detection * 1E7
-	BestAlt           int32   // Altitude of the best detection * 1E3
-	BestDetectionId   uint32  // Best detection ID
-	BestClusterId     uint32  // Best cluster ID
-	BestClusterIterId uint32  // Best cluster ID
-	ImagesDone        uint32  // Number of images already processed
-	ImagesTodo        uint32  // Number of images still to process
 	Fps               float32 // Average images per seconds processed
+	ImagesTodo        uint32  // Number of images still to process
+	ImagesDone        uint32  // Number of images already processed
+	BestClusterIterId uint32  // Best cluster ID
+	BestClusterId     uint32  // Best cluster ID
+	BestDetectionId   uint32  // Best detection ID
+	BestAlt           int32   // Altitude of the best detection * 1E3
+	BestLon           int32   // Longitude of the best detection * 1E7
+	BestLat           int32   // Latitude of the best detection * 1E7
+	BestScore         float32 // Best score
+	ClusterIters      uint32  // Number of cluster iterations
+	Detections        uint32  // Number of detections
 }
 
 func (self *DetectionStats) MsgID() uint8 {
@@ -563,20 +563,20 @@ func (self *DetectionStats) MsgSize() uint8 {
 
 //
 type OnboardHealth struct {
+	NetworkLoadOut float32 // Network load outbound in KiB/s
+	NetworkLoadIn  float32 // Network load inbound KiB/s
+	Voltage        float32 // Supply voltage V
+	Temp           float32 // Temperature
+	DiskTotal      float32 // Disk total in GiB
+	SwapTotal      float32 // Swap size in GiB
+	RamTotal       float32 // RAM size in GiB
 	Uptime         uint32  // Uptime of system
 	CpuFreq        uint16  // CPU frequency
-	CpuLoad        uint8   // CPU load in percent
-	RamUsage       uint8   // RAM usage in percent
-	RamTotal       float32 // RAM size in GiB
-	SwapUsage      uint8   // Swap usage in percent
-	SwapTotal      float32 // Swap size in GiB
-	DiskHealth     int8    // Disk health (-1: N/A, 0: ERR, 1: RO, 2: RW)
 	DiskUsage      uint8   // Disk usage in percent
-	DiskTotal      float32 // Disk total in GiB
-	Temp           float32 // Temperature
-	Voltage        float32 // Supply voltage V
-	NetworkLoadIn  float32 // Network load inbound KiB/s
-	NetworkLoadOut float32 // Network load outbound in KiB/s
+	DiskHealth     int8    // Disk health (-1: N/A, 0: ERR, 1: RO, 2: RW)
+	SwapUsage      uint8   // Swap usage in percent
+	RamUsage       uint8   // RAM usage in percent
+	CpuLoad        uint8   // CPU load in percent
 }
 
 func (self *OnboardHealth) MsgID() uint8 {

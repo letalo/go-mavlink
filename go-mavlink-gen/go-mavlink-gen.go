@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"go/format"
 	"os"
+	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -28,33 +30,37 @@ import (
 	"github.com/ungerik/go-dry"
 )
 
-type Protocol struct {
-	Name             string
-	StringSizes      map[int]bool
-	IncludedProtocol *Protocol
+var (
+	goFormat bool
 
-	XMLName  xml.Name  `xml:"mavlink"`
-	Version  string    `xml:"version"`
-	Include  string    `xml:"include"`
-	Enums    []Enum    `xml:"enums>enum"`
-	Messages []Message `xml:"messages>message"`
+	templ = template.Must(template.ParseFiles("go.template"))
+)
+
+func main() {
+	var protocol Protocol
+
+	flag.StringVar(&protocol.Name, "protocol", "common", "Protocol name. One of the XML definitions.")
+	flag.BoolVar(&goFormat, "fmt", true, "Call go fmt on the result file")
+	flag.Parse()
+
+	generate(&protocol)
 }
 
-func (protocol *Protocol) IncludeName() string {
-	return strings.TrimSuffix(strings.ToLower(protocol.Include), ".xml")
-}
-
-func (protocol *Protocol) parse() {
+func generate(protocol *Protocol) {
 	protocol.StringSizes = make(map[int]bool)
 
-	err := dry.FileUnmarshallXML(fmt.Sprintf("definitions/%s.xml", protocol.Name), &protocol)
+	xmlFilename := fmt.Sprintf("definitions/%s.xml", protocol.Name)
+
+	fmt.Println("Parsing", xmlFilename)
+
+	err := dry.FileUnmarshallXML(xmlFilename, &protocol)
 	if err != nil {
 		panic(err)
 	}
 
 	if protocol.Include != "" {
 		protocol.IncludedProtocol = &Protocol{Name: protocol.IncludeName()}
-		protocol.IncludedProtocol.parse()
+		generate(protocol.IncludedProtocol)
 	}
 
 	for i := range protocol.Enums {
@@ -88,9 +94,65 @@ func (protocol *Protocol) parse() {
 				size := dry.StringToInt(field.Type[1 : len(field.Type)-len("]byte")])
 				protocol.StringSizes[size] = true
 				field.Type = "Char" + strconv.Itoa(size)
+				field.bitSize = 8
+			} else {
+				t := field.Type[strings.IndexByte(field.Type, ']')+1:]
+				if sizeStart := strings.IndexAny(t, "8136"); sizeStart != -1 {
+					field.bitSize, _ = strconv.Atoi(t[sizeStart:])
+				}
+				if field.bitSize == 0 {
+					panic("Unknown message field size")
+				}
 			}
 		}
+		sort.Stable(message)
 	}
+
+	buf := bytes.NewBuffer(nil)
+
+	err = templ.Execute(buf, &protocol)
+	if err != nil {
+		panic(err)
+	}
+
+	data := buf.Bytes()
+	if goFormat {
+		data, err = format.Source(data)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	// todo path.Join
+	pkgDir, _ := filepath.Abs(fmt.Sprintf("../mavlink/%s", protocol.Name))
+	goFilename := fmt.Sprintf("%s/%s.go", pkgDir, protocol.Name)
+
+	fmt.Println("Writing", goFilename)
+
+	os.Mkdir(pkgDir, 0770)
+
+	err = dry.FileSetBytes(goFilename, data)
+	if err != nil {
+		panic(err)
+	}
+
+	// fmt.Println(string(data))
+}
+
+type Protocol struct {
+	Name             string
+	StringSizes      map[int]bool
+	IncludedProtocol *Protocol
+
+	XMLName  xml.Name  `xml:"mavlink"`
+	Version  string    `xml:"version"`
+	Include  string    `xml:"include"`
+	Enums    []Enum    `xml:"enums>enum"`
+	Messages []Message `xml:"messages>message"`
+}
+
+func (protocol *Protocol) IncludeName() string {
+	return strings.TrimSuffix(strings.ToLower(protocol.Include), ".xml")
 }
 
 type Enum struct {
@@ -120,66 +182,25 @@ type Message struct {
 	Size        int
 }
 
+func (msg *Message) Len() int {
+	return len(msg.Fields)
+}
+
+func (msg *Message) Less(i, j int) bool {
+	return msg.Fields[i].bitSize >= msg.Fields[j].bitSize
+}
+
+func (msg *Message) Swap(i, j int) {
+	msg.Fields[i], msg.Fields[j] = msg.Fields[j], msg.Fields[i]
+}
+
 type MessageField struct {
 	Type        string `xml:"type,attr"`
 	Name        string `xml:"name,attr"`
 	Description string `xml:",innerxml"`
+	bitSize     int
 }
 
-func main() {
-	var (
-		protocol Protocol
-		goFormat bool
-	)
-	flag.StringVar(&protocol.Name, "protocol", "common", "Protocol name. One of the XML definitions.")
-	flag.BoolVar(&goFormat, "fmt", true, "Call go fmt on the result file")
-	flag.Parse()
-
-	protocol.parse()
-
-	templ := template.Must(template.ParseFiles("go.template"))
-
-	// fmt.Printf("%#v\n", &protocol)
-
-	buf := bytes.NewBuffer(nil)
-
-	err := templ.Execute(buf, &protocol)
-	if err != nil {
-		panic(err)
-	}
-
-	data := buf.Bytes()
-	if goFormat {
-		data, err = format.Source(data)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	pkgDir := fmt.Sprintf("../mavlink/%s", protocol.Name)
-	goFilename := fmt.Sprintf("%s/%s.go", pkgDir, protocol.Name)
-
-	os.Mkdir(pkgDir, 0770)
-
-	err = dry.FileSetBytes(goFilename, data)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(data))
-
-	// file, err := os.Create(goFilename)
-	// defer file.Close()
-
-	// file.Close()
-
-	// err = exec.Command("go", "fmt", goFilename).Run()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// err = templ.Execute(os.Stdout, &protocol)
-	// if err != nil {
-	// 	panic(err)
-	// }
+func (field *MessageField) BitSize() int {
+	return 0
 }

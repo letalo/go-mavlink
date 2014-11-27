@@ -1,14 +1,14 @@
 package {{.Name}}
 
 import (
-	"github.com/SpaceLeap/go-mavlink/mavlink" {{if .Include}}
-	_ "github.com/SpaceLeap/go-mavlink/mavlink/{{.IncludeName}}"{{end}}
+	"github.com/SpaceLeap/go-mavlink/mavlink"{{if .Include}}
+	"github.com/SpaceLeap/go-mavlink/mavlink/{{.IncludeName}}"{{end}}
 )
 
 const (
 	PROTOCOL_NAME    = "{{.Name}}"
-	PROTOCOL_VERSION = "{{.Version}}"
-	PROTOCOL_INCLUDE = "{{.Include}}"
+	PROTOCOL_VERSION = "{{.Version}}"{{if .Include}}
+	PROTOCOL_INCLUDE = {{.IncludeName}}.PROTOCOL_NAME{{end}}
 )
 
 func init() {
