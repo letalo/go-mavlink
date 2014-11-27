@@ -1,17 +1,3 @@
-// MAVLINK_CRC_EXTRA MAVLINK_MESSAGE_CRCS
-// Field reordering
-// Message size calc
-// def message_checksum(msg):
-//     '''calculate a 8-bit checksum of the key fields of a message, so we
-//        can detect incompatible XML changes'''
-//     crc = mavutil.x25crc(msg.name + ' ')
-//     for f in msg.ordered_fields:
-//         crc.accumulate(f.type + ' ')
-//         crc.accumulate(f.name + ' ')
-//         if f.array_length:
-//             crc.accumulate(chr(f.array_length))
-//     return (crc.crc&0xFF) ^ (crc.crc>>8) 
-
 package main
 
 import (
@@ -27,6 +13,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/SpaceLeap/go-mavlink/x25"
 	"github.com/ungerik/go-dry"
 )
 
@@ -74,27 +61,29 @@ func generate(protocol *Protocol) {
 
 	for i := range protocol.Messages {
 		message := &protocol.Messages[i]
-		message.Name = dry.StringToUpperCamelCase(message.NameUpper)
+		message.Name = dry.StringToUpperCamelCase(message.CName)
 		message.Description = strings.Replace(message.Description, "\n", "\n// ", -1)
 		// message.Description = strings.Replace(message.Description, "\t", "", -1)
 		for j := range message.Fields {
 			field := &message.Fields[j]
-			field.Name = dry.StringToUpperCamelCase(field.Name)
+			field.Name = dry.StringToUpperCamelCase(field.CName)
 			field.Description = strings.Replace(field.Description, "\n", " ", -1)
-			field.Type = dry.StringReplaceMulti(field.Type,
+			field.Type = dry.StringReplaceMulti(field.CType,
 				"_t", "",
 				"_mavlink_version", "",
 				"char", "byte",
 				"float", "float32",
 				"double", "float64")
 			if index := strings.IndexByte(field.Type, '['); index != -1 {
+				field.arrayLength, _ = strconv.Atoi(field.Type[index+1 : len(field.Type)-1])
 				field.Type = field.Type[index:] + field.Type[:index]
 			}
-			if strings.HasSuffix(field.Type, "]byte") {
-				size := dry.StringToInt(field.Type[1 : len(field.Type)-len("]byte")])
-				protocol.StringSizes[size] = true
-				field.Type = "Char" + strconv.Itoa(size)
+			if strings.HasSuffix(field.Type, "byte") {
 				field.bitSize = 8
+				if field.arrayLength > 0 {
+					protocol.StringSizes[field.arrayLength] = true
+					field.Type = fmt.Sprintf("Char%d", field.arrayLength)
+				}
 			} else {
 				t := field.Type[strings.IndexByte(field.Type, ']')+1:]
 				if sizeStart := strings.IndexAny(t, "8136"); sizeStart != -1 {
@@ -176,10 +165,30 @@ type EnumEntryParam struct {
 type Message struct {
 	ID          uint8          `xml:"id,attr"`
 	Name        string         `xml:"-"`
-	NameUpper   string         `xml:"name,attr"`
+	CName       string         `xml:"name,attr"`
 	Description string         `xml:"description"`
 	Fields      []MessageField `xml:"field"`
-	Size        int
+}
+
+func (msg *Message) Size() (size int) {
+	for i := range msg.Fields {
+		size += msg.Fields[i].bitSize
+	}
+	return size / 8
+}
+
+func (msg *Message) CRCExtra() uint8 {
+	hash := x25.NewHash()
+
+	fmt.Fprint(hash, msg.CName+" ")
+	for i := range msg.Fields {
+		fmt.Fprint(hash, msg.Fields[i].CType+" "+msg.Fields[i].CName+" ")
+		if msg.Fields[i].arrayLength > 0 {
+			hash.WriteByte(byte(msg.Fields[i].arrayLength))
+		}
+	}
+
+	return uint8((hash.Sum() & 0xFF) ^ (hash.Sum() >> 8))
 }
 
 func (msg *Message) Len() int {
@@ -195,12 +204,11 @@ func (msg *Message) Swap(i, j int) {
 }
 
 type MessageField struct {
-	Type        string `xml:"type,attr"`
-	Name        string `xml:"name,attr"`
+	Type        string
+	CType       string `xml:"type,attr"`
+	Name        string
+	CName       string `xml:"name,attr"`
 	Description string `xml:",innerxml"`
 	bitSize     int
-}
-
-func (field *MessageField) BitSize() int {
-	return 0
+	arrayLength int
 }

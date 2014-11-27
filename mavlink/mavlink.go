@@ -17,8 +17,7 @@ const (
 var (
 	ProtocolName    string
 	ProtocolVersion string
-	NewMessage      [256]func() Message
-	MessageCRSs     *[256]byte
+	MessageFactory  [256]func() Message
 )
 
 func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
@@ -54,11 +53,11 @@ func Receive(reader io.Reader) (*Packet, error) {
 
 	// to do: check component sequence
 
-	msg := NewMessage[packet.Header.MessageID]()
+	msg := MessageFactory[packet.Header.MessageID]()
 	if msg == nil {
 		return nil, ErrUnknownMessageID(packet.Header.MessageID)
 	}
-	if packet.Header.PayloadLength != msg.MsgSize() {
+	if packet.Header.PayloadLength != msg.TypeSize() {
 		return nil, ErrInvalidPayloadLength(packet.Header.PayloadLength)
 	}
 

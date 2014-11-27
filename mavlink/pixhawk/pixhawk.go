@@ -14,27 +14,26 @@ const (
 func init() {
 	mavlink.ProtocolName = PROTOCOL_NAME
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
-	// mavlink.MessageCRSs = nil
 
-	mavlink.NewMessage[151] = func() mavlink.Message { return new(SetCamShutter) }
-	mavlink.NewMessage[152] = func() mavlink.Message { return new(ImageTriggered) }
-	mavlink.NewMessage[153] = func() mavlink.Message { return new(ImageTriggerControl) }
-	mavlink.NewMessage[154] = func() mavlink.Message { return new(ImageAvailable) }
-	mavlink.NewMessage[160] = func() mavlink.Message { return new(SetPositionControlOffset) }
-	mavlink.NewMessage[170] = func() mavlink.Message { return new(PositionControlSetpoint) }
-	mavlink.NewMessage[171] = func() mavlink.Message { return new(Marker) }
-	mavlink.NewMessage[172] = func() mavlink.Message { return new(RawAux) }
-	mavlink.NewMessage[180] = func() mavlink.Message { return new(WatchdogHeartbeat) }
-	mavlink.NewMessage[181] = func() mavlink.Message { return new(WatchdogProcessInfo) }
-	mavlink.NewMessage[182] = func() mavlink.Message { return new(WatchdogProcessStatus) }
-	mavlink.NewMessage[183] = func() mavlink.Message { return new(WatchdogCommand) }
-	mavlink.NewMessage[190] = func() mavlink.Message { return new(PatternDetected) }
-	mavlink.NewMessage[191] = func() mavlink.Message { return new(PointOfInterest) }
-	mavlink.NewMessage[192] = func() mavlink.Message { return new(PointOfInterestConnection) }
-	mavlink.NewMessage[195] = func() mavlink.Message { return new(BriefFeature) }
-	mavlink.NewMessage[200] = func() mavlink.Message { return new(AttitudeControl) }
-	mavlink.NewMessage[205] = func() mavlink.Message { return new(DetectionStats) }
-	mavlink.NewMessage[206] = func() mavlink.Message { return new(OnboardHealth) }
+	mavlink.MessageFactory[151] = func() mavlink.Message { return new(SetCamShutter) }
+	mavlink.MessageFactory[152] = func() mavlink.Message { return new(ImageTriggered) }
+	mavlink.MessageFactory[153] = func() mavlink.Message { return new(ImageTriggerControl) }
+	mavlink.MessageFactory[154] = func() mavlink.Message { return new(ImageAvailable) }
+	mavlink.MessageFactory[160] = func() mavlink.Message { return new(SetPositionControlOffset) }
+	mavlink.MessageFactory[170] = func() mavlink.Message { return new(PositionControlSetpoint) }
+	mavlink.MessageFactory[171] = func() mavlink.Message { return new(Marker) }
+	mavlink.MessageFactory[172] = func() mavlink.Message { return new(RawAux) }
+	mavlink.MessageFactory[180] = func() mavlink.Message { return new(WatchdogHeartbeat) }
+	mavlink.MessageFactory[181] = func() mavlink.Message { return new(WatchdogProcessInfo) }
+	mavlink.MessageFactory[182] = func() mavlink.Message { return new(WatchdogProcessStatus) }
+	mavlink.MessageFactory[183] = func() mavlink.Message { return new(WatchdogCommand) }
+	mavlink.MessageFactory[190] = func() mavlink.Message { return new(PatternDetected) }
+	mavlink.MessageFactory[191] = func() mavlink.Message { return new(PointOfInterest) }
+	mavlink.MessageFactory[192] = func() mavlink.Message { return new(PointOfInterestConnection) }
+	mavlink.MessageFactory[195] = func() mavlink.Message { return new(BriefFeature) }
+	mavlink.MessageFactory[200] = func() mavlink.Message { return new(AttitudeControl) }
+	mavlink.MessageFactory[205] = func() mavlink.Message { return new(DetectionStats) }
+	mavlink.MessageFactory[206] = func() mavlink.Message { return new(OnboardHealth) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,20 +68,24 @@ type SetCamShutter struct {
 	CamNo      uint8   // Camera id
 }
 
-func (self *SetCamShutter) MsgID() uint8 {
+func (self *SetCamShutter) TypeID() uint8 {
 	return 151
 }
 
-func (self *SetCamShutter) MsgName() string {
+func (self *SetCamShutter) TypeName() string {
 	return "SetCamShutter"
 }
 
-func (self *SetCamShutter) MsgNameUpper() string {
+func (self *SetCamShutter) TypeCName() string {
 	return "SET_CAM_SHUTTER"
 }
 
-func (self *SetCamShutter) MsgSize() uint8 {
-	return 0
+func (self *SetCamShutter) TypeSize() uint8 {
+	return 11
+}
+
+func (self *SetCamShutter) TypeCRCExtra() uint8 {
+	return 235
 }
 
 //
@@ -101,20 +104,24 @@ type ImageTriggered struct {
 	Seq       uint32  // IMU seq
 }
 
-func (self *ImageTriggered) MsgID() uint8 {
+func (self *ImageTriggered) TypeID() uint8 {
 	return 152
 }
 
-func (self *ImageTriggered) MsgName() string {
+func (self *ImageTriggered) TypeName() string {
 	return "ImageTriggered"
 }
 
-func (self *ImageTriggered) MsgNameUpper() string {
+func (self *ImageTriggered) TypeCName() string {
 	return "IMAGE_TRIGGERED"
 }
 
-func (self *ImageTriggered) MsgSize() uint8 {
-	return 0
+func (self *ImageTriggered) TypeSize() uint8 {
+	return 52
+}
+
+func (self *ImageTriggered) TypeCRCExtra() uint8 {
+	return 114
 }
 
 //
@@ -122,20 +129,24 @@ type ImageTriggerControl struct {
 	Enable uint8 // 0 to disable, 1 to enable
 }
 
-func (self *ImageTriggerControl) MsgID() uint8 {
+func (self *ImageTriggerControl) TypeID() uint8 {
 	return 153
 }
 
-func (self *ImageTriggerControl) MsgName() string {
+func (self *ImageTriggerControl) TypeName() string {
 	return "ImageTriggerControl"
 }
 
-func (self *ImageTriggerControl) MsgNameUpper() string {
+func (self *ImageTriggerControl) TypeCName() string {
 	return "IMAGE_TRIGGER_CONTROL"
 }
 
-func (self *ImageTriggerControl) MsgSize() uint8 {
-	return 0
+func (self *ImageTriggerControl) TypeSize() uint8 {
+	return 1
+}
+
+func (self *ImageTriggerControl) TypeCRCExtra() uint8 {
+	return 95
 }
 
 //
@@ -165,20 +176,24 @@ type ImageAvailable struct {
 	CamNo       uint8   // Camera # (starts with 0)
 }
 
-func (self *ImageAvailable) MsgID() uint8 {
+func (self *ImageAvailable) TypeID() uint8 {
 	return 154
 }
 
-func (self *ImageAvailable) MsgName() string {
+func (self *ImageAvailable) TypeName() string {
 	return "ImageAvailable"
 }
 
-func (self *ImageAvailable) MsgNameUpper() string {
+func (self *ImageAvailable) TypeCName() string {
 	return "IMAGE_AVAILABLE"
 }
 
-func (self *ImageAvailable) MsgSize() uint8 {
-	return 0
+func (self *ImageAvailable) TypeSize() uint8 {
+	return 92
+}
+
+func (self *ImageAvailable) TypeCRCExtra() uint8 {
+	return 16
 }
 
 // Message sent to the MAV to set a new offset from the currently controlled position
@@ -191,20 +206,24 @@ type SetPositionControlOffset struct {
 	TargetSystem    uint8   // System ID
 }
 
-func (self *SetPositionControlOffset) MsgID() uint8 {
+func (self *SetPositionControlOffset) TypeID() uint8 {
 	return 160
 }
 
-func (self *SetPositionControlOffset) MsgName() string {
+func (self *SetPositionControlOffset) TypeName() string {
 	return "SetPositionControlOffset"
 }
 
-func (self *SetPositionControlOffset) MsgNameUpper() string {
+func (self *SetPositionControlOffset) TypeCName() string {
 	return "SET_POSITION_CONTROL_OFFSET"
 }
 
-func (self *SetPositionControlOffset) MsgSize() uint8 {
-	return 0
+func (self *SetPositionControlOffset) TypeSize() uint8 {
+	return 18
+}
+
+func (self *SetPositionControlOffset) TypeCRCExtra() uint8 {
+	return 203
 }
 
 //
@@ -216,20 +235,24 @@ type PositionControlSetpoint struct {
 	Id  uint16  // ID of waypoint, 0 for plain position
 }
 
-func (self *PositionControlSetpoint) MsgID() uint8 {
+func (self *PositionControlSetpoint) TypeID() uint8 {
 	return 170
 }
 
-func (self *PositionControlSetpoint) MsgName() string {
+func (self *PositionControlSetpoint) TypeName() string {
 	return "PositionControlSetpoint"
 }
 
-func (self *PositionControlSetpoint) MsgNameUpper() string {
+func (self *PositionControlSetpoint) TypeCName() string {
 	return "POSITION_CONTROL_SETPOINT"
 }
 
-func (self *PositionControlSetpoint) MsgSize() uint8 {
-	return 0
+func (self *PositionControlSetpoint) TypeSize() uint8 {
+	return 18
+}
+
+func (self *PositionControlSetpoint) TypeCRCExtra() uint8 {
+	return 88
 }
 
 //
@@ -243,20 +266,24 @@ type Marker struct {
 	Id    uint16  // ID
 }
 
-func (self *Marker) MsgID() uint8 {
+func (self *Marker) TypeID() uint8 {
 	return 171
 }
 
-func (self *Marker) MsgName() string {
+func (self *Marker) TypeName() string {
 	return "Marker"
 }
 
-func (self *Marker) MsgNameUpper() string {
+func (self *Marker) TypeCName() string {
 	return "MARKER"
 }
 
-func (self *Marker) MsgSize() uint8 {
-	return 0
+func (self *Marker) TypeSize() uint8 {
+	return 26
+}
+
+func (self *Marker) TypeCRCExtra() uint8 {
+	return 72
 }
 
 //
@@ -270,20 +297,24 @@ type RawAux struct {
 	Adc1 uint16 // ADC1 (J405 ADC3, LPC2148 AD0.6)
 }
 
-func (self *RawAux) MsgID() uint8 {
+func (self *RawAux) TypeID() uint8 {
 	return 172
 }
 
-func (self *RawAux) MsgName() string {
+func (self *RawAux) TypeName() string {
 	return "RawAux"
 }
 
-func (self *RawAux) MsgNameUpper() string {
+func (self *RawAux) TypeCName() string {
 	return "RAW_AUX"
 }
 
-func (self *RawAux) MsgSize() uint8 {
-	return 0
+func (self *RawAux) TypeSize() uint8 {
+	return 16
+}
+
+func (self *RawAux) TypeCRCExtra() uint8 {
+	return 115
 }
 
 //
@@ -292,20 +323,24 @@ type WatchdogHeartbeat struct {
 	WatchdogId   uint16 // Watchdog ID
 }
 
-func (self *WatchdogHeartbeat) MsgID() uint8 {
+func (self *WatchdogHeartbeat) TypeID() uint8 {
 	return 180
 }
 
-func (self *WatchdogHeartbeat) MsgName() string {
+func (self *WatchdogHeartbeat) TypeName() string {
 	return "WatchdogHeartbeat"
 }
 
-func (self *WatchdogHeartbeat) MsgNameUpper() string {
+func (self *WatchdogHeartbeat) TypeCName() string {
 	return "WATCHDOG_HEARTBEAT"
 }
 
-func (self *WatchdogHeartbeat) MsgSize() uint8 {
-	return 0
+func (self *WatchdogHeartbeat) TypeSize() uint8 {
+	return 4
+}
+
+func (self *WatchdogHeartbeat) TypeCRCExtra() uint8 {
+	return 123
 }
 
 //
@@ -317,20 +352,24 @@ type WatchdogProcessInfo struct {
 	Name       Char100 // Process name
 }
 
-func (self *WatchdogProcessInfo) MsgID() uint8 {
+func (self *WatchdogProcessInfo) TypeID() uint8 {
 	return 181
 }
 
-func (self *WatchdogProcessInfo) MsgName() string {
+func (self *WatchdogProcessInfo) TypeName() string {
 	return "WatchdogProcessInfo"
 }
 
-func (self *WatchdogProcessInfo) MsgNameUpper() string {
+func (self *WatchdogProcessInfo) TypeCName() string {
 	return "WATCHDOG_PROCESS_INFO"
 }
 
-func (self *WatchdogProcessInfo) MsgSize() uint8 {
-	return 0
+func (self *WatchdogProcessInfo) TypeSize() uint8 {
+	return 10
+}
+
+func (self *WatchdogProcessInfo) TypeCRCExtra() uint8 {
+	return 133
 }
 
 //
@@ -343,20 +382,24 @@ type WatchdogProcessStatus struct {
 	State      uint8  // Is running / finished / suspended / crashed
 }
 
-func (self *WatchdogProcessStatus) MsgID() uint8 {
+func (self *WatchdogProcessStatus) TypeID() uint8 {
 	return 182
 }
 
-func (self *WatchdogProcessStatus) MsgName() string {
+func (self *WatchdogProcessStatus) TypeName() string {
 	return "WatchdogProcessStatus"
 }
 
-func (self *WatchdogProcessStatus) MsgNameUpper() string {
+func (self *WatchdogProcessStatus) TypeCName() string {
 	return "WATCHDOG_PROCESS_STATUS"
 }
 
-func (self *WatchdogProcessStatus) MsgSize() uint8 {
-	return 0
+func (self *WatchdogProcessStatus) TypeSize() uint8 {
+	return 12
+}
+
+func (self *WatchdogProcessStatus) TypeCRCExtra() uint8 {
+	return 132
 }
 
 //
@@ -367,20 +410,24 @@ type WatchdogCommand struct {
 	TargetSystemId uint8  // Target system ID
 }
 
-func (self *WatchdogCommand) MsgID() uint8 {
+func (self *WatchdogCommand) TypeID() uint8 {
 	return 183
 }
 
-func (self *WatchdogCommand) MsgName() string {
+func (self *WatchdogCommand) TypeName() string {
 	return "WatchdogCommand"
 }
 
-func (self *WatchdogCommand) MsgNameUpper() string {
+func (self *WatchdogCommand) TypeCName() string {
 	return "WATCHDOG_COMMAND"
 }
 
-func (self *WatchdogCommand) MsgSize() uint8 {
-	return 0
+func (self *WatchdogCommand) TypeSize() uint8 {
+	return 6
+}
+
+func (self *WatchdogCommand) TypeCRCExtra() uint8 {
+	return 208
 }
 
 //
@@ -391,20 +438,24 @@ type PatternDetected struct {
 	Type       uint8   // 0: Pattern, 1: Letter
 }
 
-func (self *PatternDetected) MsgID() uint8 {
+func (self *PatternDetected) TypeID() uint8 {
 	return 190
 }
 
-func (self *PatternDetected) MsgName() string {
+func (self *PatternDetected) TypeName() string {
 	return "PatternDetected"
 }
 
-func (self *PatternDetected) MsgNameUpper() string {
+func (self *PatternDetected) TypeCName() string {
 	return "PATTERN_DETECTED"
 }
 
-func (self *PatternDetected) MsgSize() uint8 {
-	return 0
+func (self *PatternDetected) TypeSize() uint8 {
+	return 7
+}
+
+func (self *PatternDetected) TypeCRCExtra() uint8 {
+	return 124
 }
 
 // Notifies the operator about a point of interest (POI). This can be anything detected by the
@@ -422,20 +473,24 @@ type PointOfInterest struct {
 	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
 }
 
-func (self *PointOfInterest) MsgID() uint8 {
+func (self *PointOfInterest) TypeID() uint8 {
 	return 191
 }
 
-func (self *PointOfInterest) MsgName() string {
+func (self *PointOfInterest) TypeName() string {
 	return "PointOfInterest"
 }
 
-func (self *PointOfInterest) MsgNameUpper() string {
+func (self *PointOfInterest) TypeCName() string {
 	return "POINT_OF_INTEREST"
 }
 
-func (self *PointOfInterest) MsgSize() uint8 {
-	return 0
+func (self *PointOfInterest) TypeSize() uint8 {
+	return 18
+}
+
+func (self *PointOfInterest) TypeCRCExtra() uint8 {
+	return 115
 }
 
 // Notifies the operator about the connection of two point of interests (POI). This can be anything detected by the
@@ -456,20 +511,24 @@ type PointOfInterestConnection struct {
 	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
 }
 
-func (self *PointOfInterestConnection) MsgID() uint8 {
+func (self *PointOfInterestConnection) TypeID() uint8 {
 	return 192
 }
 
-func (self *PointOfInterestConnection) MsgName() string {
+func (self *PointOfInterestConnection) TypeName() string {
 	return "PointOfInterestConnection"
 }
 
-func (self *PointOfInterestConnection) MsgNameUpper() string {
+func (self *PointOfInterestConnection) TypeCName() string {
 	return "POINT_OF_INTEREST_CONNECTION"
 }
 
-func (self *PointOfInterestConnection) MsgSize() uint8 {
-	return 0
+func (self *PointOfInterestConnection) TypeSize() uint8 {
+	return 30
+}
+
+func (self *PointOfInterestConnection) TypeCRCExtra() uint8 {
+	return 230
 }
 
 //
@@ -484,20 +543,24 @@ type BriefFeature struct {
 	OrientationAssignment uint8     // Orientation assignment 0: false, 1:true
 }
 
-func (self *BriefFeature) MsgID() uint8 {
+func (self *BriefFeature) TypeID() uint8 {
 	return 195
 }
 
-func (self *BriefFeature) MsgName() string {
+func (self *BriefFeature) TypeName() string {
 	return "BriefFeature"
 }
 
-func (self *BriefFeature) MsgNameUpper() string {
+func (self *BriefFeature) TypeCName() string {
 	return "BRIEF_FEATURE"
 }
 
-func (self *BriefFeature) MsgSize() uint8 {
-	return 0
+func (self *BriefFeature) TypeSize() uint8 {
+	return 22
+}
+
+func (self *BriefFeature) TypeCRCExtra() uint8 {
+	return 34
 }
 
 //
@@ -513,20 +576,24 @@ type AttitudeControl struct {
 	Target       uint8   // The system to be controlled
 }
 
-func (self *AttitudeControl) MsgID() uint8 {
+func (self *AttitudeControl) TypeID() uint8 {
 	return 200
 }
 
-func (self *AttitudeControl) MsgName() string {
+func (self *AttitudeControl) TypeName() string {
 	return "AttitudeControl"
 }
 
-func (self *AttitudeControl) MsgNameUpper() string {
+func (self *AttitudeControl) TypeCName() string {
 	return "ATTITUDE_CONTROL"
 }
 
-func (self *AttitudeControl) MsgSize() uint8 {
-	return 0
+func (self *AttitudeControl) TypeSize() uint8 {
+	return 21
+}
+
+func (self *AttitudeControl) TypeCRCExtra() uint8 {
+	return 64
 }
 
 //
@@ -545,20 +612,24 @@ type DetectionStats struct {
 	Detections        uint32  // Number of detections
 }
 
-func (self *DetectionStats) MsgID() uint8 {
+func (self *DetectionStats) TypeID() uint8 {
 	return 205
 }
 
-func (self *DetectionStats) MsgName() string {
+func (self *DetectionStats) TypeName() string {
 	return "DetectionStats"
 }
 
-func (self *DetectionStats) MsgNameUpper() string {
+func (self *DetectionStats) TypeCName() string {
 	return "DETECTION_STATS"
 }
 
-func (self *DetectionStats) MsgSize() uint8 {
-	return 0
+func (self *DetectionStats) TypeSize() uint8 {
+	return 48
+}
+
+func (self *DetectionStats) TypeCRCExtra() uint8 {
+	return 41
 }
 
 //
@@ -579,20 +650,24 @@ type OnboardHealth struct {
 	CpuLoad        uint8   // CPU load in percent
 }
 
-func (self *OnboardHealth) MsgID() uint8 {
+func (self *OnboardHealth) TypeID() uint8 {
 	return 206
 }
 
-func (self *OnboardHealth) MsgName() string {
+func (self *OnboardHealth) TypeName() string {
 	return "OnboardHealth"
 }
 
-func (self *OnboardHealth) MsgNameUpper() string {
+func (self *OnboardHealth) TypeCName() string {
 	return "ONBOARD_HEALTH"
 }
 
-func (self *OnboardHealth) MsgSize() uint8 {
-	return 0
+func (self *OnboardHealth) TypeSize() uint8 {
+	return 39
+}
+
+func (self *OnboardHealth) TypeCRCExtra() uint8 {
+	return 164
 }
 
 ////////////////////////////////////////////////////////////////////////////////

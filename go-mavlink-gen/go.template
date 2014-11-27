@@ -14,10 +14,8 @@ const (
 func init() {
 	mavlink.ProtocolName = PROTOCOL_NAME
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
-	// mavlink.MessageCRSs = nil
-
 	{{range .Messages}}
-	mavlink.NewMessage[{{.ID}}] = func() mavlink.Message { return new({{.Name}}) }{{end}}
+	mavlink.MessageFactory[{{.ID}}] = func() mavlink.Message { return new({{.Name}}) }{{end}}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,20 +39,24 @@ type {{.Name}} struct { {{range .Fields}}
 	{{.Name}} {{.Type}} // {{.Description}}{{end}}
 }
 
-func (self *{{.Name}}) MsgID() uint8 {
+func (self *{{.Name}}) TypeID() uint8 {
 	return {{.ID}}
 }
 
-func (self *{{.Name}}) MsgName() string {
+func (self *{{.Name}}) TypeName() string {
 	return "{{.Name}}"
 }
 
-func (self *{{.Name}}) MsgNameUpper() string {
-	return "{{.NameUpper}}"
+func (self *{{.Name}}) TypeCName() string {
+	return "{{.CName}}"
 }
 
-func (self *{{.Name}}) MsgSize() uint8 {
+func (self *{{.Name}}) TypeSize() uint8 {
 	return {{.Size}}
+}
+
+func (self *{{.Name}}) TypeCRCExtra() uint8 {
+	return {{.CRCExtra}}
 }
 {{end}}
 

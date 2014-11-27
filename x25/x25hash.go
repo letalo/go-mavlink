@@ -4,16 +4,16 @@ import "io"
 
 var HashStart = Hash{0xffff}
 
+// Warning: Works only on little endian systems
 type Hash struct {
 	sum uint16
 }
 
-// Warning: Works only on little endian systems
-// func NewHash() *Hash {
-// 	hash := new(Hash)
-// 	hash.Init()
-// 	return hash
-// }
+func NewHash() *Hash {
+	hash := new(Hash)
+	hash.Reset()
+	return hash
+}
 
 func (hash *Hash) Reset() {
 	hash.sum = 0xffff

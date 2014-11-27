@@ -13,6 +13,14 @@ const (
 	// x25ValidateCRC uint16 = 0xf0b8
 )
 
+type Message interface {
+	TypeID() uint8       // ID of the message
+	TypeName() string    // Name of the message
+	TypeCName() string   // Upper case name of the message
+	TypeSize() uint8     // Size in bytes of the message
+	TypeCRCExtra() uint8 // CRC_EXTRA
+}
+
 type Packet struct {
 	Header   Header
 	Message  Message
@@ -23,11 +31,11 @@ func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *
 	return &Packet{
 		Header: Header{
 			FrameStart:     FRAME_START,
-			PayloadLength:  message.MsgSize(),
+			PayloadLength:  message.TypeSize(),
 			PacketSequence: sequence,
 			SystemID:       systemID,
 			ComponentID:    componentID,
-			MessageID:      message.MsgID(),
+			MessageID:      message.TypeID(),
 		},
 		Message: message,
 	}
@@ -48,7 +56,7 @@ func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
 	if err != nil {
 		return n, err
 	}
-	n += int64(packet.Message.MsgSize())
+	n += int64(packet.Message.TypeSize())
 
 	packet.Checksum = hash.Sum()
 
@@ -67,7 +75,7 @@ func (packet *Packet) ComputeChecksum() uint16 {
 
 	packet.Header.Hash(&hash)
 	binary.Write(&hash, binary.LittleEndian, packet.Message)
-	hash.WriteByte(MessageCRSs[packet.Header.MessageID])
+	hash.WriteByte(packet.Message.TypeCRCExtra())
 
 	return hash.Sum()
 }
