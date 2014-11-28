@@ -1,6 +1,7 @@
 package mavlink
 
 import (
+	"fmt"
 	"unsafe"
 
 	"github.com/SpaceLeap/go-mavlink/x25"
@@ -37,4 +38,8 @@ func (header *Header) Hash(hash *x25.Hash) {
 	hash.WriteByte(header.SystemID)
 	hash.WriteByte(header.ComponentID)
 	hash.WriteByte(header.MessageID)
+}
+
+func (header *Header) String() string {
+	return fmt.Sprintf("{System: %d, Component: %d, Sequence: %d}", header.SystemID, header.ComponentID, header.PacketSequence)
 }

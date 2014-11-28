@@ -8,6 +8,7 @@ type Connection struct {
 	io.ReadWriter
 	localComponentSeq  [256]uint8
 	remoteComponentSeq [256]uint8
+	bufferedPacket     *Packet
 	systemID           uint8
 }
 
@@ -20,17 +21,25 @@ func (conn *Connection) Send(componentID uint8, message Message) error {
 	return Send(conn, conn.systemID, componentID, conn.localComponentSeq[componentID], message)
 }
 
-func (conn *Connection) Receive() (packet *Packet, loss int, err error) {
+func (conn *Connection) Receive() (packet *Packet, err error) {
+	if conn.bufferedPacket != nil {
+		packet, conn.bufferedPacket = conn.bufferedPacket, nil
+		return packet, nil
+	}
 	packet, err = Receive(conn)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	component := packet.Header.ComponentID
-	loss = int(packet.Header.PacketSequence) - int(conn.remoteComponentSeq[component]) - 1
+	loss := int(packet.Header.PacketSequence) - int(conn.remoteComponentSeq[component]) - 1
 	if loss < 0 {
 		loss = 255 - loss
 	}
-	return packet, loss, nil
+	if loss > 0 {
+		conn.bufferedPacket = packet
+		return nil, ErrPacketLoss(loss)
+	}
+	return packet, nil
 }
 
 func (conn *Connection) Close() error {

@@ -20,6 +20,12 @@ func (length ErrInvalidPayloadLength) Error() string {
 	return fmt.Sprintf("Message ID and PayloadLength (%d) don't match", length)
 }
 
+type ErrPacketLoss int
+
+func (loss ErrPacketLoss) Error() string {
+	return fmt.Sprintf("Lost %d packages", loss)
+}
+
 // type ErrInvalidStartframe uint8
 
 // func (frame ErrInvalidStartframe) Error() string {

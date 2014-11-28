@@ -73,10 +73,6 @@ func (self *SetCamShutter) TypeID() uint8 {
 }
 
 func (self *SetCamShutter) TypeName() string {
-	return "SetCamShutter"
-}
-
-func (self *SetCamShutter) TypeCName() string {
 	return "SET_CAM_SHUTTER"
 }
 
@@ -109,10 +105,6 @@ func (self *ImageTriggered) TypeID() uint8 {
 }
 
 func (self *ImageTriggered) TypeName() string {
-	return "ImageTriggered"
-}
-
-func (self *ImageTriggered) TypeCName() string {
 	return "IMAGE_TRIGGERED"
 }
 
@@ -134,10 +126,6 @@ func (self *ImageTriggerControl) TypeID() uint8 {
 }
 
 func (self *ImageTriggerControl) TypeName() string {
-	return "ImageTriggerControl"
-}
-
-func (self *ImageTriggerControl) TypeCName() string {
 	return "IMAGE_TRIGGER_CONTROL"
 }
 
@@ -181,10 +169,6 @@ func (self *ImageAvailable) TypeID() uint8 {
 }
 
 func (self *ImageAvailable) TypeName() string {
-	return "ImageAvailable"
-}
-
-func (self *ImageAvailable) TypeCName() string {
 	return "IMAGE_AVAILABLE"
 }
 
@@ -211,10 +195,6 @@ func (self *SetPositionControlOffset) TypeID() uint8 {
 }
 
 func (self *SetPositionControlOffset) TypeName() string {
-	return "SetPositionControlOffset"
-}
-
-func (self *SetPositionControlOffset) TypeCName() string {
 	return "SET_POSITION_CONTROL_OFFSET"
 }
 
@@ -240,10 +220,6 @@ func (self *PositionControlSetpoint) TypeID() uint8 {
 }
 
 func (self *PositionControlSetpoint) TypeName() string {
-	return "PositionControlSetpoint"
-}
-
-func (self *PositionControlSetpoint) TypeCName() string {
 	return "POSITION_CONTROL_SETPOINT"
 }
 
@@ -271,10 +247,6 @@ func (self *Marker) TypeID() uint8 {
 }
 
 func (self *Marker) TypeName() string {
-	return "Marker"
-}
-
-func (self *Marker) TypeCName() string {
 	return "MARKER"
 }
 
@@ -302,10 +274,6 @@ func (self *RawAux) TypeID() uint8 {
 }
 
 func (self *RawAux) TypeName() string {
-	return "RawAux"
-}
-
-func (self *RawAux) TypeCName() string {
 	return "RAW_AUX"
 }
 
@@ -328,10 +296,6 @@ func (self *WatchdogHeartbeat) TypeID() uint8 {
 }
 
 func (self *WatchdogHeartbeat) TypeName() string {
-	return "WatchdogHeartbeat"
-}
-
-func (self *WatchdogHeartbeat) TypeCName() string {
 	return "WATCHDOG_HEARTBEAT"
 }
 
@@ -357,10 +321,6 @@ func (self *WatchdogProcessInfo) TypeID() uint8 {
 }
 
 func (self *WatchdogProcessInfo) TypeName() string {
-	return "WatchdogProcessInfo"
-}
-
-func (self *WatchdogProcessInfo) TypeCName() string {
 	return "WATCHDOG_PROCESS_INFO"
 }
 
@@ -387,10 +347,6 @@ func (self *WatchdogProcessStatus) TypeID() uint8 {
 }
 
 func (self *WatchdogProcessStatus) TypeName() string {
-	return "WatchdogProcessStatus"
-}
-
-func (self *WatchdogProcessStatus) TypeCName() string {
 	return "WATCHDOG_PROCESS_STATUS"
 }
 
@@ -415,10 +371,6 @@ func (self *WatchdogCommand) TypeID() uint8 {
 }
 
 func (self *WatchdogCommand) TypeName() string {
-	return "WatchdogCommand"
-}
-
-func (self *WatchdogCommand) TypeCName() string {
 	return "WATCHDOG_COMMAND"
 }
 
@@ -443,10 +395,6 @@ func (self *PatternDetected) TypeID() uint8 {
 }
 
 func (self *PatternDetected) TypeName() string {
-	return "PatternDetected"
-}
-
-func (self *PatternDetected) TypeCName() string {
 	return "PATTERN_DETECTED"
 }
 
@@ -478,10 +426,6 @@ func (self *PointOfInterest) TypeID() uint8 {
 }
 
 func (self *PointOfInterest) TypeName() string {
-	return "PointOfInterest"
-}
-
-func (self *PointOfInterest) TypeCName() string {
 	return "POINT_OF_INTEREST"
 }
 
@@ -516,10 +460,6 @@ func (self *PointOfInterestConnection) TypeID() uint8 {
 }
 
 func (self *PointOfInterestConnection) TypeName() string {
-	return "PointOfInterestConnection"
-}
-
-func (self *PointOfInterestConnection) TypeCName() string {
 	return "POINT_OF_INTEREST_CONNECTION"
 }
 
@@ -548,10 +488,6 @@ func (self *BriefFeature) TypeID() uint8 {
 }
 
 func (self *BriefFeature) TypeName() string {
-	return "BriefFeature"
-}
-
-func (self *BriefFeature) TypeCName() string {
 	return "BRIEF_FEATURE"
 }
 
@@ -581,10 +517,6 @@ func (self *AttitudeControl) TypeID() uint8 {
 }
 
 func (self *AttitudeControl) TypeName() string {
-	return "AttitudeControl"
-}
-
-func (self *AttitudeControl) TypeCName() string {
 	return "ATTITUDE_CONTROL"
 }
 
@@ -617,10 +549,6 @@ func (self *DetectionStats) TypeID() uint8 {
 }
 
 func (self *DetectionStats) TypeName() string {
-	return "DetectionStats"
-}
-
-func (self *DetectionStats) TypeCName() string {
 	return "DETECTION_STATS"
 }
 
@@ -655,10 +583,6 @@ func (self *OnboardHealth) TypeID() uint8 {
 }
 
 func (self *OnboardHealth) TypeName() string {
-	return "OnboardHealth"
-}
-
-func (self *OnboardHealth) TypeCName() string {
 	return "ONBOARD_HEALTH"
 }
 
@@ -674,32 +598,35 @@ func (self *OnboardHealth) TypeCRCExtra() uint8 {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
+func truncate(chars []byte) []byte {
+	for i, c := range chars {
+		if c == 0 {
+			return chars[:i]
+		}
+	}
+	return chars
+}
+
 type Char26 [26]byte
 
 func (chars *Char26) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
+}
+
+type Char32 [32]byte
+
+func (chars *Char32) String() string {
+	return string(truncate(chars[:]))
 }
 
 type Char100 [100]byte
 
 func (chars *Char100) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
 }
 
 type Char147 [147]byte
 
 func (chars *Char147) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
 }

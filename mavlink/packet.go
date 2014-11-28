@@ -14,9 +14,9 @@ const (
 )
 
 type Message interface {
-	TypeID() uint8       // ID of the message
-	TypeName() string    // Name of the message
-	TypeCName() string   // Upper case name of the message
+	TypeID() uint8    // ID of the message
+	TypeName() string // Name of the message
+	// TypeCName() string   // Upper case name of the message
 	TypeSize() uint8     // Size in bytes of the message
 	TypeCRCExtra() uint8 // CRC_EXTRA
 }

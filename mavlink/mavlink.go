@@ -2,6 +2,7 @@ package mavlink
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 	"log"
 
@@ -18,6 +19,7 @@ var (
 	ProtocolName    string
 	ProtocolVersion string
 	MessageFactory  [256]func() Message
+	Logger          *log.Logger
 )
 
 func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
@@ -33,20 +35,33 @@ func Receive(reader io.Reader) (*Packet, error) {
 	headerBytes := packet.Header.Bytes()
 	firstHeaderByte := headerBytes[:1] // points to packet.Header.FrameStart
 
-	// Initially FrameStart will be zero and != FRAME_START
-	// Read until we get FRAME_START, silently ignore non FRAME_START bytes
+	_, err := reader.Read(firstHeaderByte)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read until we get FRAME_START
+	var skipped int
 	for packet.Header.FrameStart != FRAME_START {
 		_, err := reader.Read(firstHeaderByte)
 		if err != nil {
 			return nil, err
 		}
+		skipped++
+		if skipped > 1024 {
+			return nil, errors.New("Receive wasn't able to find FRAME_START within 1kB, giving up now")
+		}
+	}
+
+	if skipped != 0 && Logger != nil {
+		Logger.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
 	}
 
 	hash := x25.HashStart
 	hashedReader := x25.HashedStream{Hash: &hash, Reader: reader}
 
 	// Read rest of header directly into packet.Header referenced by headerBytes
-	_, err := io.ReadFull(&hashedReader, headerBytes[1:])
+	_, err = io.ReadFull(&hashedReader, headerBytes[1:])
 	if err != nil {
 		return nil, err
 	}
@@ -75,15 +90,15 @@ func Receive(reader io.Reader) (*Packet, error) {
 		return nil, ErrInvalidChecksum(hash.Sum())
 	}
 
-	return nil, nil
+	return &packet, nil
 }
 
-// ReceiveNoErr calls Receive and returns a *Packet if there was no error.
-// If Receive returns an error, and logger is not nil,
-// then the error will be logged with logger.
+// ReceiveLogErr calls Receive and returns a *Packet if there was no error.
+// If Receive returns an error, and Logger is not nil,
+// then the error will be logged with Logger.
 // The only exception is the error io.EOF. In that case the error
 // won't be logged and a nil packet will be returned.
-func ReceiveNoErr(reader io.Reader, logger *log.Logger) (packet *Packet) {
+func ReceiveLogErr(reader io.Reader) (packet *Packet) {
 	var err error
 	for packet == nil {
 		packet, err = Receive(reader)
@@ -91,8 +106,8 @@ func ReceiveNoErr(reader io.Reader, logger *log.Logger) (packet *Packet) {
 			if err == io.EOF {
 				return nil
 			}
-			if logger != nil {
-				logger.Println(err)
+			if Logger != nil {
+				Logger.Println(err)
 			}
 		}
 	}

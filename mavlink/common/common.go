@@ -589,10 +589,6 @@ func (self *Heartbeat) TypeID() uint8 {
 }
 
 func (self *Heartbeat) TypeName() string {
-	return "Heartbeat"
-}
-
-func (self *Heartbeat) TypeCName() string {
 	return "HEARTBEAT"
 }
 
@@ -626,10 +622,6 @@ func (self *SysStatus) TypeID() uint8 {
 }
 
 func (self *SysStatus) TypeName() string {
-	return "SysStatus"
-}
-
-func (self *SysStatus) TypeCName() string {
 	return "SYS_STATUS"
 }
 
@@ -652,10 +644,6 @@ func (self *SystemTime) TypeID() uint8 {
 }
 
 func (self *SystemTime) TypeName() string {
-	return "SystemTime"
-}
-
-func (self *SystemTime) TypeCName() string {
 	return "SYSTEM_TIME"
 }
 
@@ -680,10 +668,6 @@ func (self *Ping) TypeID() uint8 {
 }
 
 func (self *Ping) TypeName() string {
-	return "Ping"
-}
-
-func (self *Ping) TypeCName() string {
 	return "PING"
 }
 
@@ -708,10 +692,6 @@ func (self *ChangeOperatorControl) TypeID() uint8 {
 }
 
 func (self *ChangeOperatorControl) TypeName() string {
-	return "ChangeOperatorControl"
-}
-
-func (self *ChangeOperatorControl) TypeCName() string {
 	return "CHANGE_OPERATOR_CONTROL"
 }
 
@@ -735,10 +715,6 @@ func (self *ChangeOperatorControlAck) TypeID() uint8 {
 }
 
 func (self *ChangeOperatorControlAck) TypeName() string {
-	return "ChangeOperatorControlAck"
-}
-
-func (self *ChangeOperatorControlAck) TypeCName() string {
 	return "CHANGE_OPERATOR_CONTROL_ACK"
 }
 
@@ -760,10 +736,6 @@ func (self *AuthKey) TypeID() uint8 {
 }
 
 func (self *AuthKey) TypeName() string {
-	return "AuthKey"
-}
-
-func (self *AuthKey) TypeCName() string {
 	return "AUTH_KEY"
 }
 
@@ -787,10 +759,6 @@ func (self *SetMode) TypeID() uint8 {
 }
 
 func (self *SetMode) TypeName() string {
-	return "SetMode"
-}
-
-func (self *SetMode) TypeCName() string {
 	return "SET_MODE"
 }
 
@@ -815,10 +783,6 @@ func (self *ParamRequestRead) TypeID() uint8 {
 }
 
 func (self *ParamRequestRead) TypeName() string {
-	return "ParamRequestRead"
-}
-
-func (self *ParamRequestRead) TypeCName() string {
 	return "PARAM_REQUEST_READ"
 }
 
@@ -841,10 +805,6 @@ func (self *ParamRequestList) TypeID() uint8 {
 }
 
 func (self *ParamRequestList) TypeName() string {
-	return "ParamRequestList"
-}
-
-func (self *ParamRequestList) TypeCName() string {
 	return "PARAM_REQUEST_LIST"
 }
 
@@ -870,10 +830,6 @@ func (self *ParamValue) TypeID() uint8 {
 }
 
 func (self *ParamValue) TypeName() string {
-	return "ParamValue"
-}
-
-func (self *ParamValue) TypeCName() string {
 	return "PARAM_VALUE"
 }
 
@@ -899,10 +855,6 @@ func (self *ParamSet) TypeID() uint8 {
 }
 
 func (self *ParamSet) TypeName() string {
-	return "ParamSet"
-}
-
-func (self *ParamSet) TypeCName() string {
 	return "PARAM_SET"
 }
 
@@ -934,10 +886,6 @@ func (self *GpsRawInt) TypeID() uint8 {
 }
 
 func (self *GpsRawInt) TypeName() string {
-	return "GpsRawInt"
-}
-
-func (self *GpsRawInt) TypeCName() string {
 	return "GPS_RAW_INT"
 }
 
@@ -964,10 +912,6 @@ func (self *GpsStatus) TypeID() uint8 {
 }
 
 func (self *GpsStatus) TypeName() string {
-	return "GpsStatus"
-}
-
-func (self *GpsStatus) TypeCName() string {
 	return "GPS_STATUS"
 }
 
@@ -998,10 +942,6 @@ func (self *ScaledImu) TypeID() uint8 {
 }
 
 func (self *ScaledImu) TypeName() string {
-	return "ScaledImu"
-}
-
-func (self *ScaledImu) TypeCName() string {
 	return "SCALED_IMU"
 }
 
@@ -1032,10 +972,6 @@ func (self *RawImu) TypeID() uint8 {
 }
 
 func (self *RawImu) TypeName() string {
-	return "RawImu"
-}
-
-func (self *RawImu) TypeCName() string {
 	return "RAW_IMU"
 }
 
@@ -1061,10 +997,6 @@ func (self *RawPressure) TypeID() uint8 {
 }
 
 func (self *RawPressure) TypeName() string {
-	return "RawPressure"
-}
-
-func (self *RawPressure) TypeCName() string {
 	return "RAW_PRESSURE"
 }
 
@@ -1089,10 +1021,6 @@ func (self *ScaledPressure) TypeID() uint8 {
 }
 
 func (self *ScaledPressure) TypeName() string {
-	return "ScaledPressure"
-}
-
-func (self *ScaledPressure) TypeCName() string {
 	return "SCALED_PRESSURE"
 }
 
@@ -1120,10 +1048,6 @@ func (self *Attitude) TypeID() uint8 {
 }
 
 func (self *Attitude) TypeName() string {
-	return "Attitude"
-}
-
-func (self *Attitude) TypeCName() string {
 	return "ATTITUDE"
 }
 
@@ -1152,10 +1076,6 @@ func (self *AttitudeQuaternion) TypeID() uint8 {
 }
 
 func (self *AttitudeQuaternion) TypeName() string {
-	return "AttitudeQuaternion"
-}
-
-func (self *AttitudeQuaternion) TypeCName() string {
 	return "ATTITUDE_QUATERNION"
 }
 
@@ -1183,10 +1103,6 @@ func (self *LocalPositionNed) TypeID() uint8 {
 }
 
 func (self *LocalPositionNed) TypeName() string {
-	return "LocalPositionNed"
-}
-
-func (self *LocalPositionNed) TypeCName() string {
 	return "LOCAL_POSITION_NED"
 }
 
@@ -1217,10 +1133,6 @@ func (self *GlobalPositionInt) TypeID() uint8 {
 }
 
 func (self *GlobalPositionInt) TypeName() string {
-	return "GlobalPositionInt"
-}
-
-func (self *GlobalPositionInt) TypeCName() string {
 	return "GLOBAL_POSITION_INT"
 }
 
@@ -1252,10 +1164,6 @@ func (self *RcChannelsScaled) TypeID() uint8 {
 }
 
 func (self *RcChannelsScaled) TypeName() string {
-	return "RcChannelsScaled"
-}
-
-func (self *RcChannelsScaled) TypeCName() string {
 	return "RC_CHANNELS_SCALED"
 }
 
@@ -1287,10 +1195,6 @@ func (self *RcChannelsRaw) TypeID() uint8 {
 }
 
 func (self *RcChannelsRaw) TypeName() string {
-	return "RcChannelsRaw"
-}
-
-func (self *RcChannelsRaw) TypeCName() string {
 	return "RC_CHANNELS_RAW"
 }
 
@@ -1321,10 +1225,6 @@ func (self *ServoOutputRaw) TypeID() uint8 {
 }
 
 func (self *ServoOutputRaw) TypeName() string {
-	return "ServoOutputRaw"
-}
-
-func (self *ServoOutputRaw) TypeCName() string {
 	return "SERVO_OUTPUT_RAW"
 }
 
@@ -1349,10 +1249,6 @@ func (self *MissionRequestPartialList) TypeID() uint8 {
 }
 
 func (self *MissionRequestPartialList) TypeName() string {
-	return "MissionRequestPartialList"
-}
-
-func (self *MissionRequestPartialList) TypeCName() string {
 	return "MISSION_REQUEST_PARTIAL_LIST"
 }
 
@@ -1377,10 +1273,6 @@ func (self *MissionWritePartialList) TypeID() uint8 {
 }
 
 func (self *MissionWritePartialList) TypeName() string {
-	return "MissionWritePartialList"
-}
-
-func (self *MissionWritePartialList) TypeCName() string {
 	return "MISSION_WRITE_PARTIAL_LIST"
 }
 
@@ -1416,10 +1308,6 @@ func (self *MissionItem) TypeID() uint8 {
 }
 
 func (self *MissionItem) TypeName() string {
-	return "MissionItem"
-}
-
-func (self *MissionItem) TypeCName() string {
 	return "MISSION_ITEM"
 }
 
@@ -1443,10 +1331,6 @@ func (self *MissionRequest) TypeID() uint8 {
 }
 
 func (self *MissionRequest) TypeName() string {
-	return "MissionRequest"
-}
-
-func (self *MissionRequest) TypeCName() string {
 	return "MISSION_REQUEST"
 }
 
@@ -1470,10 +1354,6 @@ func (self *MissionSetCurrent) TypeID() uint8 {
 }
 
 func (self *MissionSetCurrent) TypeName() string {
-	return "MissionSetCurrent"
-}
-
-func (self *MissionSetCurrent) TypeCName() string {
 	return "MISSION_SET_CURRENT"
 }
 
@@ -1495,10 +1375,6 @@ func (self *MissionCurrent) TypeID() uint8 {
 }
 
 func (self *MissionCurrent) TypeName() string {
-	return "MissionCurrent"
-}
-
-func (self *MissionCurrent) TypeCName() string {
 	return "MISSION_CURRENT"
 }
 
@@ -1521,10 +1397,6 @@ func (self *MissionRequestList) TypeID() uint8 {
 }
 
 func (self *MissionRequestList) TypeName() string {
-	return "MissionRequestList"
-}
-
-func (self *MissionRequestList) TypeCName() string {
 	return "MISSION_REQUEST_LIST"
 }
 
@@ -1548,10 +1420,6 @@ func (self *MissionCount) TypeID() uint8 {
 }
 
 func (self *MissionCount) TypeName() string {
-	return "MissionCount"
-}
-
-func (self *MissionCount) TypeCName() string {
 	return "MISSION_COUNT"
 }
 
@@ -1574,10 +1442,6 @@ func (self *MissionClearAll) TypeID() uint8 {
 }
 
 func (self *MissionClearAll) TypeName() string {
-	return "MissionClearAll"
-}
-
-func (self *MissionClearAll) TypeCName() string {
 	return "MISSION_CLEAR_ALL"
 }
 
@@ -1599,10 +1463,6 @@ func (self *MissionItemReached) TypeID() uint8 {
 }
 
 func (self *MissionItemReached) TypeName() string {
-	return "MissionItemReached"
-}
-
-func (self *MissionItemReached) TypeCName() string {
 	return "MISSION_ITEM_REACHED"
 }
 
@@ -1626,10 +1486,6 @@ func (self *MissionAck) TypeID() uint8 {
 }
 
 func (self *MissionAck) TypeName() string {
-	return "MissionAck"
-}
-
-func (self *MissionAck) TypeCName() string {
 	return "MISSION_ACK"
 }
 
@@ -1654,10 +1510,6 @@ func (self *SetGpsGlobalOrigin) TypeID() uint8 {
 }
 
 func (self *SetGpsGlobalOrigin) TypeName() string {
-	return "SetGpsGlobalOrigin"
-}
-
-func (self *SetGpsGlobalOrigin) TypeCName() string {
 	return "SET_GPS_GLOBAL_ORIGIN"
 }
 
@@ -1681,10 +1533,6 @@ func (self *GpsGlobalOrigin) TypeID() uint8 {
 }
 
 func (self *GpsGlobalOrigin) TypeName() string {
-	return "GpsGlobalOrigin"
-}
-
-func (self *GpsGlobalOrigin) TypeCName() string {
 	return "GPS_GLOBAL_ORIGIN"
 }
 
@@ -1714,10 +1562,6 @@ func (self *SafetySetAllowedArea) TypeID() uint8 {
 }
 
 func (self *SafetySetAllowedArea) TypeName() string {
-	return "SafetySetAllowedArea"
-}
-
-func (self *SafetySetAllowedArea) TypeCName() string {
 	return "SAFETY_SET_ALLOWED_AREA"
 }
 
@@ -1745,10 +1589,6 @@ func (self *SafetyAllowedArea) TypeID() uint8 {
 }
 
 func (self *SafetyAllowedArea) TypeName() string {
-	return "SafetyAllowedArea"
-}
-
-func (self *SafetyAllowedArea) TypeCName() string {
 	return "SAFETY_ALLOWED_AREA"
 }
 
@@ -1775,10 +1615,6 @@ func (self *AttitudeQuaternionCov) TypeID() uint8 {
 }
 
 func (self *AttitudeQuaternionCov) TypeName() string {
-	return "AttitudeQuaternionCov"
-}
-
-func (self *AttitudeQuaternionCov) TypeCName() string {
 	return "ATTITUDE_QUATERNION_COV"
 }
 
@@ -1807,10 +1643,6 @@ func (self *NavControllerOutput) TypeID() uint8 {
 }
 
 func (self *NavControllerOutput) TypeName() string {
-	return "NavControllerOutput"
-}
-
-func (self *NavControllerOutput) TypeCName() string {
 	return "NAV_CONTROLLER_OUTPUT"
 }
 
@@ -1842,10 +1674,6 @@ func (self *GlobalPositionIntCov) TypeID() uint8 {
 }
 
 func (self *GlobalPositionIntCov) TypeName() string {
-	return "GlobalPositionIntCov"
-}
-
-func (self *GlobalPositionIntCov) TypeCName() string {
 	return "GLOBAL_POSITION_INT_COV"
 }
 
@@ -1876,10 +1704,6 @@ func (self *LocalPositionNedCov) TypeID() uint8 {
 }
 
 func (self *LocalPositionNedCov) TypeName() string {
-	return "LocalPositionNedCov"
-}
-
-func (self *LocalPositionNedCov) TypeCName() string {
 	return "LOCAL_POSITION_NED_COV"
 }
 
@@ -1921,10 +1745,6 @@ func (self *RcChannels) TypeID() uint8 {
 }
 
 func (self *RcChannels) TypeName() string {
-	return "RcChannels"
-}
-
-func (self *RcChannels) TypeCName() string {
 	return "RC_CHANNELS"
 }
 
@@ -1950,10 +1770,6 @@ func (self *RequestDataStream) TypeID() uint8 {
 }
 
 func (self *RequestDataStream) TypeName() string {
-	return "RequestDataStream"
-}
-
-func (self *RequestDataStream) TypeCName() string {
 	return "REQUEST_DATA_STREAM"
 }
 
@@ -1977,10 +1793,6 @@ func (self *DataStream) TypeID() uint8 {
 }
 
 func (self *DataStream) TypeName() string {
-	return "DataStream"
-}
-
-func (self *DataStream) TypeCName() string {
 	return "DATA_STREAM"
 }
 
@@ -2007,10 +1819,6 @@ func (self *ManualControl) TypeID() uint8 {
 }
 
 func (self *ManualControl) TypeName() string {
-	return "ManualControl"
-}
-
-func (self *ManualControl) TypeCName() string {
 	return "MANUAL_CONTROL"
 }
 
@@ -2041,10 +1849,6 @@ func (self *RcChannelsOverride) TypeID() uint8 {
 }
 
 func (self *RcChannelsOverride) TypeName() string {
-	return "RcChannelsOverride"
-}
-
-func (self *RcChannelsOverride) TypeCName() string {
 	return "RC_CHANNELS_OVERRIDE"
 }
 
@@ -2080,10 +1884,6 @@ func (self *MissionItemInt) TypeID() uint8 {
 }
 
 func (self *MissionItemInt) TypeName() string {
-	return "MissionItemInt"
-}
-
-func (self *MissionItemInt) TypeCName() string {
 	return "MISSION_ITEM_INT"
 }
 
@@ -2110,10 +1910,6 @@ func (self *VfrHud) TypeID() uint8 {
 }
 
 func (self *VfrHud) TypeName() string {
-	return "VfrHud"
-}
-
-func (self *VfrHud) TypeCName() string {
 	return "VFR_HUD"
 }
 
@@ -2147,10 +1943,6 @@ func (self *CommandInt) TypeID() uint8 {
 }
 
 func (self *CommandInt) TypeName() string {
-	return "CommandInt"
-}
-
-func (self *CommandInt) TypeCName() string {
 	return "COMMAND_INT"
 }
 
@@ -2182,10 +1974,6 @@ func (self *CommandLong) TypeID() uint8 {
 }
 
 func (self *CommandLong) TypeName() string {
-	return "CommandLong"
-}
-
-func (self *CommandLong) TypeCName() string {
 	return "COMMAND_LONG"
 }
 
@@ -2208,10 +1996,6 @@ func (self *CommandAck) TypeID() uint8 {
 }
 
 func (self *CommandAck) TypeName() string {
-	return "CommandAck"
-}
-
-func (self *CommandAck) TypeCName() string {
 	return "COMMAND_ACK"
 }
 
@@ -2239,10 +2023,6 @@ func (self *ManualSetpoint) TypeID() uint8 {
 }
 
 func (self *ManualSetpoint) TypeName() string {
-	return "ManualSetpoint"
-}
-
-func (self *ManualSetpoint) TypeCName() string {
 	return "MANUAL_SETPOINT"
 }
 
@@ -2272,10 +2052,6 @@ func (self *SetAttitudeTarget) TypeID() uint8 {
 }
 
 func (self *SetAttitudeTarget) TypeName() string {
-	return "SetAttitudeTarget"
-}
-
-func (self *SetAttitudeTarget) TypeCName() string {
 	return "SET_ATTITUDE_TARGET"
 }
 
@@ -2303,10 +2079,6 @@ func (self *AttitudeTarget) TypeID() uint8 {
 }
 
 func (self *AttitudeTarget) TypeName() string {
-	return "AttitudeTarget"
-}
-
-func (self *AttitudeTarget) TypeCName() string {
 	return "ATTITUDE_TARGET"
 }
 
@@ -2343,10 +2115,6 @@ func (self *SetPositionTargetLocalNed) TypeID() uint8 {
 }
 
 func (self *SetPositionTargetLocalNed) TypeName() string {
-	return "SetPositionTargetLocalNed"
-}
-
-func (self *SetPositionTargetLocalNed) TypeCName() string {
 	return "SET_POSITION_TARGET_LOCAL_NED"
 }
 
@@ -2381,10 +2149,6 @@ func (self *PositionTargetLocalNed) TypeID() uint8 {
 }
 
 func (self *PositionTargetLocalNed) TypeName() string {
-	return "PositionTargetLocalNed"
-}
-
-func (self *PositionTargetLocalNed) TypeCName() string {
 	return "POSITION_TARGET_LOCAL_NED"
 }
 
@@ -2421,10 +2185,6 @@ func (self *SetPositionTargetGlobalInt) TypeID() uint8 {
 }
 
 func (self *SetPositionTargetGlobalInt) TypeName() string {
-	return "SetPositionTargetGlobalInt"
-}
-
-func (self *SetPositionTargetGlobalInt) TypeCName() string {
 	return "SET_POSITION_TARGET_GLOBAL_INT"
 }
 
@@ -2459,10 +2219,6 @@ func (self *PositionTargetGlobalInt) TypeID() uint8 {
 }
 
 func (self *PositionTargetGlobalInt) TypeName() string {
-	return "PositionTargetGlobalInt"
-}
-
-func (self *PositionTargetGlobalInt) TypeCName() string {
 	return "POSITION_TARGET_GLOBAL_INT"
 }
 
@@ -2490,10 +2246,6 @@ func (self *LocalPositionNedSystemGlobalOffset) TypeID() uint8 {
 }
 
 func (self *LocalPositionNedSystemGlobalOffset) TypeName() string {
-	return "LocalPositionNedSystemGlobalOffset"
-}
-
-func (self *LocalPositionNedSystemGlobalOffset) TypeCName() string {
 	return "LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET"
 }
 
@@ -2530,10 +2282,6 @@ func (self *HilState) TypeID() uint8 {
 }
 
 func (self *HilState) TypeName() string {
-	return "HilState"
-}
-
-func (self *HilState) TypeCName() string {
 	return "HIL_STATE"
 }
 
@@ -2565,10 +2313,6 @@ func (self *HilControls) TypeID() uint8 {
 }
 
 func (self *HilControls) TypeName() string {
-	return "HilControls"
-}
-
-func (self *HilControls) TypeCName() string {
 	return "HIL_CONTROLS"
 }
 
@@ -2603,10 +2347,6 @@ func (self *HilRcInputsRaw) TypeID() uint8 {
 }
 
 func (self *HilRcInputsRaw) TypeName() string {
-	return "HilRcInputsRaw"
-}
-
-func (self *HilRcInputsRaw) TypeCName() string {
 	return "HIL_RC_INPUTS_RAW"
 }
 
@@ -2635,10 +2375,6 @@ func (self *OpticalFlow) TypeID() uint8 {
 }
 
 func (self *OpticalFlow) TypeName() string {
-	return "OpticalFlow"
-}
-
-func (self *OpticalFlow) TypeCName() string {
 	return "OPTICAL_FLOW"
 }
 
@@ -2666,10 +2402,6 @@ func (self *GlobalVisionPositionEstimate) TypeID() uint8 {
 }
 
 func (self *GlobalVisionPositionEstimate) TypeName() string {
-	return "GlobalVisionPositionEstimate"
-}
-
-func (self *GlobalVisionPositionEstimate) TypeCName() string {
 	return "GLOBAL_VISION_POSITION_ESTIMATE"
 }
 
@@ -2697,10 +2429,6 @@ func (self *VisionPositionEstimate) TypeID() uint8 {
 }
 
 func (self *VisionPositionEstimate) TypeName() string {
-	return "VisionPositionEstimate"
-}
-
-func (self *VisionPositionEstimate) TypeCName() string {
 	return "VISION_POSITION_ESTIMATE"
 }
 
@@ -2725,10 +2453,6 @@ func (self *VisionSpeedEstimate) TypeID() uint8 {
 }
 
 func (self *VisionSpeedEstimate) TypeName() string {
-	return "VisionSpeedEstimate"
-}
-
-func (self *VisionSpeedEstimate) TypeCName() string {
 	return "VISION_SPEED_ESTIMATE"
 }
 
@@ -2756,10 +2480,6 @@ func (self *ViconPositionEstimate) TypeID() uint8 {
 }
 
 func (self *ViconPositionEstimate) TypeName() string {
-	return "ViconPositionEstimate"
-}
-
-func (self *ViconPositionEstimate) TypeCName() string {
 	return "VICON_POSITION_ESTIMATE"
 }
 
@@ -2795,10 +2515,6 @@ func (self *HighresImu) TypeID() uint8 {
 }
 
 func (self *HighresImu) TypeName() string {
-	return "HighresImu"
-}
-
-func (self *HighresImu) TypeCName() string {
 	return "HIGHRES_IMU"
 }
 
@@ -2831,10 +2547,6 @@ func (self *OpticalFlowRad) TypeID() uint8 {
 }
 
 func (self *OpticalFlowRad) TypeName() string {
-	return "OpticalFlowRad"
-}
-
-func (self *OpticalFlowRad) TypeCName() string {
 	return "OPTICAL_FLOW_RAD"
 }
 
@@ -2870,10 +2582,6 @@ func (self *HilSensor) TypeID() uint8 {
 }
 
 func (self *HilSensor) TypeName() string {
-	return "HilSensor"
-}
-
-func (self *HilSensor) TypeCName() string {
 	return "HIL_SENSOR"
 }
 
@@ -2915,10 +2623,6 @@ func (self *SimState) TypeID() uint8 {
 }
 
 func (self *SimState) TypeName() string {
-	return "SimState"
-}
-
-func (self *SimState) TypeCName() string {
 	return "SIM_STATE"
 }
 
@@ -2946,10 +2650,6 @@ func (self *RadioStatus) TypeID() uint8 {
 }
 
 func (self *RadioStatus) TypeName() string {
-	return "RadioStatus"
-}
-
-func (self *RadioStatus) TypeCName() string {
 	return "RADIO_STATUS"
 }
 
@@ -2974,10 +2674,6 @@ func (self *FileTransferProtocol) TypeID() uint8 {
 }
 
 func (self *FileTransferProtocol) TypeName() string {
-	return "FileTransferProtocol"
-}
-
-func (self *FileTransferProtocol) TypeCName() string {
 	return "FILE_TRANSFER_PROTOCOL"
 }
 
@@ -3000,10 +2696,6 @@ func (self *Timesync) TypeID() uint8 {
 }
 
 func (self *Timesync) TypeName() string {
-	return "Timesync"
-}
-
-func (self *Timesync) TypeCName() string {
 	return "TIMESYNC"
 }
 
@@ -3038,10 +2730,6 @@ func (self *HilGps) TypeID() uint8 {
 }
 
 func (self *HilGps) TypeName() string {
-	return "HilGps"
-}
-
-func (self *HilGps) TypeCName() string {
 	return "HIL_GPS"
 }
 
@@ -3074,10 +2762,6 @@ func (self *HilOpticalFlow) TypeID() uint8 {
 }
 
 func (self *HilOpticalFlow) TypeName() string {
-	return "HilOpticalFlow"
-}
-
-func (self *HilOpticalFlow) TypeCName() string {
 	return "HIL_OPTICAL_FLOW"
 }
 
@@ -3114,10 +2798,6 @@ func (self *HilStateQuaternion) TypeID() uint8 {
 }
 
 func (self *HilStateQuaternion) TypeName() string {
-	return "HilStateQuaternion"
-}
-
-func (self *HilStateQuaternion) TypeCName() string {
 	return "HIL_STATE_QUATERNION"
 }
 
@@ -3148,10 +2828,6 @@ func (self *ScaledImu2) TypeID() uint8 {
 }
 
 func (self *ScaledImu2) TypeName() string {
-	return "ScaledImu2"
-}
-
-func (self *ScaledImu2) TypeCName() string {
 	return "SCALED_IMU2"
 }
 
@@ -3176,10 +2852,6 @@ func (self *LogRequestList) TypeID() uint8 {
 }
 
 func (self *LogRequestList) TypeName() string {
-	return "LogRequestList"
-}
-
-func (self *LogRequestList) TypeCName() string {
 	return "LOG_REQUEST_LIST"
 }
 
@@ -3205,10 +2877,6 @@ func (self *LogEntry) TypeID() uint8 {
 }
 
 func (self *LogEntry) TypeName() string {
-	return "LogEntry"
-}
-
-func (self *LogEntry) TypeCName() string {
 	return "LOG_ENTRY"
 }
 
@@ -3234,10 +2902,6 @@ func (self *LogRequestData) TypeID() uint8 {
 }
 
 func (self *LogRequestData) TypeName() string {
-	return "LogRequestData"
-}
-
-func (self *LogRequestData) TypeCName() string {
 	return "LOG_REQUEST_DATA"
 }
 
@@ -3262,10 +2926,6 @@ func (self *LogData) TypeID() uint8 {
 }
 
 func (self *LogData) TypeName() string {
-	return "LogData"
-}
-
-func (self *LogData) TypeCName() string {
 	return "LOG_DATA"
 }
 
@@ -3288,10 +2948,6 @@ func (self *LogErase) TypeID() uint8 {
 }
 
 func (self *LogErase) TypeName() string {
-	return "LogErase"
-}
-
-func (self *LogErase) TypeCName() string {
 	return "LOG_ERASE"
 }
 
@@ -3314,10 +2970,6 @@ func (self *LogRequestEnd) TypeID() uint8 {
 }
 
 func (self *LogRequestEnd) TypeName() string {
-	return "LogRequestEnd"
-}
-
-func (self *LogRequestEnd) TypeCName() string {
 	return "LOG_REQUEST_END"
 }
 
@@ -3342,10 +2994,6 @@ func (self *GpsInjectData) TypeID() uint8 {
 }
 
 func (self *GpsInjectData) TypeName() string {
-	return "GpsInjectData"
-}
-
-func (self *GpsInjectData) TypeCName() string {
 	return "GPS_INJECT_DATA"
 }
 
@@ -3378,10 +3026,6 @@ func (self *Gps2Raw) TypeID() uint8 {
 }
 
 func (self *Gps2Raw) TypeName() string {
-	return "Gps2Raw"
-}
-
-func (self *Gps2Raw) TypeCName() string {
 	return "GPS2_RAW"
 }
 
@@ -3405,10 +3049,6 @@ func (self *PowerStatus) TypeID() uint8 {
 }
 
 func (self *PowerStatus) TypeName() string {
-	return "PowerStatus"
-}
-
-func (self *PowerStatus) TypeCName() string {
 	return "POWER_STATUS"
 }
 
@@ -3435,10 +3075,6 @@ func (self *SerialControl) TypeID() uint8 {
 }
 
 func (self *SerialControl) TypeName() string {
-	return "SerialControl"
-}
-
-func (self *SerialControl) TypeCName() string {
 	return "SERIAL_CONTROL"
 }
 
@@ -3472,10 +3108,6 @@ func (self *GpsRtk) TypeID() uint8 {
 }
 
 func (self *GpsRtk) TypeName() string {
-	return "GpsRtk"
-}
-
-func (self *GpsRtk) TypeCName() string {
 	return "GPS_RTK"
 }
 
@@ -3509,10 +3141,6 @@ func (self *Gps2Rtk) TypeID() uint8 {
 }
 
 func (self *Gps2Rtk) TypeName() string {
-	return "Gps2Rtk"
-}
-
-func (self *Gps2Rtk) TypeCName() string {
 	return "GPS2_RTK"
 }
 
@@ -3540,10 +3168,6 @@ func (self *DataTransmissionHandshake) TypeID() uint8 {
 }
 
 func (self *DataTransmissionHandshake) TypeName() string {
-	return "DataTransmissionHandshake"
-}
-
-func (self *DataTransmissionHandshake) TypeCName() string {
 	return "DATA_TRANSMISSION_HANDSHAKE"
 }
 
@@ -3566,10 +3190,6 @@ func (self *EncapsulatedData) TypeID() uint8 {
 }
 
 func (self *EncapsulatedData) TypeName() string {
-	return "EncapsulatedData"
-}
-
-func (self *EncapsulatedData) TypeCName() string {
 	return "ENCAPSULATED_DATA"
 }
 
@@ -3598,10 +3218,6 @@ func (self *DistanceSensor) TypeID() uint8 {
 }
 
 func (self *DistanceSensor) TypeName() string {
-	return "DistanceSensor"
-}
-
-func (self *DistanceSensor) TypeCName() string {
 	return "DISTANCE_SENSOR"
 }
 
@@ -3626,10 +3242,6 @@ func (self *TerrainRequest) TypeID() uint8 {
 }
 
 func (self *TerrainRequest) TypeName() string {
-	return "TerrainRequest"
-}
-
-func (self *TerrainRequest) TypeCName() string {
 	return "TERRAIN_REQUEST"
 }
 
@@ -3655,10 +3267,6 @@ func (self *TerrainData) TypeID() uint8 {
 }
 
 func (self *TerrainData) TypeName() string {
-	return "TerrainData"
-}
-
-func (self *TerrainData) TypeCName() string {
 	return "TERRAIN_DATA"
 }
 
@@ -3681,10 +3289,6 @@ func (self *TerrainCheck) TypeID() uint8 {
 }
 
 func (self *TerrainCheck) TypeName() string {
-	return "TerrainCheck"
-}
-
-func (self *TerrainCheck) TypeCName() string {
 	return "TERRAIN_CHECK"
 }
 
@@ -3712,10 +3316,6 @@ func (self *TerrainReport) TypeID() uint8 {
 }
 
 func (self *TerrainReport) TypeName() string {
-	return "TerrainReport"
-}
-
-func (self *TerrainReport) TypeCName() string {
 	return "TERRAIN_REPORT"
 }
 
@@ -3745,10 +3345,6 @@ func (self *BatteryStatus) TypeID() uint8 {
 }
 
 func (self *BatteryStatus) TypeName() string {
-	return "BatteryStatus"
-}
-
-func (self *BatteryStatus) TypeCName() string {
 	return "BATTERY_STATUS"
 }
 
@@ -3772,10 +3368,6 @@ func (self *AutopilotVersion) TypeID() uint8 {
 }
 
 func (self *AutopilotVersion) TypeName() string {
-	return "AutopilotVersion"
-}
-
-func (self *AutopilotVersion) TypeCName() string {
 	return "AUTOPILOT_VERSION"
 }
 
@@ -3801,10 +3393,6 @@ func (self *V2Extension) TypeID() uint8 {
 }
 
 func (self *V2Extension) TypeName() string {
-	return "V2Extension"
-}
-
-func (self *V2Extension) TypeCName() string {
 	return "V2_EXTENSION"
 }
 
@@ -3829,10 +3417,6 @@ func (self *MemoryVect) TypeID() uint8 {
 }
 
 func (self *MemoryVect) TypeName() string {
-	return "MemoryVect"
-}
-
-func (self *MemoryVect) TypeCName() string {
 	return "MEMORY_VECT"
 }
 
@@ -3858,10 +3442,6 @@ func (self *DebugVect) TypeID() uint8 {
 }
 
 func (self *DebugVect) TypeName() string {
-	return "DebugVect"
-}
-
-func (self *DebugVect) TypeCName() string {
 	return "DEBUG_VECT"
 }
 
@@ -3885,10 +3465,6 @@ func (self *NamedValueFloat) TypeID() uint8 {
 }
 
 func (self *NamedValueFloat) TypeName() string {
-	return "NamedValueFloat"
-}
-
-func (self *NamedValueFloat) TypeCName() string {
 	return "NAMED_VALUE_FLOAT"
 }
 
@@ -3912,10 +3488,6 @@ func (self *NamedValueInt) TypeID() uint8 {
 }
 
 func (self *NamedValueInt) TypeName() string {
-	return "NamedValueInt"
-}
-
-func (self *NamedValueInt) TypeCName() string {
 	return "NAMED_VALUE_INT"
 }
 
@@ -3938,10 +3510,6 @@ func (self *Statustext) TypeID() uint8 {
 }
 
 func (self *Statustext) TypeName() string {
-	return "Statustext"
-}
-
-func (self *Statustext) TypeCName() string {
 	return "STATUSTEXT"
 }
 
@@ -3965,10 +3533,6 @@ func (self *Debug) TypeID() uint8 {
 }
 
 func (self *Debug) TypeName() string {
-	return "Debug"
-}
-
-func (self *Debug) TypeCName() string {
 	return "DEBUG"
 }
 
@@ -3984,52 +3548,107 @@ func (self *Debug) TypeCRCExtra() uint8 {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
+func truncate(chars []byte) []byte {
+	for i, c := range chars {
+		if c == 0 {
+			return chars[:i]
+		}
+	}
+	return chars
+}
+
+type Char4 [4]byte
+
+func (chars *Char4) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char8 [8]byte
+
+func (chars *Char8) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char9 [9]byte
+
+func (chars *Char9) String() string {
+	return string(truncate(chars[:]))
+}
+
 type Char10 [10]byte
 
 func (chars *Char10) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
 }
 
 type Char16 [16]byte
 
 func (chars *Char16) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
+}
+
+type Char20 [20]byte
+
+func (chars *Char20) String() string {
+	return string(truncate(chars[:]))
 }
 
 type Char25 [25]byte
 
 func (chars *Char25) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
+}
+
+type Char36 [36]byte
+
+func (chars *Char36) String() string {
+	return string(truncate(chars[:]))
 }
 
 type Char50 [50]byte
 
 func (chars *Char50) String() string {
-	i := 0
-	for chars[i] != 0 && i < len(chars) {
-		i++
-	}
-	return string(chars[:i])
+	return string(truncate(chars[:]))
+}
+
+type Char70 [70]byte
+
+func (chars *Char70) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char90 [90]byte
+
+func (chars *Char90) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char110 [110]byte
+
+func (chars *Char110) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char249 [249]byte
+
+func (chars *Char249) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char251 [251]byte
+
+func (chars *Char251) String() string {
+	return string(truncate(chars[:]))
+}
+
+type Char253 [253]byte
+
+func (chars *Char253) String() string {
+	return string(truncate(chars[:]))
 }
