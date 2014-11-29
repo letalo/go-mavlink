@@ -70,9 +70,14 @@ func Receive(reader io.Reader) (*Packet, error) {
 
 	msg := MessageFactory[packet.Header.MessageID]()
 	if msg == nil {
+		io.ReadFull(reader, make([]byte, msg.TypeSize())) // Skip rest of message
 		return nil, ErrUnknownMessageID(packet.Header.MessageID)
 	}
 	if packet.Header.PayloadLength != msg.TypeSize() {
+		if packet.Header.PayloadLength > msg.TypeSize() {
+			packet.Header.PayloadLength = msg.TypeSize() // use smaller size
+		}
+		io.ReadFull(reader, make([]byte, packet.Header.PayloadLength)) // Skip rest of message
 		return nil, ErrInvalidPayloadLength(packet.Header.PayloadLength)
 	}
 
