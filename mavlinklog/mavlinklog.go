@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/ungerik/go-dry"
@@ -20,11 +21,11 @@ func main() {
 	flag.Parse()
 
 	if port == "" && flag.NArg() == 0 {
-		fmt.Println("Call mavlink -port=PORT")
+		fmt.Fprintln(os.Stderr, "Call mavlink -port=PORT")
 		flag.PrintDefaults()
-		fmt.Println("\nAvailable as PORT are:")
+		fmt.Fprintln(os.Stderr, "\nAvailable as PORT are:")
 		for _, p := range goserial.ListPorts() {
-			fmt.Println("  ", p)
+			fmt.Fprintln(os.Stderr, "  ", p)
 		}
 		return
 	}
