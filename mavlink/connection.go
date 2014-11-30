@@ -9,8 +9,8 @@ import (
 type Connection struct {
 	wrappedConn        io.ReadWriter
 	channel            chan *Packet
-	closeTime          chan time.Time
-	closeError         chan error
+	closeTimeout       time.Time
+	sendLoopFinished   chan struct{}
 	closed             bool
 	localComponentSeq  [256]uint8
 	remoteComponentSeq [256]uint8
@@ -19,11 +19,10 @@ type Connection struct {
 
 func NewConnection(wrappedConn io.ReadWriter, systemID uint8) *Connection {
 	conn := &Connection{
-		wrappedConn: wrappedConn,
-		channel:     make(chan *Packet, 64),
-		closeTime:   make(chan time.Time, 1),
-		closeError:  make(chan error),
-		systemID:    systemID,
+		wrappedConn:      wrappedConn,
+		channel:          make(chan *Packet, 64),
+		sendLoopFinished: make(chan struct{}),
+		systemID:         systemID,
 	}
 	go conn.sendLoop()
 	go conn.receiveLoop()
@@ -65,7 +64,7 @@ func (conn *Connection) receiveLoop() {
 }
 
 func (conn *Connection) sendLoop() {
-	for !conn.closed {
+	for !conn.closed || time.Now().Before(conn.closeTimeout) {
 		select {
 		case packet := <-conn.channel:
 			conn.localComponentSeq[packet.Header.ComponentID]++
@@ -77,13 +76,17 @@ func (conn *Connection) sendLoop() {
 					log.Println(packet.Err)
 				}
 				if packet.OnErr != nil {
-					packet.OnErr(packet)
+					go packet.OnErr(packet)
 				}
 			}
 		default:
+			if conn.closed {
+				break
+			}
 			time.Sleep(time.Millisecond)
 		}
 	}
+	conn.sendLoopFinished <- struct{}{}
 }
 
 func (conn *Connection) Send(componentID uint8, message Message, onErr func(*Packet)) {
@@ -118,8 +121,14 @@ func (conn *Connection) close() (err error) {
 	return err
 }
 
+// Close stops reading from wrappedConn after the current read finishes
+// and stops writing when there are no more buffered packets or
+// the current time has reached timeout.
+// After that, if wrappedConn implements io.Closer, its Close method will
+// be called and the result returned.
 func (conn *Connection) Close(timeout time.Time) error {
+	conn.closeTimeout = timeout
+	conn.closed = true
+	<-conn.sendLoopFinished
 	return conn.close()
-	// conn.closeTime <- timeout
-	// return <-conn.closeError
 }
