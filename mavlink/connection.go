@@ -2,49 +2,124 @@ package mavlink
 
 import (
 	"io"
+	"log"
+	"time"
 )
 
 type Connection struct {
-	io.ReadWriter
+	wrappedConn        io.ReadWriter
+	channel            chan *Packet
+	closeTime          chan time.Time
+	closeError         chan error
+	closed             bool
 	localComponentSeq  [256]uint8
 	remoteComponentSeq [256]uint8
-	bufferedPacket     *Packet
 	systemID           uint8
 }
 
 func NewConnection(wrappedConn io.ReadWriter, systemID uint8) *Connection {
-	return &Connection{ReadWriter: wrappedConn, systemID: systemID}
+	conn := &Connection{
+		wrappedConn: wrappedConn,
+		channel:     make(chan *Packet, 64),
+		closeTime:   make(chan time.Time, 1),
+		closeError:  make(chan error),
+		systemID:    systemID,
+	}
+	go conn.sendLoop()
+	go conn.receiveLoop()
+	return conn
 }
 
-func (conn *Connection) Send(componentID uint8, message Message) error {
-	conn.localComponentSeq[componentID]++
-	return Send(conn, conn.systemID, componentID, conn.localComponentSeq[componentID], message)
+func (conn *Connection) receiveLoop() {
+	for !conn.closed {
+
+		packet, err := Receive(conn.wrappedConn)
+		if err != nil {
+			if LogAllErrors {
+				log.Println(err)
+			}
+			if err == io.EOF {
+				conn.close() // make sure everything is in closed state
+				return
+			} else {
+				conn.channel <- &Packet{Err: err}
+				continue
+			}
+		}
+
+		component := packet.Header.ComponentID
+		loss := int(packet.Header.PacketSequence) - int(conn.remoteComponentSeq[component]) - 1
+		if loss < 0 {
+			loss = 255 - loss
+		}
+		if loss > 0 {
+			err := ErrPacketLoss(loss)
+			if LogAllErrors {
+				log.Println(err)
+			}
+			conn.channel <- &Packet{Err: err}
+		}
+
+		conn.channel <- packet
+	}
 }
 
-func (conn *Connection) Receive() (packet *Packet, err error) {
-	if conn.bufferedPacket != nil {
-		packet, conn.bufferedPacket = conn.bufferedPacket, nil
-		return packet, nil
+func (conn *Connection) sendLoop() {
+	for !conn.closed {
+		select {
+		case packet := <-conn.channel:
+			conn.localComponentSeq[packet.Header.ComponentID]++
+			packet.Header.PacketSequence = conn.localComponentSeq[packet.Header.ComponentID]
+
+			_, packet.Err = packet.WriteTo(conn.wrappedConn)
+			if packet.Err != nil {
+				if LogAllErrors {
+					log.Println(packet.Err)
+				}
+				if packet.OnErr != nil {
+					packet.OnErr(packet)
+				}
+			}
+		default:
+			time.Sleep(time.Millisecond)
+		}
 	}
-	packet, err = Receive(conn)
-	if err != nil {
-		return nil, err
-	}
-	component := packet.Header.ComponentID
-	loss := int(packet.Header.PacketSequence) - int(conn.remoteComponentSeq[component]) - 1
-	if loss < 0 {
-		loss = 255 - loss
-	}
-	if loss > 0 {
-		conn.bufferedPacket = packet
-		return nil, ErrPacketLoss(loss)
-	}
-	return packet, nil
 }
 
-func (conn *Connection) Close() error {
-	if closer, ok := conn.ReadWriter.(io.Closer); ok {
-		return closer.Close()
+func (conn *Connection) Send(componentID uint8, message Message, onErr func(*Packet)) {
+	if conn.closed {
+		return
 	}
-	return nil
+
+	packet := NewPacket(conn.systemID, componentID, 0, message)
+	packet.OnErr = onErr
+
+	conn.channel <- packet
+}
+
+func (conn *Connection) Receive() *Packet {
+	if conn.closed {
+		return nil
+	}
+
+	return <-conn.channel
+}
+
+func (conn *Connection) close() (err error) {
+	defer func() { conn.closed = true }()
+
+	if closer, ok := conn.wrappedConn.(io.Closer); ok {
+		err = closer.Close()
+		if err != nil && LogAllErrors {
+			log.Println(err)
+		}
+	}
+
+	return err
+}
+
+func (conn *Connection) Close(timeout time.Time) error {
+	return conn.close()
+	// conn.closeTime <- timeout
+	// return <-conn.closeError
 }

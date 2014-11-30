@@ -25,6 +25,8 @@ type Packet struct {
 	Header   Header
 	Message  Message
 	Checksum uint16
+	Err      error
+	OnErr    func(*Packet)
 }
 
 func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *Packet) {
