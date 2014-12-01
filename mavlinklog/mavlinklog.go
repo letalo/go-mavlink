@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/ungerik/go-dry"
@@ -12,12 +13,15 @@ import (
 )
 
 var (
-	port string
+	port      string
+	quitAfter time.Duration
+
 	stop bool
 )
 
 func main() {
-	flag.StringVar(&port, "port", "", "Serial port to connect to")
+	flag.StringVar(&port, "port", "COM3", "Serial port to connect to")
+	flag.DurationVar(&quitAfter, "quitafter", time.Second*3, "Quit program after this duration")
 	flag.Parse()
 
 	if port == "" && flag.NArg() == 0 {
@@ -40,15 +44,17 @@ func main() {
 	log.Println("Opened serial port", port)
 	defer log.Println("Closed serial port", port, "with error", serialConn.Close())
 
-	conn := mavlink.NewConnection(serialConn, 99)
+	//conn := mavlink.NewConnection(serialConn, 99)
 
 	go func() {
 		dry.WaitForStdin("Press any key to quit")
 		stop = true
 	}()
 
+	time.AfterFunc(quitAfter, func() { stop = true })
+
 	for !stop {
-		packet, err := conn.Receive()
+		packet, err := mavlink.Receive(serialConn)
 		if err == nil {
 			log.Println(packet)
 		} else {
