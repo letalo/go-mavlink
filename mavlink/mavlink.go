@@ -19,7 +19,11 @@ var (
 	ProtocolName    string
 	ProtocolVersion string
 	MessageFactory  [256]func() Message
-	Logger          *log.Logger
+)
+
+var (
+	LogAllErrors        bool
+	LogUnreportedErrors bool
 )
 
 func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
@@ -53,8 +57,8 @@ func Receive(reader io.Reader) (*Packet, error) {
 		}
 	}
 
-	if skipped != 0 && Logger != nil {
-		Logger.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
+	if skipped != 0 && LogUnreportedErrors {
+		log.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
 	}
 
 	hash := x25.HashStart
@@ -99,8 +103,8 @@ func Receive(reader io.Reader) (*Packet, error) {
 }
 
 // ReceiveLogErr calls Receive and returns a *Packet if there was no error.
-// If Receive returns an error, and Logger is not nil,
-// then the error will be logged with Logger.
+// If Receive returns an error, and LogUnreportedErrors is true,
+// then the error will be logged.
 // The only exception is the error io.EOF. In that case the error
 // won't be logged and a nil packet will be returned.
 func ReceiveLogErr(reader io.Reader) (packet *Packet) {
@@ -111,8 +115,8 @@ func ReceiveLogErr(reader io.Reader) (packet *Packet) {
 			if err == io.EOF {
 				return nil
 			}
-			if Logger != nil {
-				Logger.Println(err)
+			if LogUnreportedErrors {
+				log.Println(err)
 			}
 		}
 	}
