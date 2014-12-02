@@ -226,13 +226,13 @@ const (
 // MAV_STATE:
 const (
 	MAV_STATE_UNINIT      = 0 // Uninitialized system, state is unknown.
-	MAV_STATE_BOOT        = 0 // System is booting up.
-	MAV_STATE_CALIBRATING = 0 // System is calibrating and not flight-ready.
-	MAV_STATE_STANDBY     = 0 // System is grounded and on standby. It can be launched any time.
-	MAV_STATE_ACTIVE      = 0 // System is active and might be already airborne. Motors are engaged.
-	MAV_STATE_CRITICAL    = 0 // System is in a non-normal flight mode. It can however still navigate.
-	MAV_STATE_EMERGENCY   = 0 // System is in a non-normal flight mode. It lost control over parts or over the whole airframe. It is in mayday and going down.
-	MAV_STATE_POWEROFF    = 0 // System just initialized its power-down sequence, will shut down now.
+	MAV_STATE_BOOT        = 1 // System is booting up.
+	MAV_STATE_CALIBRATING = 2 // System is calibrating and not flight-ready.
+	MAV_STATE_STANDBY     = 3 // System is grounded and on standby. It can be launched any time.
+	MAV_STATE_ACTIVE      = 4 // System is active and might be already airborne. Motors are engaged.
+	MAV_STATE_CRITICAL    = 5 // System is in a non-normal flight mode. It can however still navigate.
+	MAV_STATE_EMERGENCY   = 6 // System is in a non-normal flight mode. It lost control over parts or over the whole airframe. It is in mayday and going down.
+	MAV_STATE_POWEROFF    = 7 // System just initialized its power-down sequence, will shut down now.
 )
 
 // MAV_COMPONENT:
@@ -308,11 +308,11 @@ const (
 // MAVLINK_DATA_STREAM_TYPE:
 const (
 	MAVLINK_DATA_STREAM_IMG_JPEG   = 0 //
-	MAVLINK_DATA_STREAM_IMG_BMP    = 0 //
-	MAVLINK_DATA_STREAM_IMG_RAW8U  = 0 //
-	MAVLINK_DATA_STREAM_IMG_RAW32U = 0 //
-	MAVLINK_DATA_STREAM_IMG_PGM    = 0 //
-	MAVLINK_DATA_STREAM_IMG_PNG    = 0 //
+	MAVLINK_DATA_STREAM_IMG_BMP    = 1 //
+	MAVLINK_DATA_STREAM_IMG_RAW8U  = 2 //
+	MAVLINK_DATA_STREAM_IMG_RAW32U = 3 //
+	MAVLINK_DATA_STREAM_IMG_PGM    = 4 //
+	MAVLINK_DATA_STREAM_IMG_PNG    = 5 //
 )
 
 // FENCE_ACTION:
@@ -432,14 +432,14 @@ const (
 // MAV_CMD_ACK: ACK / NACK / ERROR values as a result of MAV_CMDs and for mission item transmission.
 const (
 	MAV_CMD_ACK_OK                                 = 0 // Command / mission item is ok.
-	MAV_CMD_ACK_ERR_FAIL                           = 0 // Generic error message if none of the other reasons fails or if no detailed error reporting is implemented.
-	MAV_CMD_ACK_ERR_ACCESS_DENIED                  = 0 // The system is refusing to accept this command from this source / communication partner.
-	MAV_CMD_ACK_ERR_NOT_SUPPORTED                  = 0 // Command or mission item is not supported, other commands would be accepted.
-	MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = 0 // The coordinate frame of this command / mission item is not supported.
-	MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE       = 0 // The coordinate frame of this command is ok, but he coordinate values exceed the safety limits of this system. This is a generic error, please use the more specific error messages below if possible.
-	MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE             = 0 // The X or latitude value is out of range.
-	MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE             = 0 // The Y or longitude value is out of range.
-	MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE             = 0 // The Z or altitude value is out of range.
+	MAV_CMD_ACK_ERR_FAIL                           = 1 // Generic error message if none of the other reasons fails or if no detailed error reporting is implemented.
+	MAV_CMD_ACK_ERR_ACCESS_DENIED                  = 2 // The system is refusing to accept this command from this source / communication partner.
+	MAV_CMD_ACK_ERR_NOT_SUPPORTED                  = 3 // Command or mission item is not supported, other commands would be accepted.
+	MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = 4 // The coordinate frame of this command / mission item is not supported.
+	MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE       = 5 // The coordinate frame of this command is ok, but he coordinate values exceed the safety limits of this system. This is a generic error, please use the more specific error messages below if possible.
+	MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE             = 6 // The X or latitude value is out of range.
+	MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE             = 7 // The Y or longitude value is out of range.
+	MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE             = 8 // The Z or altitude value is out of range.
 )
 
 // MAV_PARAM_TYPE: Specifies the datatype of a MAVLink parameter.
@@ -582,6 +582,10 @@ type Heartbeat struct {
 	BaseMode       uint8  // System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
 	Autopilot      uint8  // Autopilot type / class. defined in MAV_AUTOPILOT ENUM
 	Type           uint8  // Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
+}
+
+func NewHeartbeat() *Heartbeat {
+	return &Heartbeat{MavlinkVersion: 3}
 }
 
 func (self *Heartbeat) TypeID() uint8 {

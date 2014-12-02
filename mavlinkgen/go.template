@@ -1,5 +1,7 @@
 package {{.Name}}
 
+{{$version := .Version}}
+
 import (
 	"github.com/SpaceLeap/go-mavlink/mavlink"{{if .Include}}
 	"github.com/SpaceLeap/go-mavlink/mavlink/{{.IncludeName}}"{{end}}
@@ -40,6 +42,11 @@ type {{$name}} struct { {{range .Fields}}
 	{{.Name | UpperCamelCase}} {{.GoType}} // {{.Description}}{{end}}
 }
 
+{{if eq $name "Heartbeat"}}
+func NewHeartbeat() *Heartbeat {
+	return &Heartbeat{MavlinkVersion: {{$version}} }
+}
+{{end}}
 func (self *{{$name}}) TypeID() uint8 {
 	return {{.ID}}
 }
@@ -72,9 +79,9 @@ func truncate(chars []byte) []byte {
 }
 
 {{range $size, $_ := .StringSizes}}
-type Char{{print $size}}[{{print $size}}]byte
+type Char{{$size}}[{{$size}}]byte
 
-func (chars *Char{{print $size}}) String() string {
+func (chars *Char{{$size}}) String() string {
 	return string(truncate(chars[:]))
 }
 {{end}}

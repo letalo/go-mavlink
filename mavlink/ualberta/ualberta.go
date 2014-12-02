@@ -27,25 +27,25 @@ func init() {
 // UALBERTA_AUTOPILOT_MODE: Available autopilot modes for ualberta uav
 const (
 	MODE_MANUAL_DIRECT = 0 // Raw input pulse widts sent to output
-	MODE_MANUAL_SCALED = 0 // Inputs are normalized using calibration, the converted back to raw pulse widths for output
-	MODE_AUTO_PID_ATT  = 0 //  dfsdfs
-	MODE_AUTO_PID_VEL  = 0 //  dfsfds
-	MODE_AUTO_PID_POS  = 0 //  dfsdfsdfs
+	MODE_MANUAL_SCALED = 1 // Inputs are normalized using calibration, the converted back to raw pulse widths for output
+	MODE_AUTO_PID_ATT  = 2 //  dfsdfs
+	MODE_AUTO_PID_VEL  = 3 //  dfsfds
+	MODE_AUTO_PID_POS  = 4 //  dfsdfsdfs
 )
 
 // UALBERTA_NAV_MODE: Navigation filter mode
 const (
 	NAV_AHRS_INIT    = 0 //
-	NAV_AHRS         = 0 // AHRS mode
-	NAV_INS_GPS_INIT = 0 // INS/GPS initialization mode
-	NAV_INS_GPS      = 0 // INS/GPS mode
+	NAV_AHRS         = 1 // AHRS mode
+	NAV_INS_GPS_INIT = 2 // INS/GPS initialization mode
+	NAV_INS_GPS      = 3 // INS/GPS mode
 )
 
 // UALBERTA_PILOT_MODE: Mode currently commanded by pilot
 const (
 	PILOT_MANUAL = 0 //  sdf
-	PILOT_AUTO   = 0 //  dfs
-	PILOT_ROTO   = 0 //  Rotomotion mode
+	PILOT_AUTO   = 1 //  dfs
+	PILOT_ROTO   = 2 //  Rotomotion mode
 )
 
 ////////////////////////////////////////////////////////////////////////////////

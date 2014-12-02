@@ -79,6 +79,10 @@ func generate(name string) {
 		enum := &protocol.Enums[i]
 		enum.Description = strings.Replace(enum.Description, "\n", "\n// ", -1)
 		for j := range enum.Entries {
+			if enum.Entries[j].Value == nil {
+				enum.Entries[j].Value = new(uint8)
+				*enum.Entries[j].Value = uint8(j)
+			}
 			enum.Entries[j].Description = strings.Replace(enum.Entries[j].Description, "\n", " ", -1)
 		}
 	}
@@ -182,7 +186,7 @@ type Enum struct {
 }
 
 type EnumEntry struct {
-	Value       uint8            `xml:"value,attr"`
+	Value       *uint8           `xml:"value,attr"` // ptr to make optional
 	Name        string           `xml:"name,attr"`
 	Description string           `xml:"description"`
 	Params      []EnumEntryParam `xml:"param"`
