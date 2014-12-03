@@ -65,11 +65,9 @@ func (conn *Connection) receiveLoop() {
 
 func (conn *Connection) sendLoop() {
 	for !conn.closed || time.Now().Before(conn.closeTimeout) {
-		select {
-		case packet := <-conn.channel:
+		if packet, ok := <-conn.channel; ok {
 			conn.localComponentSeq[packet.Header.ComponentID]++
 			packet.Header.PacketSequence = conn.localComponentSeq[packet.Header.ComponentID]
-
 			_, packet.Err = packet.WriteTo(conn.wrappedConn)
 			if packet.Err != nil {
 				if LogAllErrors {
@@ -79,7 +77,7 @@ func (conn *Connection) sendLoop() {
 					go packet.OnErr(packet)
 				}
 			}
-		default:
+		} else {
 			if conn.closed {
 				break
 			}
