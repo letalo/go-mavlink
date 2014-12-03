@@ -45,11 +45,7 @@ func main() {
 	log.Println("Opened serial port", port)
 	defer log.Println("Closed serial port", port, "with error", serialConn.Close())
 
-<<<<<<< Updated upstream
 	//conn := mavlink.NewConnection(serialConn, 99)
-=======
-	// conn := mavlink.NewConnection(serialConn, 99)
->>>>>>> Stashed changes
 
 	go func() {
 		dry.WaitForStdin("Press any key to quit")
@@ -59,14 +55,11 @@ func main() {
 	time.AfterFunc(quitAfter, func() { stop = true })
 
 	for !stop {
-<<<<<<< Updated upstream
-=======
 		err := mavlink.Send(serialConn, 0, 0, 0, minimal.NewHeartbeat())
 		if err != nil {
 			log.Println(err)
 		}
 
->>>>>>> Stashed changes
 		packet, err := mavlink.Receive(serialConn)
 		if err == nil {
 			log.Println(packet)
