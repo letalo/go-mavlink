@@ -7,7 +7,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "ualberta"
-	PROTOCOL_VERSION = ""
+	PROTOCOL_VERSION = 0
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 

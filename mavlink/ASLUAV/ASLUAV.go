@@ -7,7 +7,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "ASLUAV"
-	PROTOCOL_VERSION = ""
+	PROTOCOL_VERSION = 0
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 

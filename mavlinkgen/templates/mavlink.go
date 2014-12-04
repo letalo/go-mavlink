@@ -9,7 +9,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "{{.Name}}"
-	PROTOCOL_VERSION = "{{.Version}}"{{if .Include}}
+	PROTOCOL_VERSION = {{if .Version}}{{.Version}}{{else}}0{{end}}{{if .Include}}
 	PROTOCOL_INCLUDE = {{.IncludeName}}.PROTOCOL_NAME{{end}}
 )
 
@@ -44,7 +44,7 @@ type {{$name}} struct { {{range .Fields}}
 
 {{if eq $name "Heartbeat"}}
 func NewHeartbeat() *Heartbeat {
-	return &Heartbeat{MavlinkVersion: {{$version}} }
+	return &Heartbeat{MavlinkVersion: PROTOCOL_VERSION}
 }
 {{end}}
 func (self *{{$name}}) TypeID() uint8 {

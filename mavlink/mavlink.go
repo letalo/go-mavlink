@@ -17,7 +17,7 @@ const (
 // a protocol definition package.
 var (
 	ProtocolName    string
-	ProtocolVersion string
+	ProtocolVersion uint8
 	MessageFactory  [256]func() Message
 )
 

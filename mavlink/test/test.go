@@ -6,7 +6,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "test"
-	PROTOCOL_VERSION = "3"
+	PROTOCOL_VERSION = 3
 )
 
 func init() {

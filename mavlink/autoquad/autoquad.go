@@ -7,7 +7,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "autoquad"
-	PROTOCOL_VERSION = "3"
+	PROTOCOL_VERSION = 3
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 

@@ -6,7 +6,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "minimal"
-	PROTOCOL_VERSION = "2"
+	PROTOCOL_VERSION = 2
 )
 
 func init() {
@@ -108,7 +108,7 @@ type Heartbeat struct {
 }
 
 func NewHeartbeat() *Heartbeat {
-	return &Heartbeat{MavlinkVersion: 2}
+	return &Heartbeat{MavlinkVersion: PROTOCOL_VERSION}
 }
 
 func (self *Heartbeat) TypeID() uint8 {

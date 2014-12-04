@@ -31,7 +31,7 @@ var (
 
 	generated = make(map[string]bool)
 
-	templ = template.Must(template.New("go.template").Funcs(funcMap).ParseFiles("go.template"))
+	templ = template.Must(template.New("mavlink.go").Funcs(funcMap).ParseFiles(path.Join("templates", "mavlink.go")))
 )
 
 func main() {
