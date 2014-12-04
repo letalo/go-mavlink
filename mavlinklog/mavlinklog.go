@@ -14,14 +14,16 @@ import (
 )
 
 var (
-	port      string
-	quitAfter time.Duration
+	port       string
+	maxPackets int
+	quitAfter  time.Duration
 
 	stop bool
 )
 
 func main() {
-	flag.StringVar(&port, "port", "COM3", "Serial port to connect to")
+	flag.StringVar(&port, "port", "", "Serial port to connect to")
+	flag.IntVar(&maxPackets, "max", 10, "Quit program after this number of packets")
 	flag.DurationVar(&quitAfter, "quitafter", time.Second*3, "Quit program after this duration")
 	flag.Parse()
 
@@ -43,9 +45,16 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Opened serial port", port)
-	defer log.Println("Closed serial port", port, "with error", serialConn.Close())
+	defer func() {
+		log.Println("Closed serial port", port, "with error", serialConn.Close())
+	}()
 
 	//conn := mavlink.NewConnection(serialConn, 99)
+
+	err = mavlink.Send(serialConn, 0, 0, 0, minimal.NewHeartbeat())
+	if err != nil {
+		log.Println(err)
+	}
 
 	go func() {
 		dry.WaitForStdin("Press any key to quit")
@@ -54,18 +63,12 @@ func main() {
 
 	time.AfterFunc(quitAfter, func() { stop = true })
 
-	for !stop {
-		err := mavlink.Send(serialConn, 0, 0, 0, minimal.NewHeartbeat())
-		if err != nil {
-			log.Println(err)
-		}
-
+	for i := 0; i < maxPackets && !stop; i++ {
 		packet, err := mavlink.Receive(serialConn)
 		if err == nil {
 			log.Println(packet)
 		} else {
 			log.Println(err)
 		}
-		break
 	}
 }
