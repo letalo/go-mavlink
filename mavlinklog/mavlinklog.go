@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
-	"github.com/SpaceLeap/go-mavlink/mavlink/minimal"
+	// "github.com/SpaceLeap/go-mavlink/mavlink/minimal"
+	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 	"github.com/ungerik/go-dry"
 	"github.com/ungerik/goserial"
 )
@@ -40,7 +41,7 @@ func main() {
 		port = flag.Arg(0)
 	}
 
-	serialConn, err := goserial.OpenPort(&goserial.Config{Name: port, Baud: 115200})
+	serialConn, err := goserial.OpenPort(&goserial.Config{Name: port, Baud: 115200, Timeout: time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +52,17 @@ func main() {
 
 	//conn := mavlink.NewConnection(serialConn, 99)
 
-	err = mavlink.Send(serialConn, 0, 0, 0, minimal.NewHeartbeat())
+	err = mavlink.Send(serialConn, 0, 0, 0, common.NewHeartbeat())
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = mavlink.Send(serialConn, 0, 0, 0, &common.Ping{})
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = mavlink.Send(serialConn, 0, 0, 0, &common.ParamRequestList{})
 	if err != nil {
 		log.Println(err)
 	}
