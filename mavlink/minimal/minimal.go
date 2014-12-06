@@ -1,6 +1,8 @@
 package minimal
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 )
 
@@ -125,4 +127,12 @@ func (self *Heartbeat) TypeSize() uint8 {
 
 func (self *Heartbeat) TypeCRCExtra() uint8 {
 	return 206
+}
+
+func (self *Heartbeat) FieldsString() string {
+	return fmt.Sprintf("CustomMode=%d MavlinkVersion=%d SystemStatus=%d BaseMode=%d Autopilot=%d Type=%d", self.CustomMode, self.MavlinkVersion, self.SystemStatus, self.BaseMode, self.Autopilot, self.Type)
+}
+
+func (self *Heartbeat) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }

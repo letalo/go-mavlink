@@ -1,6 +1,8 @@
 package common
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 )
 
@@ -604,6 +606,14 @@ func (self *Heartbeat) TypeCRCExtra() uint8 {
 	return 206
 }
 
+func (self *Heartbeat) FieldsString() string {
+	return fmt.Sprintf("CustomMode=%d MavlinkVersion=%d SystemStatus=%d BaseMode=%d Autopilot=%d Type=%d", self.CustomMode, self.MavlinkVersion, self.SystemStatus, self.BaseMode, self.Autopilot, self.Type)
+}
+
+func (self *Heartbeat) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The general system state. If the system is following the MAVLink standard, the system state is mainly defined by three orthogonal states/modes: The system mode, which is either LOCKED (motors shut down and locked), MANUAL (system under RC control), GUIDED (system with autonomous position control, position setpoint controlled manually) or AUTO (system guided by path/waypoint planner). The NAV_MODE defined the current flight state: LIFTOFF (often an open-loop maneuver), LANDING, WAYPOINTS or VECTOR. This represents the internal navigation state machine. The system status shows wether the system is currently active or not and if an emergency occured. During the CRITICAL and EMERGENCY states the MAV is still considered to be active, but should start emergency procedures autonomously. After a failure occured it should first move from active to critical to allow manual intervention and then move to emergency after a certain timeout.
 type SysStatus struct {
 	OnboardControlSensorsHealth  uint32 // Bitmask showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
@@ -637,6 +647,14 @@ func (self *SysStatus) TypeCRCExtra() uint8 {
 	return 118
 }
 
+func (self *SysStatus) FieldsString() string {
+	return fmt.Sprintf("OnboardControlSensorsHealth=%d OnboardControlSensorsEnabled=%d OnboardControlSensorsPresent=%d ErrorsCount4=%d ErrorsCount3=%d ErrorsCount2=%d ErrorsCount1=%d ErrorsComm=%d DropRateComm=%d CurrentBattery=%d VoltageBattery=%d Load=%d BatteryRemaining=%d", self.OnboardControlSensorsHealth, self.OnboardControlSensorsEnabled, self.OnboardControlSensorsPresent, self.ErrorsCount4, self.ErrorsCount3, self.ErrorsCount2, self.ErrorsCount1, self.ErrorsComm, self.DropRateComm, self.CurrentBattery, self.VoltageBattery, self.Load, self.BatteryRemaining)
+}
+
+func (self *SysStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The system time is the time of the master clock, typically the computer clock of the main onboard computer.
 type SystemTime struct {
 	TimeUnixUsec uint64 // Timestamp of the master clock in microseconds since UNIX epoch.
@@ -657,6 +675,14 @@ func (self *SystemTime) TypeSize() uint8 {
 
 func (self *SystemTime) TypeCRCExtra() uint8 {
 	return 137
+}
+
+func (self *SystemTime) FieldsString() string {
+	return fmt.Sprintf("TimeUnixUsec=%d TimeBootMs=%d", self.TimeUnixUsec, self.TimeBootMs)
+}
+
+func (self *SystemTime) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // A ping message either requesting or responding to a ping. This allows to measure the system latencies, including serial port, radio modem and UDP connections.
@@ -683,6 +709,14 @@ func (self *Ping) TypeCRCExtra() uint8 {
 	return 30
 }
 
+func (self *Ping) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Seq=%d TargetComponent=%d TargetSystem=%d", self.TimeUsec, self.Seq, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *Ping) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request to control this MAV
 type ChangeOperatorControl struct {
 	Passkey        Char25 // Password / Key, depending on version plaintext or encrypted. 25 or less characters, NULL terminated. The characters may involve A-Z, a-z, 0-9, and "!?,.-"
@@ -700,11 +734,19 @@ func (self *ChangeOperatorControl) TypeName() string {
 }
 
 func (self *ChangeOperatorControl) TypeSize() uint8 {
-	return 4
+	return 28
 }
 
 func (self *ChangeOperatorControl) TypeCRCExtra() uint8 {
 	return 136
+}
+
+func (self *ChangeOperatorControl) FieldsString() string {
+	return fmt.Sprintf("Passkey=\"%s\" Version=%d ControlRequest=%d TargetSystem=%d", self.Passkey, self.Version, self.ControlRequest, self.TargetSystem)
+}
+
+func (self *ChangeOperatorControl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Accept / deny control of this MAV
@@ -730,6 +772,14 @@ func (self *ChangeOperatorControlAck) TypeCRCExtra() uint8 {
 	return 13
 }
 
+func (self *ChangeOperatorControlAck) FieldsString() string {
+	return fmt.Sprintf("Ack=%d ControlRequest=%d GcsSystemId=%d", self.Ack, self.ControlRequest, self.GcsSystemId)
+}
+
+func (self *ChangeOperatorControlAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Emit an encrypted signature / key identifying this system. PLEASE NOTE: This protocol has been kept simple, so transmitting the key requires an encrypted channel for true safety.
 type AuthKey struct {
 	Key Char32 // key
@@ -744,11 +794,19 @@ func (self *AuthKey) TypeName() string {
 }
 
 func (self *AuthKey) TypeSize() uint8 {
-	return 1
+	return 32
 }
 
 func (self *AuthKey) TypeCRCExtra() uint8 {
 	return 152
+}
+
+func (self *AuthKey) FieldsString() string {
+	return fmt.Sprintf("Key=\"%s\"", self.Key)
+}
+
+func (self *AuthKey) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set the system mode, as defined by enum MAV_MODE. There is no target component id as the mode is by definition for the overall aircraft, not only for one component.
@@ -774,6 +832,14 @@ func (self *SetMode) TypeCRCExtra() uint8 {
 	return 130
 }
 
+func (self *SetMode) FieldsString() string {
+	return fmt.Sprintf("CustomMode=%d BaseMode=%d TargetSystem=%d", self.CustomMode, self.BaseMode, self.TargetSystem)
+}
+
+func (self *SetMode) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request to read the onboard parameter with the param_id string id. Onboard parameters are stored as key[const char*] -> value[float]. This allows to send a parameter to any other component (such as the GCS) without the need of previous knowledge of possible parameter names. Thus the same GCS can store different parameters for different autopilots. See also http://qgroundcontrol.org/parameter_interface for a full documentation of QGroundControl and IMU code.
 type ParamRequestRead struct {
 	ParamIndex      int16  // Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored)
@@ -791,11 +857,19 @@ func (self *ParamRequestRead) TypeName() string {
 }
 
 func (self *ParamRequestRead) TypeSize() uint8 {
-	return 5
+	return 20
 }
 
 func (self *ParamRequestRead) TypeCRCExtra() uint8 {
 	return 159
+}
+
+func (self *ParamRequestRead) FieldsString() string {
+	return fmt.Sprintf("ParamIndex=%d ParamId=\"%s\" TargetComponent=%d TargetSystem=%d", self.ParamIndex, self.ParamId, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *ParamRequestRead) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Request all parameters of this component. After his request, all parameters are emitted.
@@ -820,6 +894,14 @@ func (self *ParamRequestList) TypeCRCExtra() uint8 {
 	return 108
 }
 
+func (self *ParamRequestList) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *ParamRequestList) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout.
 type ParamValue struct {
 	ParamValue float32 // Onboard parameter value
@@ -838,11 +920,19 @@ func (self *ParamValue) TypeName() string {
 }
 
 func (self *ParamValue) TypeSize() uint8 {
-	return 10
+	return 25
 }
 
 func (self *ParamValue) TypeCRCExtra() uint8 {
 	return 54
+}
+
+func (self *ParamValue) FieldsString() string {
+	return fmt.Sprintf("ParamValue=%d ParamIndex=%d ParamCount=%d ParamType=%d ParamId=\"%s\"", self.ParamValue, self.ParamIndex, self.ParamCount, self.ParamType, self.ParamId)
+}
+
+func (self *ParamValue) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set a parameter value TEMPORARILY to RAM. It will be reset to default on system reboot. Send the ACTION MAV_ACTION_STORAGE_WRITE to PERMANENTLY write the RAM contents to EEPROM. IMPORTANT: The receiving component should acknowledge the new parameter value by sending a param_value message to all communication partners. This will also ensure that multiple GCS all have an up-to-date list of all parameters. If the sending GCS did not receive a PARAM_VALUE message within its timeout time, it should re-send the PARAM_SET message.
@@ -863,11 +953,19 @@ func (self *ParamSet) TypeName() string {
 }
 
 func (self *ParamSet) TypeSize() uint8 {
-	return 8
+	return 23
 }
 
 func (self *ParamSet) TypeCRCExtra() uint8 {
 	return 159
+}
+
+func (self *ParamSet) FieldsString() string {
+	return fmt.Sprintf("ParamValue=%d ParamType=%d ParamId=\"%s\" TargetComponent=%d TargetSystem=%d", self.ParamValue, self.ParamType, self.ParamId, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *ParamSet) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The global position, as returned by the Global Positioning System (GPS). This is
@@ -901,6 +999,14 @@ func (self *GpsRawInt) TypeCRCExtra() uint8 {
 	return 184
 }
 
+func (self *GpsRawInt) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Alt=%d Lon=%d Lat=%d Cog=%d Vel=%d Epv=%d Eph=%d SatellitesVisible=%d FixType=%d", self.TimeUsec, self.Alt, self.Lon, self.Lat, self.Cog, self.Vel, self.Epv, self.Eph, self.SatellitesVisible, self.FixType)
+}
+
+func (self *GpsRawInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The positioning status, as reported by GPS. This message is intended to display status information about each satellite visible to the receiver. See message GLOBAL_POSITION for the global position estimate. This message can contain information for up to 20 satellites.
 type GpsStatus struct {
 	SatelliteSnr       [20]uint8 // Signal to noise ratio of satellite
@@ -920,11 +1026,19 @@ func (self *GpsStatus) TypeName() string {
 }
 
 func (self *GpsStatus) TypeSize() uint8 {
-	return 6
+	return 101
 }
 
 func (self *GpsStatus) TypeCRCExtra() uint8 {
 	return 174
+}
+
+func (self *GpsStatus) FieldsString() string {
+	return fmt.Sprintf("SatelliteSnr=%v SatelliteAzimuth=%v SatelliteElevation=%v SatelliteUsed=%v SatellitePrn=%v SatellitesVisible=%d", self.SatelliteSnr, self.SatelliteAzimuth, self.SatelliteElevation, self.SatelliteUsed, self.SatellitePrn, self.SatellitesVisible)
+}
+
+func (self *GpsStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The RAW IMU readings for the usual 9DOF sensor setup. This message should contain the scaled values to the described units
@@ -957,6 +1071,14 @@ func (self *ScaledImu) TypeCRCExtra() uint8 {
 	return 135
 }
 
+func (self *ScaledImu) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Zmag=%d Ymag=%d Xmag=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d", self.TimeBootMs, self.Zmag, self.Ymag, self.Xmag, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc)
+}
+
+func (self *ScaledImu) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The RAW IMU readings for the usual 9DOF sensor setup. This message should always contain the true raw values without any scaling to allow data capture and system debugging.
 type RawImu struct {
 	TimeUsec uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
@@ -987,6 +1109,14 @@ func (self *RawImu) TypeCRCExtra() uint8 {
 	return 189
 }
 
+func (self *RawImu) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Zmag=%d Ymag=%d Xmag=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d", self.TimeUsec, self.Zmag, self.Ymag, self.Xmag, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc)
+}
+
+func (self *RawImu) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The RAW pressure readings for the typical setup of one absolute pressure and one differential pressure sensor. The sensor values should be the raw, UNSCALED ADC values.
 type RawPressure struct {
 	TimeUsec    uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
@@ -1012,6 +1142,14 @@ func (self *RawPressure) TypeCRCExtra() uint8 {
 	return 176
 }
 
+func (self *RawPressure) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Temperature=%d PressDiff2=%d PressDiff1=%d PressAbs=%d", self.TimeUsec, self.Temperature, self.PressDiff2, self.PressDiff1, self.PressAbs)
+}
+
+func (self *RawPressure) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The pressure readings for the typical setup of one absolute and differential pressure sensor. The units are as specified in each field.
 type ScaledPressure struct {
 	PressDiff   float32 // Differential pressure 1 (hectopascal)
@@ -1034,6 +1172,14 @@ func (self *ScaledPressure) TypeSize() uint8 {
 
 func (self *ScaledPressure) TypeCRCExtra() uint8 {
 	return 37
+}
+
+func (self *ScaledPressure) FieldsString() string {
+	return fmt.Sprintf("PressDiff=%d PressAbs=%d TimeBootMs=%d Temperature=%d", self.PressDiff, self.PressAbs, self.TimeBootMs, self.Temperature)
+}
+
+func (self *ScaledPressure) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right).
@@ -1061,6 +1207,14 @@ func (self *Attitude) TypeSize() uint8 {
 
 func (self *Attitude) TypeCRCExtra() uint8 {
 	return 36
+}
+
+func (self *Attitude) FieldsString() string {
+	return fmt.Sprintf("Yawspeed=%d Pitchspeed=%d Rollspeed=%d Yaw=%d Pitch=%d Roll=%d TimeBootMs=%d", self.Yawspeed, self.Pitchspeed, self.Rollspeed, self.Yaw, self.Pitch, self.Roll, self.TimeBootMs)
+}
+
+func (self *Attitude) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
@@ -1091,6 +1245,14 @@ func (self *AttitudeQuaternion) TypeCRCExtra() uint8 {
 	return 18
 }
 
+func (self *AttitudeQuaternion) FieldsString() string {
+	return fmt.Sprintf("Yawspeed=%d Pitchspeed=%d Rollspeed=%d Q4=%d Q3=%d Q2=%d Q1=%d TimeBootMs=%d", self.Yawspeed, self.Pitchspeed, self.Rollspeed, self.Q4, self.Q3, self.Q2, self.Q1, self.TimeBootMs)
+}
+
+func (self *AttitudeQuaternion) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
 type LocalPositionNed struct {
 	Vz         float32 // Z Speed
@@ -1116,6 +1278,14 @@ func (self *LocalPositionNed) TypeSize() uint8 {
 
 func (self *LocalPositionNed) TypeCRCExtra() uint8 {
 	return 151
+}
+
+func (self *LocalPositionNed) FieldsString() string {
+	return fmt.Sprintf("Vz=%d Vy=%d Vx=%d Z=%d Y=%d X=%d TimeBootMs=%d", self.Vz, self.Vy, self.Vx, self.Z, self.Y, self.X, self.TimeBootMs)
+}
+
+func (self *LocalPositionNed) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It
@@ -1146,6 +1316,14 @@ func (self *GlobalPositionInt) TypeSize() uint8 {
 
 func (self *GlobalPositionInt) TypeCRCExtra() uint8 {
 	return 26
+}
+
+func (self *GlobalPositionInt) FieldsString() string {
+	return fmt.Sprintf("RelativeAlt=%d Alt=%d Lon=%d Lat=%d TimeBootMs=%d Hdg=%d Vz=%d Vy=%d Vx=%d", self.RelativeAlt, self.Alt, self.Lon, self.Lat, self.TimeBootMs, self.Hdg, self.Vz, self.Vy, self.Vx)
+}
+
+func (self *GlobalPositionInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The scaled values of the RC channels received. (-100%) -10000, (0%) 0, (100%) 10000. Channels that are inactive should be set to UINT16_MAX.
@@ -1179,6 +1357,14 @@ func (self *RcChannelsScaled) TypeCRCExtra() uint8 {
 	return 63
 }
 
+func (self *RcChannelsScaled) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Chan8Scaled=%d Chan7Scaled=%d Chan6Scaled=%d Chan5Scaled=%d Chan4Scaled=%d Chan3Scaled=%d Chan2Scaled=%d Chan1Scaled=%d Rssi=%d Port=%d", self.TimeBootMs, self.Chan8Scaled, self.Chan7Scaled, self.Chan6Scaled, self.Chan5Scaled, self.Chan4Scaled, self.Chan3Scaled, self.Chan2Scaled, self.Chan1Scaled, self.Rssi, self.Port)
+}
+
+func (self *RcChannelsScaled) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The RAW values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
 type RcChannelsRaw struct {
 	TimeBootMs uint32 // Timestamp (milliseconds since system boot)
@@ -1208,6 +1394,14 @@ func (self *RcChannelsRaw) TypeSize() uint8 {
 
 func (self *RcChannelsRaw) TypeCRCExtra() uint8 {
 	return 191
+}
+
+func (self *RcChannelsRaw) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Chan8Raw=%d Chan7Raw=%d Chan6Raw=%d Chan5Raw=%d Chan4Raw=%d Chan3Raw=%d Chan2Raw=%d Chan1Raw=%d Rssi=%d Port=%d", self.TimeBootMs, self.Chan8Raw, self.Chan7Raw, self.Chan6Raw, self.Chan5Raw, self.Chan4Raw, self.Chan3Raw, self.Chan2Raw, self.Chan1Raw, self.Rssi, self.Port)
+}
+
+func (self *RcChannelsRaw) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The RAW values of the servo outputs (for RC input from the remote, use the RC_CHANNELS messages). The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%.
@@ -1240,6 +1434,14 @@ func (self *ServoOutputRaw) TypeCRCExtra() uint8 {
 	return 136
 }
 
+func (self *ServoOutputRaw) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Servo8Raw=%d Servo7Raw=%d Servo6Raw=%d Servo5Raw=%d Servo4Raw=%d Servo3Raw=%d Servo2Raw=%d Servo1Raw=%d Port=%d", self.TimeUsec, self.Servo8Raw, self.Servo7Raw, self.Servo6Raw, self.Servo5Raw, self.Servo4Raw, self.Servo3Raw, self.Servo2Raw, self.Servo1Raw, self.Port)
+}
+
+func (self *ServoOutputRaw) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request a partial list of mission items from the system/component. http://qgroundcontrol.org/mavlink/waypoint_protocol. If start and end index are the same, just send one waypoint.
 type MissionRequestPartialList struct {
 	EndIndex        int16 // End index, -1 by default (-1: send list to end). Else a valid index of the list
@@ -1264,6 +1466,14 @@ func (self *MissionRequestPartialList) TypeCRCExtra() uint8 {
 	return 5
 }
 
+func (self *MissionRequestPartialList) FieldsString() string {
+	return fmt.Sprintf("EndIndex=%d StartIndex=%d TargetComponent=%d TargetSystem=%d", self.EndIndex, self.StartIndex, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionRequestPartialList) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // This message is sent to the MAV to write a partial list. If start index == end index, only one item will be transmitted / updated. If the start index is NOT 0 and above the current list size, this request should be REJECTED!
 type MissionWritePartialList struct {
 	EndIndex        int16 // End index, equal or greater than start index.
@@ -1286,6 +1496,14 @@ func (self *MissionWritePartialList) TypeSize() uint8 {
 
 func (self *MissionWritePartialList) TypeCRCExtra() uint8 {
 	return 216
+}
+
+func (self *MissionWritePartialList) FieldsString() string {
+	return fmt.Sprintf("EndIndex=%d StartIndex=%d TargetComponent=%d TargetSystem=%d", self.EndIndex, self.StartIndex, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionWritePartialList) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Message encoding a mission item. This message is emitted to announce
@@ -1323,6 +1541,14 @@ func (self *MissionItem) TypeCRCExtra() uint8 {
 	return 236
 }
 
+func (self *MissionItem) FieldsString() string {
+	return fmt.Sprintf("Z=%d Y=%d X=%d Param4=%d Param3=%d Param2=%d Param1=%d Command=%d Seq=%d Autocontinue=%d Current=%d Frame=%d TargetComponent=%d TargetSystem=%d", self.Z, self.Y, self.X, self.Param4, self.Param3, self.Param2, self.Param1, self.Command, self.Seq, self.Autocontinue, self.Current, self.Frame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionItem) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request the information of the mission item with the sequence number seq. The response of the system to this message should be a MISSION_ITEM message. http://qgroundcontrol.org/mavlink/waypoint_protocol
 type MissionRequest struct {
 	Seq             uint16 // Sequence
@@ -1344,6 +1570,14 @@ func (self *MissionRequest) TypeSize() uint8 {
 
 func (self *MissionRequest) TypeCRCExtra() uint8 {
 	return 21
+}
+
+func (self *MissionRequest) FieldsString() string {
+	return fmt.Sprintf("Seq=%d TargetComponent=%d TargetSystem=%d", self.Seq, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionRequest) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set the mission item with sequence number seq as current item. This means that the MAV will continue to this mission item on the shortest path (not following the mission items in-between).
@@ -1369,6 +1603,14 @@ func (self *MissionSetCurrent) TypeCRCExtra() uint8 {
 	return 239
 }
 
+func (self *MissionSetCurrent) FieldsString() string {
+	return fmt.Sprintf("Seq=%d TargetComponent=%d TargetSystem=%d", self.Seq, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionSetCurrent) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Message that announces the sequence number of the current active mission item. The MAV will fly towards this mission item.
 type MissionCurrent struct {
 	Seq uint16 // Sequence
@@ -1388,6 +1630,14 @@ func (self *MissionCurrent) TypeSize() uint8 {
 
 func (self *MissionCurrent) TypeCRCExtra() uint8 {
 	return 28
+}
+
+func (self *MissionCurrent) FieldsString() string {
+	return fmt.Sprintf("Seq=%d", self.Seq)
+}
+
+func (self *MissionCurrent) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Request the overall list of mission items from the system/component.
@@ -1410,6 +1660,14 @@ func (self *MissionRequestList) TypeSize() uint8 {
 
 func (self *MissionRequestList) TypeCRCExtra() uint8 {
 	return 119
+}
+
+func (self *MissionRequestList) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionRequestList) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // This message is emitted as response to MISSION_REQUEST_LIST by the MAV and to initiate a write transaction. The GCS can then request the individual mission item based on the knowledge of the total number of MISSIONs.
@@ -1435,6 +1693,14 @@ func (self *MissionCount) TypeCRCExtra() uint8 {
 	return 46
 }
 
+func (self *MissionCount) FieldsString() string {
+	return fmt.Sprintf("Count=%d TargetComponent=%d TargetSystem=%d", self.Count, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionCount) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Delete all mission items at once.
 type MissionClearAll struct {
 	TargetComponent uint8 // Component ID
@@ -1455,6 +1721,14 @@ func (self *MissionClearAll) TypeSize() uint8 {
 
 func (self *MissionClearAll) TypeCRCExtra() uint8 {
 	return 27
+}
+
+func (self *MissionClearAll) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionClearAll) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // A certain mission item has been reached. The system will either hold this position (or circle on the orbit) or (if the autocontinue on the WP was set) continue to the next MISSION.
@@ -1478,6 +1752,14 @@ func (self *MissionItemReached) TypeCRCExtra() uint8 {
 	return 11
 }
 
+func (self *MissionItemReached) FieldsString() string {
+	return fmt.Sprintf("Seq=%d", self.Seq)
+}
+
+func (self *MissionItemReached) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Ack message during MISSION handling. The type field states if this message is a positive ack (type=0) or if an error happened (type=non-zero).
 type MissionAck struct {
 	Type            uint8 // See MAV_MISSION_RESULT enum
@@ -1499,6 +1781,14 @@ func (self *MissionAck) TypeSize() uint8 {
 
 func (self *MissionAck) TypeCRCExtra() uint8 {
 	return 99
+}
+
+func (self *MissionAck) FieldsString() string {
+	return fmt.Sprintf("Type=%d TargetComponent=%d TargetSystem=%d", self.Type, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // As local waypoints exist, the global MISSION reference allows to transform between the local coordinate frame and the global (GPS) coordinate frame. This can be necessary when e.g. in- and outdoor settings are connected and the MAV should move from in- to outdoor.
@@ -1525,6 +1815,14 @@ func (self *SetGpsGlobalOrigin) TypeCRCExtra() uint8 {
 	return 199
 }
 
+func (self *SetGpsGlobalOrigin) FieldsString() string {
+	return fmt.Sprintf("Altitude=%d Longitude=%d Latitude=%d TargetSystem=%d", self.Altitude, self.Longitude, self.Latitude, self.TargetSystem)
+}
+
+func (self *SetGpsGlobalOrigin) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Once the MAV sets a new GPS-Local correspondence, this message announces the origin (0,0,0) position
 type GpsGlobalOrigin struct {
 	Altitude  int32 // Altitude (WGS84), in meters * 1000 (positive for up)
@@ -1546,6 +1844,14 @@ func (self *GpsGlobalOrigin) TypeSize() uint8 {
 
 func (self *GpsGlobalOrigin) TypeCRCExtra() uint8 {
 	return 65
+}
+
+func (self *GpsGlobalOrigin) FieldsString() string {
+	return fmt.Sprintf("Altitude=%d Longitude=%d Latitude=%d", self.Altitude, self.Longitude, self.Latitude)
+}
+
+func (self *GpsGlobalOrigin) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set a safety zone (volume), which is defined by two corners of a cube. This message can be used to tell the MAV which setpoints/MISSIONs to accept and which to reject. Safety areas are often enforced by national or competition regulations.
@@ -1577,6 +1883,14 @@ func (self *SafetySetAllowedArea) TypeCRCExtra() uint8 {
 	return 197
 }
 
+func (self *SafetySetAllowedArea) FieldsString() string {
+	return fmt.Sprintf("P2z=%d P2y=%d P2x=%d P1z=%d P1y=%d P1x=%d Frame=%d TargetComponent=%d TargetSystem=%d", self.P2z, self.P2y, self.P2x, self.P1z, self.P1y, self.P1x, self.Frame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *SafetySetAllowedArea) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Read out the safety zone the MAV currently assumes.
 type SafetyAllowedArea struct {
 	P2z   float32 // z position 2 / Altitude 2
@@ -1604,6 +1918,14 @@ func (self *SafetyAllowedArea) TypeCRCExtra() uint8 {
 	return 160
 }
 
+func (self *SafetyAllowedArea) FieldsString() string {
+	return fmt.Sprintf("P2z=%d P2y=%d P2x=%d P1z=%d P1y=%d P1x=%d Frame=%d", self.P2z, self.P2y, self.P2x, self.P1z, self.P1y, self.P1x, self.Frame)
+}
+
+func (self *SafetyAllowedArea) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 type AttitudeQuaternionCov struct {
 	Covariance [9]float32 // Attitude covariance
@@ -1623,11 +1945,19 @@ func (self *AttitudeQuaternionCov) TypeName() string {
 }
 
 func (self *AttitudeQuaternionCov) TypeSize() uint8 {
-	return 24
+	return 68
 }
 
 func (self *AttitudeQuaternionCov) TypeCRCExtra() uint8 {
 	return 199
+}
+
+func (self *AttitudeQuaternionCov) FieldsString() string {
+	return fmt.Sprintf("Covariance=%v Yawspeed=%d Pitchspeed=%d Rollspeed=%d Q=%v TimeBootMs=%d", self.Covariance, self.Yawspeed, self.Pitchspeed, self.Rollspeed, self.Q, self.TimeBootMs)
+}
+
+func (self *AttitudeQuaternionCov) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Outputs of the APM navigation controller. The primary use of this message is to check the response and signs of the controller before actual flight and to assist with tuning controller parameters.
@@ -1658,6 +1988,14 @@ func (self *NavControllerOutput) TypeCRCExtra() uint8 {
 	return 125
 }
 
+func (self *NavControllerOutput) FieldsString() string {
+	return fmt.Sprintf("XtrackError=%d AspdError=%d AltError=%d NavPitch=%d NavRoll=%d WpDist=%d TargetBearing=%d NavBearing=%d", self.XtrackError, self.AspdError, self.AltError, self.NavPitch, self.NavRoll, self.WpDist, self.TargetBearing, self.NavBearing)
+}
+
+func (self *NavControllerOutput) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset.
 type GlobalPositionIntCov struct {
 	TimeUtc       uint64      // Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.
@@ -1682,11 +2020,19 @@ func (self *GlobalPositionIntCov) TypeName() string {
 }
 
 func (self *GlobalPositionIntCov) TypeSize() uint8 {
-	return 45
+	return 185
 }
 
 func (self *GlobalPositionIntCov) TypeCRCExtra() uint8 {
 	return 6
+}
+
+func (self *GlobalPositionIntCov) FieldsString() string {
+	return fmt.Sprintf("TimeUtc=%d Covariance=%v Vz=%d Vy=%d Vx=%d RelativeAlt=%d Alt=%d Lon=%d Lat=%d TimeBootMs=%d EstimatorType=%d", self.TimeUtc, self.Covariance, self.Vz, self.Vy, self.Vx, self.RelativeAlt, self.Alt, self.Lon, self.Lat, self.TimeBootMs, self.EstimatorType)
+}
+
+func (self *GlobalPositionIntCov) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
@@ -1712,11 +2058,19 @@ func (self *LocalPositionNedCov) TypeName() string {
 }
 
 func (self *LocalPositionNedCov) TypeSize() uint8 {
-	return 41
+	return 181
 }
 
 func (self *LocalPositionNedCov) TypeCRCExtra() uint8 {
 	return 115
+}
+
+func (self *LocalPositionNedCov) FieldsString() string {
+	return fmt.Sprintf("TimeUtc=%d Covariance=%v Vz=%d Vy=%d Vx=%d Z=%d Y=%d X=%d TimeBootMs=%d EstimatorType=%d", self.TimeUtc, self.Covariance, self.Vz, self.Vy, self.Vx, self.Z, self.Y, self.X, self.TimeBootMs, self.EstimatorType)
+}
+
+func (self *LocalPositionNedCov) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
@@ -1760,6 +2114,14 @@ func (self *RcChannels) TypeCRCExtra() uint8 {
 	return 182
 }
 
+func (self *RcChannels) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Chan18Raw=%d Chan17Raw=%d Chan16Raw=%d Chan15Raw=%d Chan14Raw=%d Chan13Raw=%d Chan12Raw=%d Chan11Raw=%d Chan10Raw=%d Chan9Raw=%d Chan8Raw=%d Chan7Raw=%d Chan6Raw=%d Chan5Raw=%d Chan4Raw=%d Chan3Raw=%d Chan2Raw=%d Chan1Raw=%d Rssi=%d Chancount=%d", self.TimeBootMs, self.Chan18Raw, self.Chan17Raw, self.Chan16Raw, self.Chan15Raw, self.Chan14Raw, self.Chan13Raw, self.Chan12Raw, self.Chan11Raw, self.Chan10Raw, self.Chan9Raw, self.Chan8Raw, self.Chan7Raw, self.Chan6Raw, self.Chan5Raw, self.Chan4Raw, self.Chan3Raw, self.Chan2Raw, self.Chan1Raw, self.Rssi, self.Chancount)
+}
+
+func (self *RcChannels) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type RequestDataStream struct {
 	ReqMessageRate  uint16 // The requested interval between two messages of this type
@@ -1785,6 +2147,14 @@ func (self *RequestDataStream) TypeCRCExtra() uint8 {
 	return 247
 }
 
+func (self *RequestDataStream) FieldsString() string {
+	return fmt.Sprintf("ReqMessageRate=%d StartStop=%d ReqStreamId=%d TargetComponent=%d TargetSystem=%d", self.ReqMessageRate, self.StartStop, self.ReqStreamId, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *RequestDataStream) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type DataStream struct {
 	MessageRate uint16 // The requested interval between two messages of this type
@@ -1806,6 +2176,14 @@ func (self *DataStream) TypeSize() uint8 {
 
 func (self *DataStream) TypeCRCExtra() uint8 {
 	return 193
+}
+
+func (self *DataStream) FieldsString() string {
+	return fmt.Sprintf("MessageRate=%d OnOff=%d StreamId=%d", self.MessageRate, self.OnOff, self.StreamId)
+}
+
+func (self *DataStream) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // This message provides an API for manually controlling the vehicle using standard joystick axes nomenclature, along with a joystick-like input device. Unused axes can be disabled an buttons are also transmit as boolean values of their
@@ -1832,6 +2210,14 @@ func (self *ManualControl) TypeSize() uint8 {
 
 func (self *ManualControl) TypeCRCExtra() uint8 {
 	return 130
+}
+
+func (self *ManualControl) FieldsString() string {
+	return fmt.Sprintf("Buttons=%d R=%d Z=%d Y=%d X=%d Target=%d", self.Buttons, self.R, self.Z, self.Y, self.X, self.Target)
+}
+
+func (self *ManualControl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The RAW values of the RC channels sent to the MAV to override info received from the RC radio. A value of UINT16_MAX means no change to that channel. A value of 0 means control of that channel should be released back to the RC radio. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
@@ -1862,6 +2248,14 @@ func (self *RcChannelsOverride) TypeSize() uint8 {
 
 func (self *RcChannelsOverride) TypeCRCExtra() uint8 {
 	return 32
+}
+
+func (self *RcChannelsOverride) FieldsString() string {
+	return fmt.Sprintf("Chan8Raw=%d Chan7Raw=%d Chan6Raw=%d Chan5Raw=%d Chan4Raw=%d Chan3Raw=%d Chan2Raw=%d Chan1Raw=%d TargetComponent=%d TargetSystem=%d", self.Chan8Raw, self.Chan7Raw, self.Chan6Raw, self.Chan5Raw, self.Chan4Raw, self.Chan3Raw, self.Chan2Raw, self.Chan1Raw, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *RcChannelsOverride) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Message encoding a mission item. This message is emitted to announce
@@ -1899,6 +2293,14 @@ func (self *MissionItemInt) TypeCRCExtra() uint8 {
 	return 253
 }
 
+func (self *MissionItemInt) FieldsString() string {
+	return fmt.Sprintf("Z=%d Y=%d X=%d Param4=%d Param3=%d Param2=%d Param1=%d Command=%d Seq=%d Autocontinue=%d Current=%d Frame=%d TargetComponent=%d TargetSystem=%d", self.Z, self.Y, self.X, self.Param4, self.Param3, self.Param2, self.Param1, self.Command, self.Seq, self.Autocontinue, self.Current, self.Frame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *MissionItemInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Metrics typically displayed on a HUD for fixed wing aircraft
 type VfrHud struct {
 	Climb       float32 // Current climb rate in meters/second
@@ -1923,6 +2325,14 @@ func (self *VfrHud) TypeSize() uint8 {
 
 func (self *VfrHud) TypeCRCExtra() uint8 {
 	return 238
+}
+
+func (self *VfrHud) FieldsString() string {
+	return fmt.Sprintf("Climb=%d Alt=%d Groundspeed=%d Airspeed=%d Throttle=%d Heading=%d", self.Climb, self.Alt, self.Groundspeed, self.Airspeed, self.Throttle, self.Heading)
+}
+
+func (self *VfrHud) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value.
@@ -1958,6 +2368,14 @@ func (self *CommandInt) TypeCRCExtra() uint8 {
 	return 109
 }
 
+func (self *CommandInt) FieldsString() string {
+	return fmt.Sprintf("Z=%d Y=%d X=%d Param4=%d Param3=%d Param2=%d Param1=%d Command=%d Autocontinue=%d Current=%d Frame=%d TargetComponent=%d TargetSystem=%d", self.Z, self.Y, self.X, self.Param4, self.Param3, self.Param2, self.Param1, self.Command, self.Autocontinue, self.Current, self.Frame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *CommandInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Send a command with up to seven parameters to the MAV
 type CommandLong struct {
 	Param7          float32 // Parameter 7, as defined by MAV_CMD enum.
@@ -1989,6 +2407,14 @@ func (self *CommandLong) TypeCRCExtra() uint8 {
 	return 140
 }
 
+func (self *CommandLong) FieldsString() string {
+	return fmt.Sprintf("Param7=%d Param6=%d Param5=%d Param4=%d Param3=%d Param2=%d Param1=%d Command=%d Confirmation=%d TargetComponent=%d TargetSystem=%d", self.Param7, self.Param6, self.Param5, self.Param4, self.Param3, self.Param2, self.Param1, self.Command, self.Confirmation, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *CommandLong) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Report status of a command. Includes feedback wether the command was executed.
 type CommandAck struct {
 	Command uint16 // Command ID, as defined by MAV_CMD enum.
@@ -2009,6 +2435,14 @@ func (self *CommandAck) TypeSize() uint8 {
 
 func (self *CommandAck) TypeCRCExtra() uint8 {
 	return 143
+}
+
+func (self *CommandAck) FieldsString() string {
+	return fmt.Sprintf("Command=%d Result=%d", self.Command, self.Result)
+}
+
+func (self *CommandAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Setpoint in roll, pitch, yaw and thrust from the operator
@@ -2038,6 +2472,14 @@ func (self *ManualSetpoint) TypeCRCExtra() uint8 {
 	return 231
 }
 
+func (self *ManualSetpoint) FieldsString() string {
+	return fmt.Sprintf("Thrust=%d Yaw=%d Pitch=%d Roll=%d TimeBootMs=%d ManualOverrideSwitch=%d ModeSwitch=%d", self.Thrust, self.Yaw, self.Pitch, self.Roll, self.TimeBootMs, self.ManualOverrideSwitch, self.ModeSwitch)
+}
+
+func (self *ManualSetpoint) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Set the vehicle attitude and body angular rates.
 type SetAttitudeTarget struct {
 	Thrust          float32    // Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
@@ -2060,11 +2502,19 @@ func (self *SetAttitudeTarget) TypeName() string {
 }
 
 func (self *SetAttitudeTarget) TypeSize() uint8 {
-	return 27
+	return 39
 }
 
 func (self *SetAttitudeTarget) TypeCRCExtra() uint8 {
 	return 250
+}
+
+func (self *SetAttitudeTarget) FieldsString() string {
+	return fmt.Sprintf("Thrust=%d BodyYawRate=%d BodyPitchRate=%d BodyRollRate=%d Q=%v TimeBootMs=%d TypeMask=%d TargetComponent=%d TargetSystem=%d", self.Thrust, self.BodyYawRate, self.BodyPitchRate, self.BodyRollRate, self.Q, self.TimeBootMs, self.TypeMask, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *SetAttitudeTarget) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set the vehicle attitude and body angular rates.
@@ -2087,11 +2537,19 @@ func (self *AttitudeTarget) TypeName() string {
 }
 
 func (self *AttitudeTarget) TypeSize() uint8 {
-	return 25
+	return 37
 }
 
 func (self *AttitudeTarget) TypeCRCExtra() uint8 {
 	return 225
+}
+
+func (self *AttitudeTarget) FieldsString() string {
+	return fmt.Sprintf("Thrust=%d BodyYawRate=%d BodyPitchRate=%d BodyRollRate=%d Q=%v TimeBootMs=%d TypeMask=%d", self.Thrust, self.BodyYawRate, self.BodyPitchRate, self.BodyRollRate, self.Q, self.TimeBootMs, self.TypeMask)
+}
+
+func (self *AttitudeTarget) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set vehicle position, velocity and acceleration setpoint in local frame.
@@ -2130,6 +2588,14 @@ func (self *SetPositionTargetLocalNed) TypeCRCExtra() uint8 {
 	return 109
 }
 
+func (self *SetPositionTargetLocalNed) FieldsString() string {
+	return fmt.Sprintf("YawRate=%d Yaw=%d Afz=%d Afy=%d Afx=%d Vz=%d Vy=%d Vx=%d Z=%d Y=%d X=%d TimeBootMs=%d TypeMask=%d CoordinateFrame=%d TargetComponent=%d TargetSystem=%d", self.YawRate, self.Yaw, self.Afz, self.Afy, self.Afx, self.Vz, self.Vy, self.Vx, self.Z, self.Y, self.X, self.TimeBootMs, self.TypeMask, self.CoordinateFrame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *SetPositionTargetLocalNed) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Set vehicle position, velocity and acceleration setpoint in local frame.
 type PositionTargetLocalNed struct {
 	YawRate         float32 // yaw rate setpoint in rad/s
@@ -2162,6 +2628,14 @@ func (self *PositionTargetLocalNed) TypeSize() uint8 {
 
 func (self *PositionTargetLocalNed) TypeCRCExtra() uint8 {
 	return 211
+}
+
+func (self *PositionTargetLocalNed) FieldsString() string {
+	return fmt.Sprintf("YawRate=%d Yaw=%d Afz=%d Afy=%d Afx=%d Vz=%d Vy=%d Vx=%d Z=%d Y=%d X=%d TimeBootMs=%d TypeMask=%d CoordinateFrame=%d", self.YawRate, self.Yaw, self.Afz, self.Afy, self.Afx, self.Vz, self.Vy, self.Vx, self.Z, self.Y, self.X, self.TimeBootMs, self.TypeMask, self.CoordinateFrame)
+}
+
+func (self *PositionTargetLocalNed) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
@@ -2200,6 +2674,14 @@ func (self *SetPositionTargetGlobalInt) TypeCRCExtra() uint8 {
 	return 207
 }
 
+func (self *SetPositionTargetGlobalInt) FieldsString() string {
+	return fmt.Sprintf("YawRate=%d Yaw=%d Afz=%d Afy=%d Afx=%d Vz=%d Vy=%d Vx=%d Alt=%d LonInt=%d LatInt=%d TimeBootMs=%d TypeMask=%d CoordinateFrame=%d TargetComponent=%d TargetSystem=%d", self.YawRate, self.Yaw, self.Afz, self.Afy, self.Afx, self.Vz, self.Vy, self.Vx, self.Alt, self.LonInt, self.LatInt, self.TimeBootMs, self.TypeMask, self.CoordinateFrame, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *SetPositionTargetGlobalInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
 type PositionTargetGlobalInt struct {
 	YawRate         float32 // yaw rate setpoint in rad/s
@@ -2234,6 +2716,14 @@ func (self *PositionTargetGlobalInt) TypeCRCExtra() uint8 {
 	return 33
 }
 
+func (self *PositionTargetGlobalInt) FieldsString() string {
+	return fmt.Sprintf("YawRate=%d Yaw=%d Afz=%d Afy=%d Afx=%d Vz=%d Vy=%d Vx=%d Alt=%d LonInt=%d LatInt=%d TimeBootMs=%d TypeMask=%d CoordinateFrame=%d", self.YawRate, self.Yaw, self.Afz, self.Afy, self.Afx, self.Vz, self.Vy, self.Vx, self.Alt, self.LonInt, self.LatInt, self.TimeBootMs, self.TypeMask, self.CoordinateFrame)
+}
+
+func (self *PositionTargetGlobalInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The offset in X, Y, Z and yaw between the LOCAL_POSITION_NED messages of MAV X and the global coordinate frame in NED coordinates. Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
 type LocalPositionNedSystemGlobalOffset struct {
 	Yaw        float32 // Yaw
@@ -2259,6 +2749,14 @@ func (self *LocalPositionNedSystemGlobalOffset) TypeSize() uint8 {
 
 func (self *LocalPositionNedSystemGlobalOffset) TypeCRCExtra() uint8 {
 	return 142
+}
+
+func (self *LocalPositionNedSystemGlobalOffset) FieldsString() string {
+	return fmt.Sprintf("Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d TimeBootMs=%d", self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X, self.TimeBootMs)
+}
+
+func (self *LocalPositionNedSystemGlobalOffset) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // DEPRECATED PACKET! Suffers from missing airspeed fields and singularities due to Euler angles. Please use HIL_STATE_QUATERNION instead. Sent from simulation to autopilot. This packet is useful for high throughput applications such as hardware in the loop simulations.
@@ -2297,6 +2795,14 @@ func (self *HilState) TypeCRCExtra() uint8 {
 	return 135
 }
 
+func (self *HilState) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Alt=%d Lon=%d Lat=%d Yawspeed=%d Pitchspeed=%d Rollspeed=%d Yaw=%d Pitch=%d Roll=%d Zacc=%d Yacc=%d Xacc=%d Vz=%d Vy=%d Vx=%d", self.TimeUsec, self.Alt, self.Lon, self.Lat, self.Yawspeed, self.Pitchspeed, self.Rollspeed, self.Yaw, self.Pitch, self.Roll, self.Zacc, self.Yacc, self.Xacc, self.Vz, self.Vy, self.Vx)
+}
+
+func (self *HilState) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Sent from autopilot to simulation. Hardware in the loop control outputs
 type HilControls struct {
 	TimeUsec      uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
@@ -2326,6 +2832,14 @@ func (self *HilControls) TypeSize() uint8 {
 
 func (self *HilControls) TypeCRCExtra() uint8 {
 	return 255
+}
+
+func (self *HilControls) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Aux4=%d Aux3=%d Aux2=%d Aux1=%d Throttle=%d YawRudder=%d PitchElevator=%d RollAilerons=%d NavMode=%d Mode=%d", self.TimeUsec, self.Aux4, self.Aux3, self.Aux2, self.Aux1, self.Throttle, self.YawRudder, self.PitchElevator, self.RollAilerons, self.NavMode, self.Mode)
+}
+
+func (self *HilControls) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Sent from simulation to autopilot. The RAW values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
@@ -2362,6 +2876,14 @@ func (self *HilRcInputsRaw) TypeCRCExtra() uint8 {
 	return 190
 }
 
+func (self *HilRcInputsRaw) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Chan12Raw=%d Chan11Raw=%d Chan10Raw=%d Chan9Raw=%d Chan8Raw=%d Chan7Raw=%d Chan6Raw=%d Chan5Raw=%d Chan4Raw=%d Chan3Raw=%d Chan2Raw=%d Chan1Raw=%d Rssi=%d", self.TimeUsec, self.Chan12Raw, self.Chan11Raw, self.Chan10Raw, self.Chan9Raw, self.Chan8Raw, self.Chan7Raw, self.Chan6Raw, self.Chan5Raw, self.Chan4Raw, self.Chan3Raw, self.Chan2Raw, self.Chan1Raw, self.Rssi)
+}
+
+func (self *HilRcInputsRaw) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Optical flow from a flow sensor (e.g. optical mouse sensor)
 type OpticalFlow struct {
 	TimeUsec       uint64  // Timestamp (UNIX)
@@ -2388,6 +2910,14 @@ func (self *OpticalFlow) TypeSize() uint8 {
 
 func (self *OpticalFlow) TypeCRCExtra() uint8 {
 	return 53
+}
+
+func (self *OpticalFlow) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d GroundDistance=%d FlowCompMY=%d FlowCompMX=%d FlowY=%d FlowX=%d Quality=%d SensorId=%d", self.TimeUsec, self.GroundDistance, self.FlowCompMY, self.FlowCompMX, self.FlowY, self.FlowX, self.Quality, self.SensorId)
+}
+
+func (self *OpticalFlow) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -2417,6 +2947,14 @@ func (self *GlobalVisionPositionEstimate) TypeCRCExtra() uint8 {
 	return 10
 }
 
+func (self *GlobalVisionPositionEstimate) FieldsString() string {
+	return fmt.Sprintf("Usec=%d Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d", self.Usec, self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X)
+}
+
+func (self *GlobalVisionPositionEstimate) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type VisionPositionEstimate struct {
 	Usec  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
@@ -2444,6 +2982,14 @@ func (self *VisionPositionEstimate) TypeCRCExtra() uint8 {
 	return 242
 }
 
+func (self *VisionPositionEstimate) FieldsString() string {
+	return fmt.Sprintf("Usec=%d Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d", self.Usec, self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X)
+}
+
+func (self *VisionPositionEstimate) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type VisionSpeedEstimate struct {
 	Usec uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
@@ -2466,6 +3012,14 @@ func (self *VisionSpeedEstimate) TypeSize() uint8 {
 
 func (self *VisionSpeedEstimate) TypeCRCExtra() uint8 {
 	return 117
+}
+
+func (self *VisionSpeedEstimate) FieldsString() string {
+	return fmt.Sprintf("Usec=%d Z=%d Y=%d X=%d", self.Usec, self.Z, self.Y, self.X)
+}
+
+func (self *VisionSpeedEstimate) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -2493,6 +3047,14 @@ func (self *ViconPositionEstimate) TypeSize() uint8 {
 
 func (self *ViconPositionEstimate) TypeCRCExtra() uint8 {
 	return 84
+}
+
+func (self *ViconPositionEstimate) FieldsString() string {
+	return fmt.Sprintf("Usec=%d Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d", self.Usec, self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X)
+}
+
+func (self *ViconPositionEstimate) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The IMU readings in SI units in NED body frame
@@ -2530,6 +3092,14 @@ func (self *HighresImu) TypeCRCExtra() uint8 {
 	return 100
 }
 
+func (self *HighresImu) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Temperature=%d PressureAlt=%d DiffPressure=%d AbsPressure=%d Zmag=%d Ymag=%d Xmag=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d FieldsUpdated=%d", self.TimeUsec, self.Temperature, self.PressureAlt, self.DiffPressure, self.AbsPressure, self.Zmag, self.Ymag, self.Xmag, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc, self.FieldsUpdated)
+}
+
+func (self *HighresImu) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)
 type OpticalFlowRad struct {
 	TimeUsec            uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
@@ -2560,6 +3130,14 @@ func (self *OpticalFlowRad) TypeSize() uint8 {
 
 func (self *OpticalFlowRad) TypeCRCExtra() uint8 {
 	return 11
+}
+
+func (self *OpticalFlowRad) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Distance=%d TimeDeltaDistanceUs=%d IntegratedZgyro=%d IntegratedYgyro=%d IntegratedXgyro=%d IntegratedY=%d IntegratedX=%d IntegrationTimeUs=%d Temperature=%d Quality=%d SensorId=%d", self.TimeUsec, self.Distance, self.TimeDeltaDistanceUs, self.IntegratedZgyro, self.IntegratedYgyro, self.IntegratedXgyro, self.IntegratedY, self.IntegratedX, self.IntegrationTimeUs, self.Temperature, self.Quality, self.SensorId)
+}
+
+func (self *OpticalFlowRad) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The IMU readings in SI units in NED body frame
@@ -2595,6 +3173,14 @@ func (self *HilSensor) TypeSize() uint8 {
 
 func (self *HilSensor) TypeCRCExtra() uint8 {
 	return 189
+}
+
+func (self *HilSensor) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d FieldsUpdated=%d Temperature=%d PressureAlt=%d DiffPressure=%d AbsPressure=%d Zmag=%d Ymag=%d Xmag=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d", self.TimeUsec, self.FieldsUpdated, self.Temperature, self.PressureAlt, self.DiffPressure, self.AbsPressure, self.Zmag, self.Ymag, self.Xmag, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc)
+}
+
+func (self *HilSensor) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Status of simulation environment, if used
@@ -2638,6 +3224,14 @@ func (self *SimState) TypeCRCExtra() uint8 {
 	return 98
 }
 
+func (self *SimState) FieldsString() string {
+	return fmt.Sprintf("Vd=%d Ve=%d Vn=%d StdDevVert=%d StdDevHorz=%d Alt=%d Lon=%d Lat=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d Yaw=%d Pitch=%d Roll=%d Q4=%d Q3=%d Q2=%d Q1=%d", self.Vd, self.Ve, self.Vn, self.StdDevVert, self.StdDevHorz, self.Alt, self.Lon, self.Lat, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc, self.Yaw, self.Pitch, self.Roll, self.Q4, self.Q3, self.Q2, self.Q1)
+}
+
+func (self *SimState) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Status generated by radio
 type RadioStatus struct {
 	Fixed    uint16 // count of error corrected packets
@@ -2665,6 +3259,14 @@ func (self *RadioStatus) TypeCRCExtra() uint8 {
 	return 247
 }
 
+func (self *RadioStatus) FieldsString() string {
+	return fmt.Sprintf("Fixed=%d Rxerrors=%d Remnoise=%d Noise=%d Txbuf=%d Remrssi=%d Rssi=%d", self.Fixed, self.Rxerrors, self.Remnoise, self.Noise, self.Txbuf, self.Remrssi, self.Rssi)
+}
+
+func (self *RadioStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // File transfer message
 type FileTransferProtocol struct {
 	Payload         [251]uint8 // Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.
@@ -2682,11 +3284,19 @@ func (self *FileTransferProtocol) TypeName() string {
 }
 
 func (self *FileTransferProtocol) TypeSize() uint8 {
-	return 4
+	return 254
 }
 
 func (self *FileTransferProtocol) TypeCRCExtra() uint8 {
 	return 79
+}
+
+func (self *FileTransferProtocol) FieldsString() string {
+	return fmt.Sprintf("Payload=%v TargetComponent=%d TargetSystem=%d TargetNetwork=%d", self.Payload, self.TargetComponent, self.TargetSystem, self.TargetNetwork)
+}
+
+func (self *FileTransferProtocol) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Time synchronization message.
@@ -2709,6 +3319,14 @@ func (self *Timesync) TypeSize() uint8 {
 
 func (self *Timesync) TypeCRCExtra() uint8 {
 	return 116
+}
+
+func (self *Timesync) FieldsString() string {
+	return fmt.Sprintf("Ts1=%d Tc1=%d", self.Ts1, self.Tc1)
+}
+
+func (self *Timesync) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The global position, as returned by the Global Positioning System (GPS). This is
@@ -2745,6 +3363,14 @@ func (self *HilGps) TypeCRCExtra() uint8 {
 	return 88
 }
 
+func (self *HilGps) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Alt=%d Lon=%d Lat=%d Cog=%d Vd=%d Ve=%d Vn=%d Vel=%d Epv=%d Eph=%d SatellitesVisible=%d FixType=%d", self.TimeUsec, self.Alt, self.Lon, self.Lat, self.Cog, self.Vd, self.Ve, self.Vn, self.Vel, self.Epv, self.Eph, self.SatellitesVisible, self.FixType)
+}
+
+func (self *HilGps) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)
 type HilOpticalFlow struct {
 	TimeUsec            uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
@@ -2777,6 +3403,14 @@ func (self *HilOpticalFlow) TypeCRCExtra() uint8 {
 	return 108
 }
 
+func (self *HilOpticalFlow) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Distance=%d TimeDeltaDistanceUs=%d IntegratedZgyro=%d IntegratedYgyro=%d IntegratedXgyro=%d IntegratedY=%d IntegratedX=%d IntegrationTimeUs=%d Temperature=%d Quality=%d SensorId=%d", self.TimeUsec, self.Distance, self.TimeDeltaDistanceUs, self.IntegratedZgyro, self.IntegratedYgyro, self.IntegratedXgyro, self.IntegratedY, self.IntegratedX, self.IntegrationTimeUs, self.Temperature, self.Quality, self.SensorId)
+}
+
+func (self *HilOpticalFlow) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Sent from simulation to autopilot, avoids in contrast to HIL_STATE singularities. This packet is useful for high throughput applications such as hardware in the loop simulations.
 type HilStateQuaternion struct {
 	TimeUsec           uint64     // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
@@ -2806,11 +3440,19 @@ func (self *HilStateQuaternion) TypeName() string {
 }
 
 func (self *HilStateQuaternion) TypeSize() uint8 {
-	return 52
+	return 64
 }
 
 func (self *HilStateQuaternion) TypeCRCExtra() uint8 {
 	return 147
+}
+
+func (self *HilStateQuaternion) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Alt=%d Lon=%d Lat=%d Yawspeed=%d Pitchspeed=%d Rollspeed=%d AttitudeQuaternion=%v Zacc=%d Yacc=%d Xacc=%d TrueAirspeed=%d IndAirspeed=%d Vz=%d Vy=%d Vx=%d", self.TimeUsec, self.Alt, self.Lon, self.Lat, self.Yawspeed, self.Pitchspeed, self.Rollspeed, self.AttitudeQuaternion, self.Zacc, self.Yacc, self.Xacc, self.TrueAirspeed, self.IndAirspeed, self.Vz, self.Vy, self.Vx)
+}
+
+func (self *HilStateQuaternion) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The RAW IMU readings for secondary 9DOF sensor setup. This message should contain the scaled values to the described units
@@ -2843,6 +3485,14 @@ func (self *ScaledImu2) TypeCRCExtra() uint8 {
 	return 97
 }
 
+func (self *ScaledImu2) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Zmag=%d Ymag=%d Xmag=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d", self.TimeBootMs, self.Zmag, self.Ymag, self.Xmag, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc)
+}
+
+func (self *ScaledImu2) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request a list of available logs. On some systems calling this may stop on-board logging until LOG_REQUEST_END is called.
 type LogRequestList struct {
 	End             uint16 // Last log id (0xffff for last available)
@@ -2865,6 +3515,14 @@ func (self *LogRequestList) TypeSize() uint8 {
 
 func (self *LogRequestList) TypeCRCExtra() uint8 {
 	return 158
+}
+
+func (self *LogRequestList) FieldsString() string {
+	return fmt.Sprintf("End=%d Start=%d TargetComponent=%d TargetSystem=%d", self.End, self.Start, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *LogRequestList) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Reply to LOG_REQUEST_LIST
@@ -2892,6 +3550,14 @@ func (self *LogEntry) TypeCRCExtra() uint8 {
 	return 173
 }
 
+func (self *LogEntry) FieldsString() string {
+	return fmt.Sprintf("Size=%d TimeUtc=%d LastLogNum=%d NumLogs=%d Id=%d", self.Size, self.TimeUtc, self.LastLogNum, self.NumLogs, self.Id)
+}
+
+func (self *LogEntry) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request a chunk of a log
 type LogRequestData struct {
 	Count           uint32 // Number of bytes
@@ -2917,6 +3583,14 @@ func (self *LogRequestData) TypeCRCExtra() uint8 {
 	return 245
 }
 
+func (self *LogRequestData) FieldsString() string {
+	return fmt.Sprintf("Count=%d Ofs=%d Id=%d TargetComponent=%d TargetSystem=%d", self.Count, self.Ofs, self.Id, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *LogRequestData) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Reply to LOG_REQUEST_DATA
 type LogData struct {
 	Ofs   uint32    // Offset into the log
@@ -2934,11 +3608,19 @@ func (self *LogData) TypeName() string {
 }
 
 func (self *LogData) TypeSize() uint8 {
-	return 8
+	return 97
 }
 
 func (self *LogData) TypeCRCExtra() uint8 {
 	return 199
+}
+
+func (self *LogData) FieldsString() string {
+	return fmt.Sprintf("Ofs=%d Id=%d Data=%v Count=%d", self.Ofs, self.Id, self.Data, self.Count)
+}
+
+func (self *LogData) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Erase all logs
@@ -2963,6 +3645,14 @@ func (self *LogErase) TypeCRCExtra() uint8 {
 	return 30
 }
 
+func (self *LogErase) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *LogErase) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Stop log transfer and resume normal logging
 type LogRequestEnd struct {
 	TargetComponent uint8 // Component ID
@@ -2985,6 +3675,14 @@ func (self *LogRequestEnd) TypeCRCExtra() uint8 {
 	return 56
 }
 
+func (self *LogRequestEnd) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *LogRequestEnd) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // data for injecting into the onboard GPS (used for DGPS)
 type GpsInjectData struct {
 	Data            [110]uint8 // raw data (110 is enough for 12 satellites of RTCMv2)
@@ -3002,11 +3700,19 @@ func (self *GpsInjectData) TypeName() string {
 }
 
 func (self *GpsInjectData) TypeSize() uint8 {
-	return 4
+	return 113
 }
 
 func (self *GpsInjectData) TypeCRCExtra() uint8 {
 	return 75
+}
+
+func (self *GpsInjectData) FieldsString() string {
+	return fmt.Sprintf("Data=%v Len=%d TargetComponent=%d TargetSystem=%d", self.Data, self.Len, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *GpsInjectData) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Second GPS data. Coordinate frame is right-handed, Z-axis up (GPS frame).
@@ -3041,6 +3747,14 @@ func (self *Gps2Raw) TypeCRCExtra() uint8 {
 	return 223
 }
 
+func (self *Gps2Raw) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d DgpsAge=%d Alt=%d Lon=%d Lat=%d Cog=%d Vel=%d Epv=%d Eph=%d DgpsNumch=%d SatellitesVisible=%d FixType=%d", self.TimeUsec, self.DgpsAge, self.Alt, self.Lon, self.Lat, self.Cog, self.Vel, self.Epv, self.Eph, self.DgpsNumch, self.SatellitesVisible, self.FixType)
+}
+
+func (self *Gps2Raw) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Power supply status
 type PowerStatus struct {
 	Flags  uint16 // power supply status flags (see MAV_POWER_STATUS enum)
@@ -3064,6 +3778,14 @@ func (self *PowerStatus) TypeCRCExtra() uint8 {
 	return 145
 }
 
+func (self *PowerStatus) FieldsString() string {
+	return fmt.Sprintf("Flags=%d Vservo=%d Vcc=%d", self.Flags, self.Vservo, self.Vcc)
+}
+
+func (self *PowerStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Control a serial port. This can be used for raw access to an onboard serial peripheral such as a GPS or telemetry radio. It is designed to make it possible to update the devices firmware via MAVLink messages or change the devices settings. A message with zero bytes can be used to change just the baudrate.
 type SerialControl struct {
 	Baudrate uint32    // Baudrate of transfer. Zero means no change.
@@ -3083,11 +3805,19 @@ func (self *SerialControl) TypeName() string {
 }
 
 func (self *SerialControl) TypeSize() uint8 {
-	return 10
+	return 79
 }
 
 func (self *SerialControl) TypeCRCExtra() uint8 {
 	return 89
+}
+
+func (self *SerialControl) FieldsString() string {
+	return fmt.Sprintf("Baudrate=%d Timeout=%d Data=%v Count=%d Flags=%d Device=%d", self.Baudrate, self.Timeout, self.Data, self.Count, self.Flags, self.Device)
+}
+
+func (self *SerialControl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
@@ -3123,6 +3853,14 @@ func (self *GpsRtk) TypeCRCExtra() uint8 {
 	return 242
 }
 
+func (self *GpsRtk) FieldsString() string {
+	return fmt.Sprintf("IarNumHypotheses=%d Accuracy=%d BaselineCMm=%d BaselineBMm=%d BaselineAMm=%d Tow=%d TimeLastBaselineMs=%d Wn=%d BaselineCoordsType=%d Nsats=%d RtkRate=%d RtkHealth=%d RtkReceiverId=%d", self.IarNumHypotheses, self.Accuracy, self.BaselineCMm, self.BaselineBMm, self.BaselineAMm, self.Tow, self.TimeLastBaselineMs, self.Wn, self.BaselineCoordsType, self.Nsats, self.RtkRate, self.RtkHealth, self.RtkReceiverId)
+}
+
+func (self *GpsRtk) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
 type Gps2Rtk struct {
 	IarNumHypotheses   int32  // Current number of integer ambiguity hypotheses.
@@ -3156,6 +3894,14 @@ func (self *Gps2Rtk) TypeCRCExtra() uint8 {
 	return 9
 }
 
+func (self *Gps2Rtk) FieldsString() string {
+	return fmt.Sprintf("IarNumHypotheses=%d Accuracy=%d BaselineCMm=%d BaselineBMm=%d BaselineAMm=%d Tow=%d TimeLastBaselineMs=%d Wn=%d BaselineCoordsType=%d Nsats=%d RtkRate=%d RtkHealth=%d RtkReceiverId=%d", self.IarNumHypotheses, self.Accuracy, self.BaselineCMm, self.BaselineBMm, self.BaselineAMm, self.Tow, self.TimeLastBaselineMs, self.Wn, self.BaselineCoordsType, self.Nsats, self.RtkRate, self.RtkHealth, self.RtkReceiverId)
+}
+
+func (self *Gps2Rtk) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type DataTransmissionHandshake struct {
 	Size       uint32 // total data size in bytes (set on ACK only)
@@ -3183,6 +3929,14 @@ func (self *DataTransmissionHandshake) TypeCRCExtra() uint8 {
 	return 29
 }
 
+func (self *DataTransmissionHandshake) FieldsString() string {
+	return fmt.Sprintf("Size=%d Packets=%d Height=%d Width=%d JpgQuality=%d Payload=%d Type=%d", self.Size, self.Packets, self.Height, self.Width, self.JpgQuality, self.Payload, self.Type)
+}
+
+func (self *DataTransmissionHandshake) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type EncapsulatedData struct {
 	Seqnr uint16     // sequence number (starting with 0 on every transmission)
@@ -3198,11 +3952,19 @@ func (self *EncapsulatedData) TypeName() string {
 }
 
 func (self *EncapsulatedData) TypeSize() uint8 {
-	return 3
+	return 255
 }
 
 func (self *EncapsulatedData) TypeCRCExtra() uint8 {
 	return 30
+}
+
+func (self *EncapsulatedData) FieldsString() string {
+	return fmt.Sprintf("Seqnr=%d Data=%v", self.Seqnr, self.Data)
+}
+
+func (self *EncapsulatedData) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -3233,6 +3995,14 @@ func (self *DistanceSensor) TypeCRCExtra() uint8 {
 	return 125
 }
 
+func (self *DistanceSensor) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d CurrentDistance=%d MaxDistance=%d MinDistance=%d Covariance=%d Orientation=%d Id=%d Type=%d", self.TimeBootMs, self.CurrentDistance, self.MaxDistance, self.MinDistance, self.Covariance, self.Orientation, self.Id, self.Type)
+}
+
+func (self *DistanceSensor) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Request for terrain data and terrain status
 type TerrainRequest struct {
 	Mask        uint64 // Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
@@ -3257,6 +4027,14 @@ func (self *TerrainRequest) TypeCRCExtra() uint8 {
 	return 212
 }
 
+func (self *TerrainRequest) FieldsString() string {
+	return fmt.Sprintf("Mask=%d Lon=%d Lat=%d GridSpacing=%d", self.Mask, self.Lon, self.Lat, self.GridSpacing)
+}
+
+func (self *TerrainRequest) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Terrain data sent from GCS. The lat/lon and grid_spacing must be the same as a lat/lon from a TERRAIN_REQUEST
 type TerrainData struct {
 	Lon         int32     // Longitude of SW corner of first grid (in degrees *10^7)
@@ -3275,11 +4053,19 @@ func (self *TerrainData) TypeName() string {
 }
 
 func (self *TerrainData) TypeSize() uint8 {
-	return 13
+	return 43
 }
 
 func (self *TerrainData) TypeCRCExtra() uint8 {
 	return 243
+}
+
+func (self *TerrainData) FieldsString() string {
+	return fmt.Sprintf("Lon=%d Lat=%d Data=%v GridSpacing=%d Gridbit=%d", self.Lon, self.Lat, self.Data, self.GridSpacing, self.Gridbit)
+}
+
+func (self *TerrainData) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Request that the vehicle report terrain height at the given location. Used by GCS to check if vehicle has all terrain data needed for a mission.
@@ -3302,6 +4088,14 @@ func (self *TerrainCheck) TypeSize() uint8 {
 
 func (self *TerrainCheck) TypeCRCExtra() uint8 {
 	return 155
+}
+
+func (self *TerrainCheck) FieldsString() string {
+	return fmt.Sprintf("Lon=%d Lat=%d", self.Lon, self.Lat)
+}
+
+func (self *TerrainCheck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Response from a TERRAIN_CHECK request
@@ -3331,6 +4125,14 @@ func (self *TerrainReport) TypeCRCExtra() uint8 {
 	return 239
 }
 
+func (self *TerrainReport) FieldsString() string {
+	return fmt.Sprintf("CurrentHeight=%d TerrainHeight=%d Lon=%d Lat=%d Loaded=%d Pending=%d Spacing=%d", self.CurrentHeight, self.TerrainHeight, self.Lon, self.Lat, self.Loaded, self.Pending, self.Spacing)
+}
+
+func (self *TerrainReport) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Battery information
 type BatteryStatus struct {
 	EnergyConsumed   int32      // Consumed energy, in 100*Joules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
@@ -3353,11 +4155,19 @@ func (self *BatteryStatus) TypeName() string {
 }
 
 func (self *BatteryStatus) TypeSize() uint8 {
-	return 18
+	return 36
 }
 
 func (self *BatteryStatus) TypeCRCExtra() uint8 {
 	return 162
+}
+
+func (self *BatteryStatus) FieldsString() string {
+	return fmt.Sprintf("EnergyConsumed=%d CurrentConsumed=%d CurrentBattery=%d Voltages=%v Temperature=%d BatteryRemaining=%d Type=%d BatteryFunction=%d Id=%d", self.EnergyConsumed, self.CurrentConsumed, self.CurrentBattery, self.Voltages, self.Temperature, self.BatteryRemaining, self.Type, self.BatteryFunction, self.Id)
+}
+
+func (self *BatteryStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Version and capability of autopilot software
@@ -3376,11 +4186,19 @@ func (self *AutopilotVersion) TypeName() string {
 }
 
 func (self *AutopilotVersion) TypeSize() uint8 {
-	return 13
+	return 20
 }
 
 func (self *AutopilotVersion) TypeCRCExtra() uint8 {
 	return 216
+}
+
+func (self *AutopilotVersion) FieldsString() string {
+	return fmt.Sprintf("Capabilities=%d Version=%d CustomVersion=%v", self.Capabilities, self.Version, self.CustomVersion)
+}
+
+func (self *AutopilotVersion) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Message implementing parts of the V2 payload specs in V1 frames for transitional support.
@@ -3401,11 +4219,19 @@ func (self *V2Extension) TypeName() string {
 }
 
 func (self *V2Extension) TypeSize() uint8 {
-	return 6
+	return 254
 }
 
 func (self *V2Extension) TypeCRCExtra() uint8 {
 	return 41
+}
+
+func (self *V2Extension) FieldsString() string {
+	return fmt.Sprintf("MessageType=%d Payload=%v TargetComponent=%d TargetSystem=%d TargetNetwork=%d", self.MessageType, self.Payload, self.TargetComponent, self.TargetSystem, self.TargetNetwork)
+}
+
+func (self *V2Extension) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Send raw controller memory. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
@@ -3425,11 +4251,19 @@ func (self *MemoryVect) TypeName() string {
 }
 
 func (self *MemoryVect) TypeSize() uint8 {
-	return 5
+	return 36
 }
 
 func (self *MemoryVect) TypeCRCExtra() uint8 {
 	return 112
+}
+
+func (self *MemoryVect) FieldsString() string {
+	return fmt.Sprintf("Address=%d Value=%v Type=%d Ver=%d", self.Address, self.Value, self.Type, self.Ver)
+}
+
+func (self *MemoryVect) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -3450,11 +4284,19 @@ func (self *DebugVect) TypeName() string {
 }
 
 func (self *DebugVect) TypeSize() uint8 {
-	return 21
+	return 30
 }
 
 func (self *DebugVect) TypeCRCExtra() uint8 {
 	return 141
+}
+
+func (self *DebugVect) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Z=%d Y=%d X=%d Name=\"%s\"", self.TimeUsec, self.Z, self.Y, self.X, self.Name)
+}
+
+func (self *DebugVect) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Send a key-value pair as float. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
@@ -3473,11 +4315,19 @@ func (self *NamedValueFloat) TypeName() string {
 }
 
 func (self *NamedValueFloat) TypeSize() uint8 {
-	return 9
+	return 18
 }
 
 func (self *NamedValueFloat) TypeCRCExtra() uint8 {
 	return 253
+}
+
+func (self *NamedValueFloat) FieldsString() string {
+	return fmt.Sprintf("Value=%d TimeBootMs=%d Name=\"%s\"", self.Value, self.TimeBootMs, self.Name)
+}
+
+func (self *NamedValueFloat) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Send a key-value pair as integer. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
@@ -3496,11 +4346,19 @@ func (self *NamedValueInt) TypeName() string {
 }
 
 func (self *NamedValueInt) TypeSize() uint8 {
-	return 9
+	return 18
 }
 
 func (self *NamedValueInt) TypeCRCExtra() uint8 {
 	return 86
+}
+
+func (self *NamedValueInt) FieldsString() string {
+	return fmt.Sprintf("Value=%d TimeBootMs=%d Name=\"%s\"", self.Value, self.TimeBootMs, self.Name)
+}
+
+func (self *NamedValueInt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Status text message. These messages are printed in yellow in the COMM console of QGroundControl. WARNING: They consume quite some bandwidth, so use only for important status and error messages. If implemented wisely, these messages are buffered on the MCU and sent only at a limited rate (e.g. 10 Hz).
@@ -3518,11 +4376,19 @@ func (self *Statustext) TypeName() string {
 }
 
 func (self *Statustext) TypeSize() uint8 {
-	return 2
+	return 51
 }
 
 func (self *Statustext) TypeCRCExtra() uint8 {
 	return 78
+}
+
+func (self *Statustext) FieldsString() string {
+	return fmt.Sprintf("Text=\"%s\" Severity=%d", self.Text, self.Severity)
+}
+
+func (self *Statustext) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Send a debug value. The index is used to discriminate between values. These values show up in the plot of QGroundControl as DEBUG N.
@@ -3548,11 +4414,19 @@ func (self *Debug) TypeCRCExtra() uint8 {
 	return 29
 }
 
+func (self *Debug) FieldsString() string {
+	return fmt.Sprintf("Value=%d TimeBootMs=%d Ind=%d", self.Value, self.TimeBootMs, self.Ind)
+}
+
+func (self *Debug) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -3564,95 +4438,95 @@ func truncate(chars []byte) []byte {
 type Char4 [4]byte
 
 func (chars *Char4) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char8 [8]byte
 
 func (chars *Char8) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char9 [9]byte
 
 func (chars *Char9) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char10 [10]byte
 
 func (chars *Char10) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char16 [16]byte
 
 func (chars *Char16) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char20 [20]byte
 
 func (chars *Char20) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char25 [25]byte
 
 func (chars *Char25) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char36 [36]byte
 
 func (chars *Char36) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char50 [50]byte
 
 func (chars *Char50) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char70 [70]byte
 
 func (chars *Char70) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char90 [90]byte
 
 func (chars *Char90) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char110 [110]byte
 
 func (chars *Char110) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char249 [249]byte
 
 func (chars *Char249) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char251 [251]byte
 
 func (chars *Char251) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char253 [253]byte
 
 func (chars *Char253) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }

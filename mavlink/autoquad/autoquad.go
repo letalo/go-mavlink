@@ -1,6 +1,8 @@
 package autoquad
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
@@ -91,4 +93,12 @@ func (self *AqTelemetryF) TypeSize() uint8 {
 
 func (self *AqTelemetryF) TypeCRCExtra() uint8 {
 	return 21
+}
+
+func (self *AqTelemetryF) FieldsString() string {
+	return fmt.Sprintf("Value20=%d Value19=%d Value18=%d Value17=%d Value16=%d Value15=%d Value14=%d Value13=%d Value12=%d Value11=%d Value10=%d Value9=%d Value8=%d Value7=%d Value6=%d Value5=%d Value4=%d Value3=%d Value2=%d Value1=%d Index=%d", self.Value20, self.Value19, self.Value18, self.Value17, self.Value16, self.Value15, self.Value14, self.Value13, self.Value12, self.Value11, self.Value10, self.Value9, self.Value8, self.Value7, self.Value6, self.Value5, self.Value4, self.Value3, self.Value2, self.Value1, self.Index)
+}
+
+func (self *AqTelemetryF) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }

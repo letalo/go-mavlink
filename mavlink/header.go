@@ -40,6 +40,18 @@ func (header *Header) Hash(hash *x25.Hash) {
 	hash.WriteByte(header.MessageID)
 }
 
+func (header *Header) FieldsShortString() string {
+	return fmt.Sprintf("System=%d Component=%d Sequence=%d", header.SystemID, header.ComponentID, header.PacketSequence)
+}
+
+func (header *Header) FieldsString() string {
+	return fmt.Sprintf("System=%d Component=%d Sequence=%d PayloadLength=%d", header.SystemID, header.ComponentID, header.PacketSequence, header.PayloadLength)
+}
+
+func (header *Header) ShortString() string {
+	return fmt.Sprintf("%s{%s}", MessageNameID(header.MessageID), header.FieldsShortString())
+}
+
 func (header *Header) String() string {
-	return fmt.Sprintf("{System: %d, Component: %d, Sequence: %d}", header.SystemID, header.ComponentID, header.PacketSequence)
+	return fmt.Sprintf("%s{%s}", MessageNameID(header.MessageID), header.FieldsString())
 }

@@ -1,6 +1,8 @@
 package pixhawk
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
@@ -84,6 +86,14 @@ func (self *SetCamShutter) TypeCRCExtra() uint8 {
 	return 235
 }
 
+func (self *SetCamShutter) FieldsString() string {
+	return fmt.Sprintf("Gain=%d Exposure=%d Interval=%d TriggerPin=%d CamMode=%d CamNo=%d", self.Gain, self.Exposure, self.Interval, self.TriggerPin, self.CamMode, self.CamNo)
+}
+
+func (self *SetCamShutter) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type ImageTriggered struct {
 	Timestamp uint64  // Timestamp
@@ -116,6 +126,14 @@ func (self *ImageTriggered) TypeCRCExtra() uint8 {
 	return 114
 }
 
+func (self *ImageTriggered) FieldsString() string {
+	return fmt.Sprintf("Timestamp=%d GroundZ=%d GroundY=%d GroundX=%d Alt=%d Lon=%d Lat=%d LocalZ=%d Yaw=%d Pitch=%d Roll=%d Seq=%d", self.Timestamp, self.GroundZ, self.GroundY, self.GroundX, self.Alt, self.Lon, self.Lat, self.LocalZ, self.Yaw, self.Pitch, self.Roll, self.Seq)
+}
+
+func (self *ImageTriggered) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type ImageTriggerControl struct {
 	Enable uint8 // 0 to disable, 1 to enable
@@ -135,6 +153,14 @@ func (self *ImageTriggerControl) TypeSize() uint8 {
 
 func (self *ImageTriggerControl) TypeCRCExtra() uint8 {
 	return 95
+}
+
+func (self *ImageTriggerControl) FieldsString() string {
+	return fmt.Sprintf("Enable=%d", self.Enable)
+}
+
+func (self *ImageTriggerControl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -180,6 +206,14 @@ func (self *ImageAvailable) TypeCRCExtra() uint8 {
 	return 16
 }
 
+func (self *ImageAvailable) FieldsString() string {
+	return fmt.Sprintf("ValidUntil=%d Timestamp=%d CamId=%d GroundZ=%d GroundY=%d GroundX=%d Alt=%d Lon=%d Lat=%d LocalZ=%d Yaw=%d Pitch=%d Roll=%d Gain=%d Exposure=%d Key=%d ImgBufIndex=%d ImgSeq=%d Depth=%d Height=%d Width=%d Channels=%d CamNo=%d", self.ValidUntil, self.Timestamp, self.CamId, self.GroundZ, self.GroundY, self.GroundX, self.Alt, self.Lon, self.Lat, self.LocalZ, self.Yaw, self.Pitch, self.Roll, self.Gain, self.Exposure, self.Key, self.ImgBufIndex, self.ImgSeq, self.Depth, self.Height, self.Width, self.Channels, self.CamNo)
+}
+
+func (self *ImageAvailable) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Message sent to the MAV to set a new offset from the currently controlled position
 type SetPositionControlOffset struct {
 	Yaw             float32 // yaw orientation offset in radians, 0 = NORTH
@@ -206,6 +240,14 @@ func (self *SetPositionControlOffset) TypeCRCExtra() uint8 {
 	return 203
 }
 
+func (self *SetPositionControlOffset) FieldsString() string {
+	return fmt.Sprintf("Yaw=%d Z=%d Y=%d X=%d TargetComponent=%d TargetSystem=%d", self.Yaw, self.Z, self.Y, self.X, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *SetPositionControlOffset) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type PositionControlSetpoint struct {
 	Yaw float32 // yaw orientation in radians, 0 = NORTH
@@ -229,6 +271,14 @@ func (self *PositionControlSetpoint) TypeSize() uint8 {
 
 func (self *PositionControlSetpoint) TypeCRCExtra() uint8 {
 	return 88
+}
+
+func (self *PositionControlSetpoint) FieldsString() string {
+	return fmt.Sprintf("Yaw=%d Z=%d Y=%d X=%d Id=%d", self.Yaw, self.Z, self.Y, self.X, self.Id)
+}
+
+func (self *PositionControlSetpoint) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -258,6 +308,14 @@ func (self *Marker) TypeCRCExtra() uint8 {
 	return 72
 }
 
+func (self *Marker) FieldsString() string {
+	return fmt.Sprintf("Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d Id=%d", self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X, self.Id)
+}
+
+func (self *Marker) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type RawAux struct {
 	Baro int32  // Barometric pressure (hecto Pascal)
@@ -285,6 +343,14 @@ func (self *RawAux) TypeCRCExtra() uint8 {
 	return 115
 }
 
+func (self *RawAux) FieldsString() string {
+	return fmt.Sprintf("Baro=%d Temp=%d Vbat=%d Adc4=%d Adc3=%d Adc2=%d Adc1=%d", self.Baro, self.Temp, self.Vbat, self.Adc4, self.Adc3, self.Adc2, self.Adc1)
+}
+
+func (self *RawAux) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type WatchdogHeartbeat struct {
 	ProcessCount uint16 // Number of processes
@@ -307,6 +373,14 @@ func (self *WatchdogHeartbeat) TypeCRCExtra() uint8 {
 	return 123
 }
 
+func (self *WatchdogHeartbeat) FieldsString() string {
+	return fmt.Sprintf("ProcessCount=%d WatchdogId=%d", self.ProcessCount, self.WatchdogId)
+}
+
+func (self *WatchdogHeartbeat) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type WatchdogProcessInfo struct {
 	Timeout    int32   // Timeout (seconds)
@@ -325,11 +399,19 @@ func (self *WatchdogProcessInfo) TypeName() string {
 }
 
 func (self *WatchdogProcessInfo) TypeSize() uint8 {
-	return 10
+	return 255
 }
 
 func (self *WatchdogProcessInfo) TypeCRCExtra() uint8 {
 	return 133
+}
+
+func (self *WatchdogProcessInfo) FieldsString() string {
+	return fmt.Sprintf("Timeout=%d ProcessId=%d WatchdogId=%d Arguments=\"%s\" Name=\"%s\"", self.Timeout, self.ProcessId, self.WatchdogId, self.Arguments, self.Name)
+}
+
+func (self *WatchdogProcessInfo) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -358,6 +440,14 @@ func (self *WatchdogProcessStatus) TypeCRCExtra() uint8 {
 	return 132
 }
 
+func (self *WatchdogProcessStatus) FieldsString() string {
+	return fmt.Sprintf("Pid=%d Crashes=%d ProcessId=%d WatchdogId=%d Muted=%d State=%d", self.Pid, self.Crashes, self.ProcessId, self.WatchdogId, self.Muted, self.State)
+}
+
+func (self *WatchdogProcessStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type WatchdogCommand struct {
 	ProcessId      uint16 // Process ID
@@ -382,6 +472,14 @@ func (self *WatchdogCommand) TypeCRCExtra() uint8 {
 	return 208
 }
 
+func (self *WatchdogCommand) FieldsString() string {
+	return fmt.Sprintf("ProcessId=%d WatchdogId=%d CommandId=%d TargetSystemId=%d", self.ProcessId, self.WatchdogId, self.CommandId, self.TargetSystemId)
+}
+
+func (self *WatchdogCommand) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 //
 type PatternDetected struct {
 	Confidence float32 // Confidence of detection
@@ -399,11 +497,19 @@ func (self *PatternDetected) TypeName() string {
 }
 
 func (self *PatternDetected) TypeSize() uint8 {
-	return 7
+	return 106
 }
 
 func (self *PatternDetected) TypeCRCExtra() uint8 {
 	return 124
+}
+
+func (self *PatternDetected) FieldsString() string {
+	return fmt.Sprintf("Confidence=%d Detected=%d File=\"%s\" Type=%d", self.Confidence, self.Detected, self.File, self.Type)
+}
+
+func (self *PatternDetected) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Notifies the operator about a point of interest (POI). This can be anything detected by the
@@ -430,11 +536,19 @@ func (self *PointOfInterest) TypeName() string {
 }
 
 func (self *PointOfInterest) TypeSize() uint8 {
-	return 18
+	return 43
 }
 
 func (self *PointOfInterest) TypeCRCExtra() uint8 {
 	return 115
+}
+
+func (self *PointOfInterest) FieldsString() string {
+	return fmt.Sprintf("Z=%d Y=%d X=%d Timeout=%d Name=\"%s\" CoordinateSystem=%d Color=%d Type=%d", self.Z, self.Y, self.X, self.Timeout, self.Name, self.CoordinateSystem, self.Color, self.Type)
+}
+
+func (self *PointOfInterest) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Notifies the operator about the connection of two point of interests (POI). This can be anything detected by the
@@ -464,11 +578,19 @@ func (self *PointOfInterestConnection) TypeName() string {
 }
 
 func (self *PointOfInterestConnection) TypeSize() uint8 {
-	return 30
+	return 55
 }
 
 func (self *PointOfInterestConnection) TypeCRCExtra() uint8 {
 	return 230
+}
+
+func (self *PointOfInterestConnection) FieldsString() string {
+	return fmt.Sprintf("Zp2=%d Yp2=%d Xp2=%d Zp1=%d Yp1=%d Xp1=%d Timeout=%d Name=\"%s\" CoordinateSystem=%d Color=%d Type=%d", self.Zp2, self.Yp2, self.Xp2, self.Zp1, self.Yp1, self.Xp1, self.Timeout, self.Name, self.CoordinateSystem, self.Color, self.Type)
+}
+
+func (self *PointOfInterestConnection) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -492,11 +614,19 @@ func (self *BriefFeature) TypeName() string {
 }
 
 func (self *BriefFeature) TypeSize() uint8 {
-	return 22
+	return 53
 }
 
 func (self *BriefFeature) TypeCRCExtra() uint8 {
 	return 34
+}
+
+func (self *BriefFeature) FieldsString() string {
+	return fmt.Sprintf("Response=%d Z=%d Y=%d X=%d Orientation=%d Size=%d Descriptor=%v OrientationAssignment=%d", self.Response, self.Z, self.Y, self.X, self.Orientation, self.Size, self.Descriptor, self.OrientationAssignment)
+}
+
+func (self *BriefFeature) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -526,6 +656,14 @@ func (self *AttitudeControl) TypeSize() uint8 {
 
 func (self *AttitudeControl) TypeCRCExtra() uint8 {
 	return 64
+}
+
+func (self *AttitudeControl) FieldsString() string {
+	return fmt.Sprintf("Thrust=%d Yaw=%d Pitch=%d Roll=%d ThrustManual=%d YawManual=%d PitchManual=%d RollManual=%d Target=%d", self.Thrust, self.Yaw, self.Pitch, self.Roll, self.ThrustManual, self.YawManual, self.PitchManual, self.RollManual, self.Target)
+}
+
+func (self *AttitudeControl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -558,6 +696,14 @@ func (self *DetectionStats) TypeSize() uint8 {
 
 func (self *DetectionStats) TypeCRCExtra() uint8 {
 	return 41
+}
+
+func (self *DetectionStats) FieldsString() string {
+	return fmt.Sprintf("Fps=%d ImagesTodo=%d ImagesDone=%d BestClusterIterId=%d BestClusterId=%d BestDetectionId=%d BestAlt=%d BestLon=%d BestLat=%d BestScore=%d ClusterIters=%d Detections=%d", self.Fps, self.ImagesTodo, self.ImagesDone, self.BestClusterIterId, self.BestClusterId, self.BestDetectionId, self.BestAlt, self.BestLon, self.BestLat, self.BestScore, self.ClusterIters, self.Detections)
+}
+
+func (self *DetectionStats) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -594,11 +740,19 @@ func (self *OnboardHealth) TypeCRCExtra() uint8 {
 	return 164
 }
 
+func (self *OnboardHealth) FieldsString() string {
+	return fmt.Sprintf("NetworkLoadOut=%d NetworkLoadIn=%d Voltage=%d Temp=%d DiskTotal=%d SwapTotal=%d RamTotal=%d Uptime=%d CpuFreq=%d DiskUsage=%d DiskHealth=%d SwapUsage=%d RamUsage=%d CpuLoad=%d", self.NetworkLoadOut, self.NetworkLoadIn, self.Voltage, self.Temp, self.DiskTotal, self.SwapTotal, self.RamTotal, self.Uptime, self.CpuFreq, self.DiskUsage, self.DiskHealth, self.SwapUsage, self.RamUsage, self.CpuLoad)
+}
+
+func (self *OnboardHealth) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -610,23 +764,23 @@ func truncate(chars []byte) []byte {
 type Char26 [26]byte
 
 func (chars *Char26) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char100 [100]byte
 
 func (chars *Char100) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char147 [147]byte
 
 func (chars *Char147) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }

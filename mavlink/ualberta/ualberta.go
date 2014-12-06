@@ -1,6 +1,8 @@
 package ualberta
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
@@ -79,6 +81,14 @@ func (self *NavFilterBias) TypeCRCExtra() uint8 {
 	return 142
 }
 
+func (self *NavFilterBias) FieldsString() string {
+	return fmt.Sprintf("Usec=%d Gyro2=%d Gyro1=%d Gyro0=%d Accel2=%d Accel1=%d Accel0=%d", self.Usec, self.Gyro2, self.Gyro1, self.Gyro0, self.Accel2, self.Accel1, self.Accel0)
+}
+
+func (self *NavFilterBias) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Complete set of calibration parameters for the radio
 type RadioCalibration struct {
 	Throttle [5]uint16 // Throttle curve setpoints (every 25%)
@@ -98,11 +108,19 @@ func (self *RadioCalibration) TypeName() string {
 }
 
 func (self *RadioCalibration) TypeSize() uint8 {
-	return 12
+	return 42
 }
 
 func (self *RadioCalibration) TypeCRCExtra() uint8 {
 	return 79
+}
+
+func (self *RadioCalibration) FieldsString() string {
+	return fmt.Sprintf("Throttle=%v Pitch=%v Gyro=%v Rudder=%v Elevator=%v Aileron=%v", self.Throttle, self.Pitch, self.Gyro, self.Rudder, self.Elevator, self.Aileron)
+}
+
+func (self *RadioCalibration) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // System status specific to ualberta uav
@@ -128,11 +146,19 @@ func (self *UalbertaSysStatus) TypeCRCExtra() uint8 {
 	return 43
 }
 
+func (self *UalbertaSysStatus) FieldsString() string {
+	return fmt.Sprintf("Pilot=%d NavMode=%d Mode=%d", self.Pilot, self.NavMode, self.Mode)
+}
+
+func (self *UalbertaSysStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -144,17 +170,17 @@ func truncate(chars []byte) []byte {
 type Char2 [2]byte
 
 func (chars *Char2) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char3 [3]byte
 
 func (chars *Char3) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char5 [5]byte
 
 func (chars *Char5) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }

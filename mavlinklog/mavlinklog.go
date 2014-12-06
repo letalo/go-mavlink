@@ -16,23 +16,27 @@ import (
 
 var (
 	port       string
+	baud       int
 	maxPackets int
 	quitAfter  time.Duration
+	timeout    time.Duration
 
 	stop bool
 )
 
 func main() {
 	flag.StringVar(&port, "port", "", "Serial port to connect to")
+	flag.IntVar(&baud, "baud", 115200, "Speed of the connection")
 	flag.IntVar(&maxPackets, "max", 10, "Quit program after this number of packets")
 	flag.DurationVar(&quitAfter, "quitafter", time.Second*3, "Quit program after this duration")
+	flag.DurationVar(&timeout, "timeout", time.Second, "Read timeout per packet")
 	flag.Parse()
 
 	if port == "" && flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr, "Call mavlink -port=PORT")
 		flag.PrintDefaults()
 		fmt.Fprintln(os.Stderr, "\nAvailable as PORT are:")
-		for _, p := range goserial.ListPorts() {
+		for _, p := range serial.ListPorts() {
 			fmt.Fprintln(os.Stderr, "  ", p)
 		}
 		return
@@ -41,7 +45,7 @@ func main() {
 		port = flag.Arg(0)
 	}
 
-	serialConn, err := goserial.OpenPort(&goserial.Config{Name: port, Baud: 115200, Timeout: time.Second})
+	serialConn, err := serial.OpenDefault(port, serial.Baud(baud), timeout)
 	if err != nil {
 		log.Fatal(err)
 	}

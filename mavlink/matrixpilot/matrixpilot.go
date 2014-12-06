@@ -1,6 +1,8 @@
 package matrixpilot
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
@@ -84,6 +86,14 @@ func (self *FlexifunctionSet) TypeCRCExtra() uint8 {
 	return 70
 }
 
+func (self *FlexifunctionSet) FieldsString() string {
+	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionSet) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Reqest reading of flexifunction data
 type FlexifunctionReadReq struct {
 	DataIndex       int16 // index into data where needed
@@ -108,6 +118,14 @@ func (self *FlexifunctionReadReq) TypeCRCExtra() uint8 {
 	return 176
 }
 
+func (self *FlexifunctionReadReq) FieldsString() string {
+	return fmt.Sprintf("DataIndex=%d ReadReqType=%d TargetComponent=%d TargetSystem=%d", self.DataIndex, self.ReadReqType, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionReadReq) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Flexifunction type and parameters for component at function index from buffer
 type FlexifunctionBufferFunction struct {
 	DataSize        uint16   // Size of the
@@ -128,11 +146,19 @@ func (self *FlexifunctionBufferFunction) TypeName() string {
 }
 
 func (self *FlexifunctionBufferFunction) TypeSize() uint8 {
-	return 11
+	return 58
 }
 
 func (self *FlexifunctionBufferFunction) TypeCRCExtra() uint8 {
 	return 106
+}
+
+func (self *FlexifunctionBufferFunction) FieldsString() string {
+	return fmt.Sprintf("DataSize=%d DataAddress=%d FuncCount=%d FuncIndex=%d Data=%v TargetComponent=%d TargetSystem=%d", self.DataSize, self.DataAddress, self.FuncCount, self.FuncIndex, self.Data, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionBufferFunction) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Flexifunction type and parameters for component at function index from buffer
@@ -159,6 +185,14 @@ func (self *FlexifunctionBufferFunctionAck) TypeCRCExtra() uint8 {
 	return 16
 }
 
+func (self *FlexifunctionBufferFunctionAck) FieldsString() string {
+	return fmt.Sprintf("Result=%d FuncIndex=%d TargetComponent=%d TargetSystem=%d", self.Result, self.FuncIndex, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionBufferFunctionAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionDirectory struct {
 	DirectoryData   [48]int8 // Settings data
@@ -178,11 +212,19 @@ func (self *FlexifunctionDirectory) TypeName() string {
 }
 
 func (self *FlexifunctionDirectory) TypeSize() uint8 {
-	return 6
+	return 53
 }
 
 func (self *FlexifunctionDirectory) TypeCRCExtra() uint8 {
 	return 18
+}
+
+func (self *FlexifunctionDirectory) FieldsString() string {
+	return fmt.Sprintf("DirectoryData=%v Count=%d StartIndex=%d DirectoryType=%d TargetComponent=%d TargetSystem=%d", self.DirectoryData, self.Count, self.StartIndex, self.DirectoryType, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionDirectory) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Acknowldge sucess or failure of a flexifunction command
@@ -211,6 +253,14 @@ func (self *FlexifunctionDirectoryAck) TypeCRCExtra() uint8 {
 	return 28
 }
 
+func (self *FlexifunctionDirectoryAck) FieldsString() string {
+	return fmt.Sprintf("Result=%d Count=%d StartIndex=%d DirectoryType=%d TargetComponent=%d TargetSystem=%d", self.Result, self.Count, self.StartIndex, self.DirectoryType, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionDirectoryAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionCommand struct {
 	CommandType     uint8 // Flexifunction command type
@@ -234,6 +284,14 @@ func (self *FlexifunctionCommand) TypeCRCExtra() uint8 {
 	return 127
 }
 
+func (self *FlexifunctionCommand) FieldsString() string {
+	return fmt.Sprintf("CommandType=%d TargetComponent=%d TargetSystem=%d", self.CommandType, self.TargetComponent, self.TargetSystem)
+}
+
+func (self *FlexifunctionCommand) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionCommandAck struct {
 	Result      uint16 // result of acknowledge
@@ -254,6 +312,14 @@ func (self *FlexifunctionCommandAck) TypeSize() uint8 {
 
 func (self *FlexifunctionCommandAck) TypeCRCExtra() uint8 {
 	return 55
+}
+
+func (self *FlexifunctionCommandAck) FieldsString() string {
+	return fmt.Sprintf("Result=%d CommandType=%d", self.Result, self.CommandType)
+}
+
+func (self *FlexifunctionCommandAck) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Backwards compatible MAVLink version of SERIAL_UDB_EXTRA - F2: Format Part A
@@ -302,6 +368,14 @@ func (self *SerialUdbExtraF2A) TypeSize() uint8 {
 
 func (self *SerialUdbExtraF2A) TypeCRCExtra() uint8 {
 	return 231
+}
+
+func (self *SerialUdbExtraF2A) FieldsString() string {
+	return fmt.Sprintf("SueAltitude=%d SueLongitude=%d SueLatitude=%d SueTime=%d SueHdop=%d SueSvs=%d SueMagfieldearth2=%d SueMagfieldearth1=%d SueMagfieldearth0=%d SueEstimatedWind2=%d SueEstimatedWind1=%d SueEstimatedWind0=%d SueAirSpeed3dimu=%d SueVoltageMilis=%d SueCpuLoad=%d SueSog=%d SueCog=%d SueRmat8=%d SueRmat7=%d SueRmat6=%d SueRmat5=%d SueRmat4=%d SueRmat3=%d SueRmat2=%d SueRmat1=%d SueRmat0=%d SueWaypointIndex=%d SueStatus=%d", self.SueAltitude, self.SueLongitude, self.SueLatitude, self.SueTime, self.SueHdop, self.SueSvs, self.SueMagfieldearth2, self.SueMagfieldearth1, self.SueMagfieldearth0, self.SueEstimatedWind2, self.SueEstimatedWind1, self.SueEstimatedWind0, self.SueAirSpeed3dimu, self.SueVoltageMilis, self.SueCpuLoad, self.SueSog, self.SueCog, self.SueRmat8, self.SueRmat7, self.SueRmat6, self.SueRmat5, self.SueRmat4, self.SueRmat3, self.SueRmat2, self.SueRmat1, self.SueRmat0, self.SueWaypointIndex, self.SueStatus)
+}
+
+func (self *SerialUdbExtraF2A) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Backwards compatible version of SERIAL_UDB_EXTRA - F2: Part B
@@ -357,6 +431,14 @@ func (self *SerialUdbExtraF2B) TypeCRCExtra() uint8 {
 	return 201
 }
 
+func (self *SerialUdbExtraF2B) FieldsString() string {
+	return fmt.Sprintf("SueFlags=%d SueTime=%d SueMemoryStackFree=%d SueWaypointGoalZ=%d SueWaypointGoalY=%d SueWaypointGoalX=%d SueImuVelocityZ=%d SueImuVelocityY=%d SueImuVelocityX=%d SueOscFails=%d SueImuLocationZ=%d SueImuLocationY=%d SueImuLocationX=%d SuePwmOutput10=%d SuePwmOutput9=%d SuePwmOutput8=%d SuePwmOutput7=%d SuePwmOutput6=%d SuePwmOutput5=%d SuePwmOutput4=%d SuePwmOutput3=%d SuePwmOutput2=%d SuePwmOutput1=%d SuePwmInput10=%d SuePwmInput9=%d SuePwmInput8=%d SuePwmInput7=%d SuePwmInput6=%d SuePwmInput5=%d SuePwmInput4=%d SuePwmInput3=%d SuePwmInput2=%d SuePwmInput1=%d", self.SueFlags, self.SueTime, self.SueMemoryStackFree, self.SueWaypointGoalZ, self.SueWaypointGoalY, self.SueWaypointGoalX, self.SueImuVelocityZ, self.SueImuVelocityY, self.SueImuVelocityX, self.SueOscFails, self.SueImuLocationZ, self.SueImuLocationY, self.SueImuLocationX, self.SuePwmOutput10, self.SuePwmOutput9, self.SuePwmOutput8, self.SuePwmOutput7, self.SuePwmOutput6, self.SuePwmOutput5, self.SuePwmOutput4, self.SuePwmOutput3, self.SuePwmOutput2, self.SuePwmOutput1, self.SuePwmInput10, self.SuePwmInput9, self.SuePwmInput8, self.SuePwmInput7, self.SuePwmInput6, self.SuePwmInput5, self.SuePwmInput4, self.SuePwmInput3, self.SuePwmInput2, self.SuePwmInput1)
+}
+
+func (self *SerialUdbExtraF2B) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Backwards compatible version of SERIAL_UDB_EXTRA F4: format
 type SerialUdbExtraF4 struct {
 	SueRacingMode                uint8 // Serial UDB Extra Firmware racing mode enabled
@@ -387,6 +469,14 @@ func (self *SerialUdbExtraF4) TypeCRCExtra() uint8 {
 	return 248
 }
 
+func (self *SerialUdbExtraF4) FieldsString() string {
+	return fmt.Sprintf("SueRacingMode=%d SueAltitudeholdWaypoint=%d SueAltitudeholdStabilized=%d SueRudderNavigation=%d SueAileronNavigation=%d SueYawStabilizationAileron=%d SueYawStabilizationRudder=%d SuePitchStabilization=%d SueRollStabilizationRudder=%d SueRollStabilizationAilerons=%d", self.SueRacingMode, self.SueAltitudeholdWaypoint, self.SueAltitudeholdStabilized, self.SueRudderNavigation, self.SueAileronNavigation, self.SueYawStabilizationAileron, self.SueYawStabilizationRudder, self.SuePitchStabilization, self.SueRollStabilizationRudder, self.SueRollStabilizationAilerons)
+}
+
+func (self *SerialUdbExtraF4) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Backwards compatible version of SERIAL_UDB_EXTRA F5: format
 type SerialUdbExtraF5 struct {
 	SueAileronBoost            float32 // Gain For Boosting Manual Aileron control When Plane Stabilized
@@ -411,6 +501,14 @@ func (self *SerialUdbExtraF5) TypeSize() uint8 {
 
 func (self *SerialUdbExtraF5) TypeCRCExtra() uint8 {
 	return 151
+}
+
+func (self *SerialUdbExtraF5) FieldsString() string {
+	return fmt.Sprintf("SueAileronBoost=%d SueYawStabilizationAileron=%d SueRollkd=%d SueRollkp=%d SueYawkdAileron=%d SueYawkpAileron=%d", self.SueAileronBoost, self.SueYawStabilizationAileron, self.SueRollkd, self.SueRollkp, self.SueYawkdAileron, self.SueYawkpAileron)
+}
+
+func (self *SerialUdbExtraF5) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F6: format
@@ -438,6 +536,14 @@ func (self *SerialUdbExtraF6) TypeCRCExtra() uint8 {
 	return 187
 }
 
+func (self *SerialUdbExtraF6) FieldsString() string {
+	return fmt.Sprintf("SueElevatorBoost=%d SueRollElevMix=%d SueRudderElevMix=%d SuePitchkd=%d SuePitchgain=%d", self.SueElevatorBoost, self.SueRollElevMix, self.SueRudderElevMix, self.SuePitchkd, self.SuePitchgain)
+}
+
+func (self *SerialUdbExtraF6) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Backwards compatible version of SERIAL_UDB_EXTRA F7: format
 type SerialUdbExtraF7 struct {
 	SueRtlPitchDown float32 // Serial UDB Extra Return To Landing - Angle to Pitch Plane Down
@@ -462,6 +568,14 @@ func (self *SerialUdbExtraF7) TypeSize() uint8 {
 
 func (self *SerialUdbExtraF7) TypeCRCExtra() uint8 {
 	return 61
+}
+
+func (self *SerialUdbExtraF7) FieldsString() string {
+	return fmt.Sprintf("SueRtlPitchDown=%d SueRudderBoost=%d SueRollkdRudder=%d SueRollkpRudder=%d SueYawkdRudder=%d SueYawkpRudder=%d", self.SueRtlPitchDown, self.SueRudderBoost, self.SueRollkdRudder, self.SueRollkpRudder, self.SueYawkdRudder, self.SueYawkpRudder)
+}
+
+func (self *SerialUdbExtraF7) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F8: format
@@ -491,6 +605,14 @@ func (self *SerialUdbExtraF8) TypeCRCExtra() uint8 {
 	return 204
 }
 
+func (self *SerialUdbExtraF8) FieldsString() string {
+	return fmt.Sprintf("SueAltHoldPitchHigh=%d SueAltHoldPitchMax=%d SueAltHoldPitchMin=%d SueAltHoldThrottleMax=%d SueAltHoldThrottleMin=%d SueHeightTargetMin=%d SueHeightTargetMax=%d", self.SueAltHoldPitchHigh, self.SueAltHoldPitchMax, self.SueAltHoldPitchMin, self.SueAltHoldThrottleMax, self.SueAltHoldThrottleMin, self.SueHeightTargetMin, self.SueHeightTargetMax)
+}
+
+func (self *SerialUdbExtraF8) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Backwards compatible version of SERIAL_UDB_EXTRA F13: format
 type SerialUdbExtraF13 struct {
 	SueAltOrigin int32 // Serial UDB Extra MP Origin Altitude Above Sea Level
@@ -513,6 +635,14 @@ func (self *SerialUdbExtraF13) TypeSize() uint8 {
 
 func (self *SerialUdbExtraF13) TypeCRCExtra() uint8 {
 	return 15
+}
+
+func (self *SerialUdbExtraF13) FieldsString() string {
+	return fmt.Sprintf("SueAltOrigin=%d SueLonOrigin=%d SueLatOrigin=%d SueWeekNo=%d", self.SueAltOrigin, self.SueLonOrigin, self.SueLatOrigin, self.SueWeekNo)
+}
+
+func (self *SerialUdbExtraF13) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F14: format
@@ -546,6 +676,14 @@ func (self *SerialUdbExtraF14) TypeCRCExtra() uint8 {
 	return 202
 }
 
+func (self *SerialUdbExtraF14) FieldsString() string {
+	return fmt.Sprintf("SueTrapSource=%d SueOscFailCount=%d SueTrapFlags=%d SueRcon=%d SueFlightPlanType=%d SueClockConfig=%d SueAirframe=%d SueBoardType=%d SueDr=%d SueGpsType=%d SueWindEstimation=%d", self.SueTrapSource, self.SueOscFailCount, self.SueTrapFlags, self.SueRcon, self.SueFlightPlanType, self.SueClockConfig, self.SueAirframe, self.SueBoardType, self.SueDr, self.SueGpsType, self.SueWindEstimation)
+}
+
+func (self *SerialUdbExtraF14) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format
 type SerialUdbExtraF15 struct {
 	SueIdVehicleRegistration [20]uint8 // Serial UDB Extra Registraton Number of Vehicle
@@ -561,11 +699,19 @@ func (self *SerialUdbExtraF15) TypeName() string {
 }
 
 func (self *SerialUdbExtraF15) TypeSize() uint8 {
-	return 2
+	return 60
 }
 
 func (self *SerialUdbExtraF15) TypeCRCExtra() uint8 {
 	return 161
+}
+
+func (self *SerialUdbExtraF15) FieldsString() string {
+	return fmt.Sprintf("SueIdVehicleRegistration=%v SueIdVehicleModelName=%v", self.SueIdVehicleRegistration, self.SueIdVehicleModelName)
+}
+
+func (self *SerialUdbExtraF15) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 //
@@ -583,11 +729,19 @@ func (self *SerialUdbExtraF16) TypeName() string {
 }
 
 func (self *SerialUdbExtraF16) TypeSize() uint8 {
-	return 2
+	return 110
 }
 
 func (self *SerialUdbExtraF16) TypeCRCExtra() uint8 {
 	return 85
+}
+
+func (self *SerialUdbExtraF16) FieldsString() string {
+	return fmt.Sprintf("SueIdDiyDronesUrl=%v SueIdLeadPilot=%v", self.SueIdDiyDronesUrl, self.SueIdLeadPilot)
+}
+
+func (self *SerialUdbExtraF16) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // The altitude measured by sensors and IMU
@@ -617,6 +771,14 @@ func (self *Altitudes) TypeCRCExtra() uint8 {
 	return 81
 }
 
+func (self *Altitudes) FieldsString() string {
+	return fmt.Sprintf("AltExtra=%d AltRangeFinder=%d AltOpticalFlow=%d AltBarometric=%d AltImu=%d AltGps=%d TimeBootMs=%d", self.AltExtra, self.AltRangeFinder, self.AltOpticalFlow, self.AltBarometric, self.AltImu, self.AltGps, self.TimeBootMs)
+}
+
+func (self *Altitudes) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The airspeed measured by sensors and IMU
 type Airspeeds struct {
 	TimeBootMs         uint32 // Timestamp (milliseconds since system boot)
@@ -644,11 +806,19 @@ func (self *Airspeeds) TypeCRCExtra() uint8 {
 	return 240
 }
 
+func (self *Airspeeds) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d Aoy=%d Aoa=%d AirspeedUltrasonic=%d AirspeedHotWire=%d AirspeedPitot=%d AirspeedImu=%d", self.TimeBootMs, self.Aoy, self.Aoa, self.AirspeedUltrasonic, self.AirspeedHotWire, self.AirspeedPitot, self.AirspeedImu)
+}
+
+func (self *Airspeeds) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -660,23 +830,23 @@ func truncate(chars []byte) []byte {
 type Char20 [20]byte
 
 func (chars *Char20) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char40 [40]byte
 
 func (chars *Char40) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char48 [48]byte
 
 func (chars *Char48) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char70 [70]byte
 
 func (chars *Char70) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }

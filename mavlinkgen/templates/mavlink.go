@@ -3,6 +3,8 @@ package {{.Name}}
 {{$version := .Version}}
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"{{if .Include}}
 	"github.com/SpaceLeap/go-mavlink/mavlink/{{.IncludeName}}"{{end}}
 )
@@ -62,6 +64,14 @@ func (self *{{$name}}) TypeSize() uint8 {
 func (self *{{$name}}) TypeCRCExtra() uint8 {
 	return {{.CRCExtra}}
 }
+
+func (self *{{$name}}) FieldsString() string {
+	return {{.FieldsString}}
+}
+
+func (self *{{$name}}) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
 {{end}}
 
 {{if .StringSizes}}
@@ -69,7 +79,7 @@ func (self *{{$name}}) TypeCRCExtra() uint8 {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -82,7 +92,7 @@ func truncate(chars []byte) []byte {
 type Char{{$size}}[{{$size}}]byte
 
 func (chars *Char{{$size}}) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 {{end}}
 

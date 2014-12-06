@@ -204,9 +204,22 @@ type Message struct {
 	Fields      []MessageField `xml:"field"`
 }
 
+type MessageField struct {
+	CType       string `xml:"type,attr"`
+	Name        string `xml:"name,attr"`
+	Description string `xml:",innerxml"`
+	GoType      string
+	bitSize     int
+	arrayLength int
+}
+
 func (msg *Message) Size() (size int) {
 	for i := range msg.Fields {
-		size += msg.Fields[i].bitSize
+		bitSize := msg.Fields[i].bitSize
+		if msg.Fields[i].arrayLength > 0 {
+			bitSize *= msg.Fields[i].arrayLength
+		}
+		size += bitSize
 	}
 	return size / 8
 }
@@ -225,6 +238,42 @@ func (msg *Message) CRCExtra() uint8 {
 	return uint8((hash.Sum() & 0xFF) ^ (hash.Sum() >> 8))
 }
 
+func (msg *Message) FieldsString() string {
+	var buf bytes.Buffer
+	buf.WriteString("fmt.Sprintf(")
+	for i := range msg.Fields {
+		t := msg.Fields[i].GoType
+		var placeholder string
+		switch {
+		case strings.HasPrefix(t, "Char"):
+			placeholder = `\"%s\"`
+		case msg.Fields[i].arrayLength > 0:
+			placeholder = "%v"
+		case strings.Contains(t, "int"), t == "byte":
+			placeholder = "%d"
+		case strings.Contains(t, "float"):
+			placeholder = "%d"
+		default:
+			panic("Unknown message field type: " + t)
+		}
+		if i == 0 {
+			buf.WriteByte('"')
+		} else {
+			buf.WriteByte(' ')
+		}
+		buf.WriteString(dry.StringToUpperCamelCase(msg.Fields[i].Name))
+		buf.WriteByte('=')
+		buf.WriteString(placeholder)
+	}
+	buf.WriteByte('"')
+	for i := range msg.Fields {
+		buf.WriteString(", self.")
+		buf.WriteString(dry.StringToUpperCamelCase(msg.Fields[i].Name))
+	}
+	buf.WriteByte(')')
+	return buf.String()
+}
+
 func (msg *Message) Len() int {
 	return len(msg.Fields)
 }
@@ -235,14 +284,4 @@ func (msg *Message) Less(i, j int) bool {
 
 func (msg *Message) Swap(i, j int) {
 	msg.Fields[i], msg.Fields[j] = msg.Fields[j], msg.Fields[i]
-}
-
-type MessageField struct {
-	Type        string
-	CType       string `xml:"type,attr"`
-	Name        string `xml:"name,attr"`
-	Description string `xml:",innerxml"`
-	GoType      string
-	bitSize     int
-	arrayLength int
 }

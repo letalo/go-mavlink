@@ -3,7 +3,10 @@ package mavlink
 import (
 	"bytes"
 	"encoding/binary"
+	// "fmt"
 	"io"
+	// "strconv"
+	// "strings"
 
 	"github.com/SpaceLeap/go-mavlink/x25"
 )
@@ -12,14 +15,6 @@ const (
 	x25InitCRC uint16 = 0xffff
 	// x25ValidateCRC uint16 = 0xf0b8
 )
-
-type Message interface {
-	TypeID() uint8    // ID of the message
-	TypeName() string // Name of the message
-	// TypeCName() string   // Upper case name of the message
-	TypeSize() uint8     // Size in bytes of the message
-	TypeCRCExtra() uint8 // CRC_EXTRA
-}
 
 type Packet struct {
 	Header   Header
@@ -87,4 +82,34 @@ func (packet *Packet) Bytes() []byte {
 	binary.Write(buf, binary.LittleEndian, packet.Message)
 	binary.Write(buf, binary.LittleEndian, packet.Checksum)
 	return buf.Bytes()
+}
+
+func (packet *Packet) String() string {
+	var buf bytes.Buffer
+	buf.WriteString(MessageNameID(packet.Header.MessageID))
+	buf.WriteByte('{')
+	buf.WriteString(packet.Header.FieldsString())
+	if packet.Message != nil {
+		buf.WriteByte(' ')
+		buf.WriteString(packet.Message.FieldsString())
+	} else {
+		buf.WriteString(" Message=nil")
+	}
+	buf.WriteByte('}')
+	return buf.String()
+}
+
+func (packet *Packet) ShortString() string {
+	var buf bytes.Buffer
+	buf.WriteString(MessageNameID(packet.Header.MessageID))
+	buf.WriteByte('{')
+	buf.WriteString(packet.Header.FieldsShortString())
+	if packet.Message != nil {
+		buf.WriteByte(' ')
+		buf.WriteString(packet.Message.FieldsString())
+	} else {
+		buf.WriteString(" Message=nil")
+	}
+	buf.WriteByte('}')
+	return buf.String()
 }

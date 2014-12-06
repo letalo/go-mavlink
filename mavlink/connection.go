@@ -2,7 +2,6 @@ package mavlink
 
 import (
 	"io"
-	"log"
 	"time"
 )
 
@@ -29,13 +28,21 @@ func NewConnection(wrappedConn io.ReadWriter, systemID uint8) *Connection {
 	return conn
 }
 
+func NewConnectionDial(address string, systemID uint8) (*Connection, error) {
+	wrappedConn, err := Dial(address)
+	if err != nil {
+		return nil, err
+	}
+	return NewConnection(wrappedConn, systemID), nil
+}
+
 func (conn *Connection) receiveLoop() {
 	for !conn.closed {
 
 		packet, err := Receive(conn.wrappedConn)
 		if err != nil {
-			if LogAllErrors {
-				log.Println(err)
+			if AllErrorsLogger != nil {
+				AllErrorsLogger.Println(err)
 			}
 			if err == io.EOF {
 				conn.close() // make sure everything is in closed state
@@ -53,8 +60,8 @@ func (conn *Connection) receiveLoop() {
 		}
 		if loss > 0 {
 			err := ErrPacketLoss(loss)
-			if LogAllErrors {
-				log.Println(err)
+			if AllErrorsLogger != nil {
+				AllErrorsLogger.Println(err)
 			}
 			conn.channel <- &Packet{Err: err}
 		}
@@ -70,8 +77,8 @@ func (conn *Connection) sendLoop() {
 			packet.Header.PacketSequence = conn.localComponentSeq[packet.Header.ComponentID]
 			_, packet.Err = packet.WriteTo(conn.wrappedConn)
 			if packet.Err != nil {
-				if LogAllErrors {
-					log.Println(packet.Err)
+				if AllErrorsLogger != nil {
+					AllErrorsLogger.Println(packet.Err)
 				}
 				if packet.OnErr != nil {
 					go packet.OnErr(packet)
@@ -111,8 +118,8 @@ func (conn *Connection) close() (err error) {
 
 	if closer, ok := conn.wrappedConn.(io.Closer); ok {
 		err = closer.Close()
-		if err != nil && LogAllErrors {
-			log.Println(err)
+		if err != nil && AllErrorsLogger != nil {
+			AllErrorsLogger.Println(err)
 		}
 	}
 
@@ -121,11 +128,11 @@ func (conn *Connection) close() (err error) {
 
 // Close stops reading from wrappedConn after the current read finishes
 // and stops writing when there are no more buffered packets or
-// the current time has reached timeout.
+// the current time has reached writeTimeout.
 // After that, if wrappedConn implements io.Closer, its Close method will
 // be called and the result returned.
-func (conn *Connection) Close(timeout time.Time) error {
-	conn.closeTimeout = timeout
+func (conn *Connection) Close(writeTimeout time.Time) error {
+	conn.closeTimeout = writeTimeout
 	conn.closed = true
 	<-conn.sendLoopFinished
 	return conn.close()

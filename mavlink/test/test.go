@@ -1,6 +1,8 @@
 package test
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 )
 
@@ -59,18 +61,26 @@ func (self *TestTypes) TypeName() string {
 }
 
 func (self *TestTypes) TypeSize() uint8 {
-	return 86
+	return 179
 }
 
 func (self *TestTypes) TypeCRCExtra() uint8 {
 	return 113
 }
 
+func (self *TestTypes) FieldsString() string {
+	return fmt.Sprintf("DArray=%v S64Array=%v U64Array=%v D=%d S64=%d U64=%d FArray=%v S32Array=%v U32Array=%v F=%d S32=%d U32=%d S16Array=%v U16Array=%v S16=%d U16=%d S8Array=%v U8Array=%v S8=%d U8=%d S=\"%s\" C=%d", self.DArray, self.S64Array, self.U64Array, self.D, self.S64, self.U64, self.FArray, self.S32Array, self.U32Array, self.F, self.S32, self.U32, self.S16Array, self.U16Array, self.S16, self.U16, self.S8Array, self.U8Array, self.S8, self.U8, self.S, self.C)
+}
+
+func (self *TestTypes) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncate(chars []byte) []byte {
+func truncateZeroTerminator(chars []byte) []byte {
 	for i, c := range chars {
 		if c == 0 {
 			return chars[:i]
@@ -82,11 +92,11 @@ func truncate(chars []byte) []byte {
 type Char3 [3]byte
 
 func (chars *Char3) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }
 
 type Char10 [10]byte
 
 func (chars *Char10) String() string {
-	return string(truncate(chars[:]))
+	return string(truncateZeroTerminator(chars[:]))
 }

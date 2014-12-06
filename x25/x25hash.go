@@ -47,7 +47,7 @@ type HashedStream struct {
 }
 
 func (stream *HashedStream) Read(data []byte) (n int, err error) {
-	n, err = stream.Read(data)
+	n, err = stream.Reader.Read(data)
 	if n > 0 {
 		stream.Hash.Write(data[:n])
 	}

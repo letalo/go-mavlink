@@ -1,6 +1,8 @@
 package slugs
 
 import (
+	"fmt"
+
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 )
@@ -107,6 +109,14 @@ func (self *CpuLoad) TypeCRCExtra() uint8 {
 	return 183
 }
 
+func (self *CpuLoad) FieldsString() string {
+	return fmt.Sprintf("Batvolt=%d Ctrlload=%d Sensload=%d", self.Batvolt, self.Ctrlload, self.Sensload)
+}
+
+func (self *CpuLoad) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Accelerometer and gyro biases.
 type SensorBias struct {
 	Gzbias float32 // Gyro Z bias (rad/s)
@@ -133,6 +143,14 @@ func (self *SensorBias) TypeCRCExtra() uint8 {
 	return 213
 }
 
+func (self *SensorBias) FieldsString() string {
+	return fmt.Sprintf("Gzbias=%d Gybias=%d Gxbias=%d Azbias=%d Aybias=%d Axbias=%d", self.Gzbias, self.Gybias, self.Gxbias, self.Azbias, self.Aybias, self.Axbias)
+}
+
+func (self *SensorBias) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Configurable diagnostic messages.
 type Diagnostic struct {
 	Diagfl3 float32 // Diagnostic float 3
@@ -157,6 +175,14 @@ func (self *Diagnostic) TypeSize() uint8 {
 
 func (self *Diagnostic) TypeCRCExtra() uint8 {
 	return 236
+}
+
+func (self *Diagnostic) FieldsString() string {
+	return fmt.Sprintf("Diagfl3=%d Diagfl2=%d Diagfl1=%d Diagsh3=%d Diagsh2=%d Diagsh1=%d", self.Diagfl3, self.Diagfl2, self.Diagfl1, self.Diagsh3, self.Diagsh2, self.Diagsh1)
+}
+
+func (self *Diagnostic) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Data used in the navigation algorithm.
@@ -189,6 +215,14 @@ func (self *SlugsNavigation) TypeCRCExtra() uint8 {
 	return 249
 }
 
+func (self *SlugsNavigation) FieldsString() string {
+	return fmt.Sprintf("Dist2go=%d Totaldist=%d AyBody=%d PsidotC=%d ThetaC=%d PhiC=%d UM=%d HC=%d Towp=%d Fromwp=%d", self.Dist2go, self.Totaldist, self.AyBody, self.PsidotC, self.ThetaC, self.PhiC, self.UM, self.HC, self.Towp, self.Fromwp)
+}
+
+func (self *SlugsNavigation) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Configurable data log probes to be used inside Simulink
 type DataLog struct {
 	Fl6 float32 // Log value 6
@@ -213,6 +247,14 @@ func (self *DataLog) TypeSize() uint8 {
 
 func (self *DataLog) TypeCRCExtra() uint8 {
 	return 224
+}
+
+func (self *DataLog) FieldsString() string {
+	return fmt.Sprintf("Fl6=%d Fl5=%d Fl4=%d Fl3=%d Fl2=%d Fl1=%d", self.Fl6, self.Fl5, self.Fl4, self.Fl3, self.Fl2, self.Fl1)
+}
+
+func (self *DataLog) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Pilot console PWM messges.
@@ -247,6 +289,14 @@ func (self *GpsDateTime) TypeCRCExtra() uint8 {
 	return 33
 }
 
+func (self *GpsDateTime) FieldsString() string {
+	return fmt.Sprintf("Percentused=%d Sigusedmask=%d Gppgl=%d Usesat=%d Vissat=%d Clockstat=%d Sec=%d Min=%d Hour=%d Day=%d Month=%d Year=%d", self.Percentused, self.Sigusedmask, self.Gppgl, self.Usesat, self.Vissat, self.Clockstat, self.Sec, self.Min, self.Hour, self.Day, self.Month, self.Year)
+}
+
+func (self *GpsDateTime) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Mid Level commands sent from the GS to the autopilot. These are only sent when being operated in mid-level commands mode from the ground.
 type MidLvlCmds struct {
 	Rcommand float32 // Commanded Turnrate in rad/s
@@ -271,6 +321,14 @@ func (self *MidLvlCmds) TypeCRCExtra() uint8 {
 	return 117
 }
 
+func (self *MidLvlCmds) FieldsString() string {
+	return fmt.Sprintf("Rcommand=%d Ucommand=%d Hcommand=%d Target=%d", self.Rcommand, self.Ucommand, self.Hcommand, self.Target)
+}
+
+func (self *MidLvlCmds) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // This message sets the control surfaces for selective passthrough mode.
 type CtrlSrfcPt struct {
 	Bitfieldpt uint16 // Bitfield containing the passthrough configuration, see CONTROL_SURFACE_FLAG ENUM.
@@ -291,6 +349,14 @@ func (self *CtrlSrfcPt) TypeSize() uint8 {
 
 func (self *CtrlSrfcPt) TypeCRCExtra() uint8 {
 	return 104
+}
+
+func (self *CtrlSrfcPt) FieldsString() string {
+	return fmt.Sprintf("Bitfieldpt=%d Target=%d", self.Bitfieldpt, self.Target)
+}
+
+func (self *CtrlSrfcPt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Orders generated to the SLUGS camera mount.
@@ -318,6 +384,14 @@ func (self *SlugsCameraOrder) TypeCRCExtra() uint8 {
 	return 201
 }
 
+func (self *SlugsCameraOrder) FieldsString() string {
+	return fmt.Sprintf("Movehome=%d Zoom=%d Tilt=%d Pan=%d Target=%d", self.Movehome, self.Zoom, self.Tilt, self.Pan, self.Target)
+}
+
+func (self *SlugsCameraOrder) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Control for surface; pending and order to origin.
 type ControlSurface struct {
 	Bcontrol  float32 // Order to origin
@@ -340,6 +414,14 @@ func (self *ControlSurface) TypeSize() uint8 {
 
 func (self *ControlSurface) TypeCRCExtra() uint8 {
 	return 43
+}
+
+func (self *ControlSurface) FieldsString() string {
+	return fmt.Sprintf("Bcontrol=%d Mcontrol=%d Idsurface=%d Target=%d", self.Bcontrol, self.Mcontrol, self.Idsurface, self.Target)
+}
+
+func (self *ControlSurface) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Transmits the last known position of the mobile GS to the UAV. Very relevant when Track Mobile is enabled
@@ -365,6 +447,14 @@ func (self *SlugsMobileLocation) TypeCRCExtra() uint8 {
 	return 20
 }
 
+func (self *SlugsMobileLocation) FieldsString() string {
+	return fmt.Sprintf("Longitude=%d Latitude=%d Target=%d", self.Longitude, self.Latitude, self.Target)
+}
+
+func (self *SlugsMobileLocation) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Control for camara.
 type SlugsConfigurationCamera struct {
 	Order   uint8 //  1: up/on 2: down/off 3: auto/reset/no action
@@ -386,6 +476,14 @@ func (self *SlugsConfigurationCamera) TypeSize() uint8 {
 
 func (self *SlugsConfigurationCamera) TypeCRCExtra() uint8 {
 	return 72
+}
+
+func (self *SlugsConfigurationCamera) FieldsString() string {
+	return fmt.Sprintf("Order=%d Idorder=%d Target=%d", self.Order, self.Idorder, self.Target)
+}
+
+func (self *SlugsConfigurationCamera) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Transmits the position of watch
@@ -415,6 +513,14 @@ func (self *IsrLocation) TypeCRCExtra() uint8 {
 	return 166
 }
 
+func (self *IsrLocation) FieldsString() string {
+	return fmt.Sprintf("Height=%d Longitude=%d Latitude=%d Option3=%d Option2=%d Option1=%d Target=%d", self.Height, self.Longitude, self.Latitude, self.Option3, self.Option2, self.Option1, self.Target)
+}
+
+func (self *IsrLocation) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Transmits the readings from the voltage and current sensors
 type VoltSensor struct {
 	Reading2 uint16 // Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
@@ -438,6 +544,14 @@ func (self *VoltSensor) TypeCRCExtra() uint8 {
 	return 240
 }
 
+func (self *VoltSensor) FieldsString() string {
+	return fmt.Sprintf("Reading2=%d Voltage=%d R2type=%d", self.Reading2, self.Voltage, self.R2type)
+}
+
+func (self *VoltSensor) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Transmits the actual Pan, Tilt and Zoom values of the camera unit
 type PtzStatus struct {
 	Tilt int16 // The Tilt value in 10ths of degree
@@ -459,6 +573,14 @@ func (self *PtzStatus) TypeSize() uint8 {
 
 func (self *PtzStatus) TypeCRCExtra() uint8 {
 	return 48
+}
+
+func (self *PtzStatus) FieldsString() string {
+	return fmt.Sprintf("Tilt=%d Pan=%d Zoom=%d", self.Tilt, self.Pan, self.Zoom)
+}
+
+func (self *PtzStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // Transmits the actual status values UAV in flight
@@ -485,6 +607,14 @@ func (self *UavStatus) TypeSize() uint8 {
 
 func (self *UavStatus) TypeCRCExtra() uint8 {
 	return 144
+}
+
+func (self *UavStatus) FieldsString() string {
+	return fmt.Sprintf("Course=%d Speed=%d Altitude=%d Longitude=%d Latitude=%d Target=%d", self.Course, self.Speed, self.Altitude, self.Longitude, self.Latitude, self.Target)
+}
+
+func (self *UavStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
 // This contains the status of the GPS readings
@@ -514,6 +644,14 @@ func (self *StatusGps) TypeCRCExtra() uint8 {
 	return 63
 }
 
+func (self *StatusGps) FieldsString() string {
+	return fmt.Sprintf("Magvar=%d Csfails=%d Modeind=%d Magdir=%d Posstatus=%d Msgstype=%d Gpsquality=%d", self.Magvar, self.Csfails, self.Modeind, self.Magdir, self.Posstatus, self.Msgstype, self.Gpsquality)
+}
+
+func (self *StatusGps) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Transmits the diagnostics data from the Novatel OEMStar GPS
 type NovatelDiag struct {
 	Possolage      float32 // Age of the position solution in seconds
@@ -541,6 +679,14 @@ func (self *NovatelDiag) TypeCRCExtra() uint8 {
 	return 93
 }
 
+func (self *NovatelDiag) FieldsString() string {
+	return fmt.Sprintf("Possolage=%d Receiverstatus=%d Csfails=%d Veltype=%d Postype=%d Solstatus=%d Timestatus=%d", self.Possolage, self.Receiverstatus, self.Csfails, self.Veltype, self.Postype, self.Solstatus, self.Timestatus)
+}
+
+func (self *NovatelDiag) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Diagnostic data Sensor MCU
 type SensorDiag struct {
 	Float2 float32 // Float field 2
@@ -565,6 +711,14 @@ func (self *SensorDiag) TypeCRCExtra() uint8 {
 	return 43
 }
 
+func (self *SensorDiag) FieldsString() string {
+	return fmt.Sprintf("Float2=%d Float1=%d Int1=%d Char1=%d", self.Float2, self.Float1, self.Int1, self.Char1)
+}
+
+func (self *SensorDiag) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // The boot message indicates that a system is starting. The onboard software version allows to keep track of onboard soft/firmware revisions. This message allows the sensor and control MCUs to communicate version numbers on startup.
 type Boot struct {
 	Version uint32 // The onboard software version
@@ -584,4 +738,12 @@ func (self *Boot) TypeSize() uint8 {
 
 func (self *Boot) TypeCRCExtra() uint8 {
 	return 39
+}
+
+func (self *Boot) FieldsString() string {
+	return fmt.Sprintf("Version=%d", self.Version)
+}
+
+func (self *Boot) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
