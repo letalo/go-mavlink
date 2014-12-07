@@ -3,31 +3,22 @@ package mavlink
 import (
 	"bytes"
 	"encoding/binary"
-	// "fmt"
 	"io"
-	// "strconv"
-	// "strings"
 
 	"github.com/SpaceLeap/go-mavlink/x25"
-)
-
-const (
-	x25InitCRC uint16 = 0xffff
-	// x25ValidateCRC uint16 = 0xf0b8
+	"github.com/ungerik/go-dry"
 )
 
 type Packet struct {
-	Header   Header
-	Message  Message
-	Checksum uint16
-	Err      error
-	OnErr    func(*Packet)
+	Header  Header
+	Message Message
+	Err     error
+	OnErr   func(*Packet)
 }
 
 func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *Packet) {
 	return &Packet{
 		Header: Header{
-			FrameStart:     FRAME_START,
 			PayloadLength:  message.TypeSize(),
 			PacketSequence: sequence,
 			SystemID:       systemID,
@@ -38,49 +29,64 @@ func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *
 	}
 }
 
+// func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
+// 	m, err := writer.Write(FRAME_START_BYTE)
+// 	n = int64(m)
+// 	if err != nil {
+// 		return n, err
+// 	}
+
+// 	hashedWriter := x25.MakeHashedWriter(writer)
+
+// 	// Write and hash header
+// 	m, err = hashedWriter.Write(packet.Header.BytesRef())
+// 	n += int64(m)
+// 	if err != nil {
+// 		return n, err
+// 	}
+
+// 	// Write and hash message
+// 	err = binary.Write(&hashedWriter, binary.LittleEndian, packet.Message)
+// 	if err != nil {
+// 		return n, err
+// 	}
+// 	n += int64(packet.Message.TypeSize())
+
+// 	// Add CRCExtra to the hash
+// 	hashedWriter.Hash.WriteByte(packet.Message.TypeCRCExtra())
+
+// 	hashBytes := make([]byte, 2)
+// 	binary.LittleEndian.PutUint16(hashBytes, hashedWriter.Hash.Sum)
+
+// 	// Write hash
+// 	m, err = writer.Write(hashBytes)
+// 	n += int64(m)
+
+// 	return n, err
+// }
+
 func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
-	hash := x25.HashStart
-	hashedWriter := x25.HashedStream{Hash: &hash, Writer: writer}
-
-	m, err := writer.Write(packet.Header.Bytes())
-	n = int64(m)
-	if err != nil {
-		return n, err
-	}
-	packet.Header.Hash(&hash)
-
-	err = binary.Write(&hashedWriter, binary.LittleEndian, packet.Message)
-	if err != nil {
-		return n, err
-	}
-	n += int64(packet.Message.TypeSize())
-
-	packet.Checksum = hash.Sum()
-
-	var hashBytesArray [2]byte // local variable to avoid allocation on heap
-	hashBytes := hashBytesArray[:]
-	binary.LittleEndian.PutUint16(hashBytes, packet.Checksum)
-
-	m, err = writer.Write(hashBytes)
-	n += int64(m)
-
-	return n, err
+	m, err := writer.Write(packet.WireBytes())
+	return int64(m), err
 }
 
-func (packet *Packet) ComputeChecksum() uint16 {
-	hash := x25.HashStart
-
-	packet.Header.Hash(&hash)
-	binary.Write(&hash, binary.LittleEndian, packet.Message)
-	hash.WriteByte(packet.Message.TypeCRCExtra())
-
-	return hash.Sum()
+func (packet *Packet) WireSize() int {
+	return 6 + int(packet.Message.TypeSize()) + 2
 }
 
-func (packet *Packet) Bytes() []byte {
-	buf := bytes.NewBuffer(packet.Header.Bytes())
-	binary.Write(buf, binary.LittleEndian, packet.Message)
-	binary.Write(buf, binary.LittleEndian, packet.Checksum)
+func (packet *Packet) WireBytes() []byte {
+	buf := bytes.NewBuffer(make([]byte, 0, packet.WireSize()))
+	buf.WriteByte(FRAME_START)
+
+	writer := x25.MakeHashedWriter(buf)
+	writer.Write(packet.Header.BytesRef())
+	binary.Write(&writer, binary.LittleEndian, packet.Message)
+	writer.Hash.WriteByte(packet.Message.TypeCRCExtra())
+
+	least, most := dry.EndianSafeSplitUint16(writer.Hash.Sum)
+	buf.WriteByte(least)
+	buf.WriteByte(most)
+
 	return buf.Bytes()
 }
 

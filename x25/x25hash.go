@@ -2,8 +2,6 @@ package x25
 
 import "io"
 
-var HashStart = Hash{0xffff}
-
 // Warning: Works only on little endian systems
 type Hash struct {
 	Sum uint16
@@ -11,6 +9,11 @@ type Hash struct {
 
 func NewHash() *Hash {
 	hash := new(Hash)
+	hash.Reset()
+	return hash
+}
+
+func MakeHash() (hash Hash) {
 	hash.Reset()
 	return hash
 }
@@ -35,12 +38,16 @@ func (hash *Hash) WriteByte(data byte) {
 }
 
 type HashedReader struct {
-	Hash   *Hash
+	Hash   Hash
 	reader io.Reader
 }
 
 func NewHashedReader(reader io.Reader) *HashedReader {
-	return &HashedReader{Hash: NewHash(), reader: reader}
+	return &HashedReader{Hash: MakeHash(), reader: reader}
+}
+
+func MakeHashedReader(reader io.Reader) HashedReader {
+	return HashedReader{Hash: MakeHash(), reader: reader}
 }
 
 func (hr *HashedReader) Read(data []byte) (n int, err error) {
@@ -52,12 +59,16 @@ func (hr *HashedReader) Read(data []byte) (n int, err error) {
 }
 
 type HashedWriter struct {
-	Hash   *Hash
+	Hash   Hash
 	writer io.Writer
 }
 
 func NewHashedWriter(writer io.Writer) *HashedWriter {
-	return &HashedWriter{Hash: NewHash(), writer: writer}
+	return &HashedWriter{Hash: MakeHash(), writer: writer}
+}
+
+func MakeHashedWriter(writer io.Writer) HashedWriter {
+	return HashedWriter{Hash: MakeHash(), writer: writer}
 }
 
 func (hw *HashedWriter) Write(data []byte) (n int, err error) {

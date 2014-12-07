@@ -1,6 +1,7 @@
 package mavlink
 
 import (
+	// "bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -10,9 +11,9 @@ import (
 	"github.com/SpaceLeap/go-mavlink/x25"
 )
 
-const (
-	FRAME_START = 0xFE
-)
+const FRAME_START = 0xFE
+
+var FRAME_START_BYTE = []byte{FRAME_START}
 
 // The following variables will be set by importing
 // a protocol definition package.
@@ -35,22 +36,18 @@ func Send(writer io.Writer, systemID, componentID, sequence uint8, message Messa
 }
 
 func Receive(reader io.Reader) (*Packet, error) {
-	var packet Packet
 
-	// Slice bytes are pointer to packet.Header,
-	// so accessing the slice elements accesses the packet.Header
-	headerBytes := packet.Header.Bytes()
-	firstHeaderByte := headerBytes[:1] // points to packet.Header.FrameStart
+	firstByte := make([]byte, 1)
 
-	_, err := reader.Read(firstHeaderByte)
+	_, err := reader.Read(firstByte)
 	if err != nil {
 		return nil, err
 	}
 
 	// Read until we get FRAME_START
-	var skipped int
-	for packet.Header.FrameStart != FRAME_START {
-		_, err := reader.Read(firstHeaderByte)
+	skipped := 0
+	for firstByte[0] != FRAME_START {
+		_, err := reader.Read(firstByte)
 		if err != nil {
 			return nil, err
 		}
@@ -64,14 +61,23 @@ func Receive(reader io.Reader) (*Packet, error) {
 		UnreportedErrorsLogger.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
 	}
 
-	hash := x25.HashStart
-	hashedReader := x25.HashedStream{Hash: &hash, Reader: reader}
+	var (
+		packet Packet
 
-	// Read rest of header directly into packet.Header referenced by headerBytes
-	n, err := io.ReadFull(&hashedReader, headerBytes[1:])
+		// Slice uses packet.Header for data storage,
+		// so accessing the slice elements accesses the packet.Header
+		headerBytesRef = packet.Header.BytesRef()
+
+		hashedReader = x25.MakeHashedReader(reader)
+	)
+
+	// Read rest of header directly into packet.Header referenced by headerBytesRef
+	n, err := io.ReadFull(&hashedReader, headerBytesRef)
 	if err != nil {
-		return nil, fmt.Errorf("Read %d of %d header bytes. %s", n, len(headerBytes[1:]), err)
+		return nil, fmt.Errorf("Read %d of %d header bytes. %s", n, len(headerBytesRef), err)
 	}
+
+	// log.Println("HEADER", headerBytesRef)
 
 	// to do: check component sequence
 
@@ -99,14 +105,23 @@ func Receive(reader io.Reader) (*Packet, error) {
 		return nil, err
 	}
 
-	err = binary.Read(reader, binary.LittleEndian, &packet.Checksum)
+	hashedReader.Hash.WriteByte(packet.Message.TypeCRCExtra())
+	// calculatedChecksum := hashedReader.Hash.Sum
+
+	var receivedChecksum uint16
+	err = binary.Read(reader, binary.LittleEndian, &receivedChecksum)
 	if err != nil {
 		return nil, err
 	}
 
-	if packet.Checksum != hash.Sum() {
-		return nil, &ErrInvalidChecksum{&packet, hash.Sum()}
-	}
+	// if receivedChecksum != calculatedChecksum {
+	// 	err = &ErrInvalidChecksum{
+	// 		Packet:             &packet,
+	// 		CalculatedChecksum: calculatedChecksum,
+	// 		ReceivedChecksum:   receivedChecksum,
+	// 	}
+	// 	return nil, err
+	// }
 
 	return &packet, nil
 }
