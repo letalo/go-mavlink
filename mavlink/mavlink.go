@@ -28,6 +28,7 @@ var (
 	ReceiveLogger          *log.Logger
 	AllErrorsLogger        *log.Logger
 	UnreportedErrorsLogger *log.Logger
+	DebugLogger            *log.Logger
 )
 
 func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
@@ -99,6 +100,12 @@ func Receive(reader io.Reader) (*Packet, error) {
 			packet.Header.PayloadLength)
 		return nil, err
 	}
+	// Just for debugging:
+	if false {
+		if binary.Size(packet.Message) != int(packet.Message.TypeSize()) {
+			panic("Invalid packet size")
+		}
+	}
 
 	err = binary.Read(&hashedReader, binary.LittleEndian, packet.Message)
 	if err != nil {
@@ -106,22 +113,25 @@ func Receive(reader io.Reader) (*Packet, error) {
 	}
 
 	hashedReader.Hash.WriteByte(packet.Message.TypeCRCExtra())
-	// calculatedChecksum := hashedReader.Hash.Sum
 
-	var receivedChecksum uint16
+	var (
+		calculatedChecksum = hashedReader.Hash.Sum
+		receivedChecksum   uint16
+	)
+
 	err = binary.Read(reader, binary.LittleEndian, &receivedChecksum)
 	if err != nil {
 		return nil, err
 	}
 
-	// if receivedChecksum != calculatedChecksum {
-	// 	err = &ErrInvalidChecksum{
-	// 		Packet:             &packet,
-	// 		CalculatedChecksum: calculatedChecksum,
-	// 		ReceivedChecksum:   receivedChecksum,
-	// 	}
-	// 	return nil, err
-	// }
+	if receivedChecksum != calculatedChecksum {
+		err = &ErrInvalidChecksum{
+			Packet:             &packet,
+			CalculatedChecksum: calculatedChecksum,
+			ReceivedChecksum:   receivedChecksum,
+		}
+		return nil, err
+	}
 
 	return &packet, nil
 }

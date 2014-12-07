@@ -98,7 +98,7 @@ func generate(name string) {
 				protocol.StringSizes[field.arrayLength] = true
 			}
 		}
-		sort.Stable(message)
+		sort.Stable(sort.Reverse(message))
 	}
 
 	buf := bytes.NewBuffer(nil)
@@ -235,7 +235,7 @@ func (msg *Message) CRCExtra() uint8 {
 		}
 	}
 
-	return uint8((hash.Sum() & 0xFF) ^ (hash.Sum() >> 8))
+	return uint8((hash.Sum & 0xFF) ^ (hash.Sum >> 8))
 }
 
 func (msg *Message) FieldsString() string {
@@ -279,7 +279,7 @@ func (msg *Message) Len() int {
 }
 
 func (msg *Message) Less(i, j int) bool {
-	return msg.Fields[i].bitSize >= msg.Fields[j].bitSize
+	return msg.Fields[i].bitSize < msg.Fields[j].bitSize
 }
 
 func (msg *Message) Swap(i, j int) {

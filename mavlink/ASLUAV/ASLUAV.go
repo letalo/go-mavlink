@@ -34,10 +34,10 @@ func init() {
 
 // Voltage and current sensor data
 type SensPower struct {
-	Adc121Cs2Amp   float32 //  Board current sensor 2 reading in amps
-	Adc121Cs1Amp   float32 //  Board current sensor 1 reading in amps
-	Adc121CspbAmp  float32 //  Power board current sensor reading in amps
 	Adc121VspbVolt float32 //  Power board voltage sensor reading in volts
+	Adc121CspbAmp  float32 //  Power board current sensor reading in amps
+	Adc121Cs1Amp   float32 //  Board current sensor 1 reading in amps
+	Adc121Cs2Amp   float32 //  Board current sensor 2 reading in amps
 }
 
 func (self *SensPower) TypeID() uint8 {
@@ -53,11 +53,11 @@ func (self *SensPower) TypeSize() uint8 {
 }
 
 func (self *SensPower) TypeCRCExtra() uint8 {
-	return 145
+	return 218
 }
 
 func (self *SensPower) FieldsString() string {
-	return fmt.Sprintf("Adc121Cs2Amp=%d Adc121Cs1Amp=%d Adc121CspbAmp=%d Adc121VspbVolt=%d", self.Adc121Cs2Amp, self.Adc121Cs1Amp, self.Adc121CspbAmp, self.Adc121VspbVolt)
+	return fmt.Sprintf("Adc121VspbVolt=%d Adc121CspbAmp=%d Adc121Cs1Amp=%d Adc121Cs2Amp=%d", self.Adc121VspbVolt, self.Adc121CspbAmp, self.Adc121Cs1Amp, self.Adc121Cs2Amp)
 }
 
 func (self *SensPower) String() string {
@@ -67,18 +67,18 @@ func (self *SensPower) String() string {
 // Maximum Power Point Tracker (MPPT) sensor data for solar module power performance tracking
 type SensMppt struct {
 	MpptTimestamp uint64  //  MPPT last timestamp
-	Mppt3Amp      float32 //  MPPT3 current
-	Mppt3Volt     float32 //  MPPT3 voltage
-	Mppt2Amp      float32 //  MPPT2 current
-	Mppt2Volt     float32 //  MPPT2 voltage
-	Mppt1Amp      float32 //  MPPT1 current
 	Mppt1Volt     float32 //  MPPT1 voltage
-	Mppt3Pwm      uint16  //  MPPT3 pwm
-	Mppt2Pwm      uint16  //  MPPT2 pwm
+	Mppt1Amp      float32 //  MPPT1 current
+	Mppt2Volt     float32 //  MPPT2 voltage
+	Mppt2Amp      float32 //  MPPT2 current
+	Mppt3Volt     float32 //  MPPT3 voltage
+	Mppt3Amp      float32 //  MPPT3 current
 	Mppt1Pwm      uint16  //  MPPT1 pwm
-	Mppt3Status   uint8   //  MPPT3 status
-	Mppt2Status   uint8   //  MPPT2 status
+	Mppt2Pwm      uint16  //  MPPT2 pwm
+	Mppt3Pwm      uint16  //  MPPT3 pwm
 	Mppt1Status   uint8   //  MPPT1 status
+	Mppt2Status   uint8   //  MPPT2 status
+	Mppt3Status   uint8   //  MPPT3 status
 }
 
 func (self *SensMppt) TypeID() uint8 {
@@ -94,11 +94,11 @@ func (self *SensMppt) TypeSize() uint8 {
 }
 
 func (self *SensMppt) TypeCRCExtra() uint8 {
-	return 57
+	return 231
 }
 
 func (self *SensMppt) FieldsString() string {
-	return fmt.Sprintf("MpptTimestamp=%d Mppt3Amp=%d Mppt3Volt=%d Mppt2Amp=%d Mppt2Volt=%d Mppt1Amp=%d Mppt1Volt=%d Mppt3Pwm=%d Mppt2Pwm=%d Mppt1Pwm=%d Mppt3Status=%d Mppt2Status=%d Mppt1Status=%d", self.MpptTimestamp, self.Mppt3Amp, self.Mppt3Volt, self.Mppt2Amp, self.Mppt2Volt, self.Mppt1Amp, self.Mppt1Volt, self.Mppt3Pwm, self.Mppt2Pwm, self.Mppt1Pwm, self.Mppt3Status, self.Mppt2Status, self.Mppt1Status)
+	return fmt.Sprintf("MpptTimestamp=%d Mppt1Volt=%d Mppt1Amp=%d Mppt2Volt=%d Mppt2Amp=%d Mppt3Volt=%d Mppt3Amp=%d Mppt1Pwm=%d Mppt2Pwm=%d Mppt3Pwm=%d Mppt1Status=%d Mppt2Status=%d Mppt3Status=%d", self.MpptTimestamp, self.Mppt1Volt, self.Mppt1Amp, self.Mppt2Volt, self.Mppt2Amp, self.Mppt3Volt, self.Mppt3Amp, self.Mppt1Pwm, self.Mppt2Pwm, self.Mppt3Pwm, self.Mppt1Status, self.Mppt2Status, self.Mppt3Status)
 }
 
 func (self *SensMppt) String() string {
@@ -108,30 +108,30 @@ func (self *SensMppt) String() string {
 // ASL-fixed-wing controller data
 type AslctrlData struct {
 	Timestamp       uint64  //  Timestamp
-	Urud            float32 //
-	Uail            float32 //
-	Rref            float32 //
-	R               float32 //
-	Pref            float32 //
-	P               float32 //
-	Rollangleref    float32 // Roll angle reference[deg]
-	Rollangle       float32 // Roll angle [deg]
-	Yawangleref     float32 // Yaw angle reference[deg]
-	Yawangle        float32 // Yaw angle [deg]
-	Airspeedref     float32 // Airspeed reference [m/s]
-	Az              float32 //
-	Uthrot2         float32 //
-	Uthrot          float32 //
-	Uelev           float32 //
-	Qref            float32 //
-	Q               float32 //
-	Pitchangleref   float32 // Pitch angle reference[deg]
-	Pitchangle      float32 // Pitch angle [deg]
-	HrefT           float32 //
-	Href            float32 //
 	H               float32 //  See sourcecode for a description of these values...
-	Spoilersengaged uint8   //
+	Href            float32 //
+	HrefT           float32 //
+	Pitchangle      float32 // Pitch angle [deg]
+	Pitchangleref   float32 // Pitch angle reference[deg]
+	Q               float32 //
+	Qref            float32 //
+	Uelev           float32 //
+	Uthrot          float32 //
+	Uthrot2         float32 //
+	Az              float32 //
+	Airspeedref     float32 // Airspeed reference [m/s]
+	Yawangle        float32 // Yaw angle [deg]
+	Yawangleref     float32 // Yaw angle reference[deg]
+	Rollangle       float32 // Roll angle [deg]
+	Rollangleref    float32 // Roll angle reference[deg]
+	P               float32 //
+	Pref            float32 //
+	R               float32 //
+	Rref            float32 //
+	Uail            float32 //
+	Urud            float32 //
 	AslctrlMode     uint8   //  ASLCTRL control-mode (manual, stabilized, auto, etc...)
+	Spoilersengaged uint8   //
 }
 
 func (self *AslctrlData) TypeID() uint8 {
@@ -147,11 +147,11 @@ func (self *AslctrlData) TypeSize() uint8 {
 }
 
 func (self *AslctrlData) TypeCRCExtra() uint8 {
-	return 172
+	return 0
 }
 
 func (self *AslctrlData) FieldsString() string {
-	return fmt.Sprintf("Timestamp=%d Urud=%d Uail=%d Rref=%d R=%d Pref=%d P=%d Rollangleref=%d Rollangle=%d Yawangleref=%d Yawangle=%d Airspeedref=%d Az=%d Uthrot2=%d Uthrot=%d Uelev=%d Qref=%d Q=%d Pitchangleref=%d Pitchangle=%d HrefT=%d Href=%d H=%d Spoilersengaged=%d AslctrlMode=%d", self.Timestamp, self.Urud, self.Uail, self.Rref, self.R, self.Pref, self.P, self.Rollangleref, self.Rollangle, self.Yawangleref, self.Yawangle, self.Airspeedref, self.Az, self.Uthrot2, self.Uthrot, self.Uelev, self.Qref, self.Q, self.Pitchangleref, self.Pitchangle, self.HrefT, self.Href, self.H, self.Spoilersengaged, self.AslctrlMode)
+	return fmt.Sprintf("Timestamp=%d H=%d Href=%d HrefT=%d Pitchangle=%d Pitchangleref=%d Q=%d Qref=%d Uelev=%d Uthrot=%d Uthrot2=%d Az=%d Airspeedref=%d Yawangle=%d Yawangleref=%d Rollangle=%d Rollangleref=%d P=%d Pref=%d R=%d Rref=%d Uail=%d Urud=%d AslctrlMode=%d Spoilersengaged=%d", self.Timestamp, self.H, self.Href, self.HrefT, self.Pitchangle, self.Pitchangleref, self.Q, self.Qref, self.Uelev, self.Uthrot, self.Uthrot2, self.Az, self.Airspeedref, self.Yawangle, self.Yawangleref, self.Rollangle, self.Rollangleref, self.P, self.Pref, self.R, self.Rref, self.Uail, self.Urud, self.AslctrlMode, self.Spoilersengaged)
 }
 
 func (self *AslctrlData) String() string {
@@ -160,17 +160,17 @@ func (self *AslctrlData) String() string {
 
 // ASL-fixed-wing controller debug data
 type AslctrlDebug struct {
-	F8   float32 //  Debug data
-	F7   float32 //  Debug data
-	F6   float32 //  Debug data
-	F5   float32 //  Debug data
-	F4   float32 //  Debug data
-	F3   float32 //  Debug data
-	F2   float32 //  Debug data
-	F1   float32 //  Debug data
 	I321 uint32  //  Debug data
-	I82  uint8   //  Debug data
+	F1   float32 //  Debug data
+	F2   float32 //  Debug data
+	F3   float32 //  Debug data
+	F4   float32 //  Debug data
+	F5   float32 //  Debug data
+	F6   float32 //  Debug data
+	F7   float32 //  Debug data
+	F8   float32 //  Debug data
 	I81  uint8   //  Debug data
+	I82  uint8   //  Debug data
 }
 
 func (self *AslctrlDebug) TypeID() uint8 {
@@ -186,11 +186,11 @@ func (self *AslctrlDebug) TypeSize() uint8 {
 }
 
 func (self *AslctrlDebug) TypeCRCExtra() uint8 {
-	return 182
+	return 251
 }
 
 func (self *AslctrlDebug) FieldsString() string {
-	return fmt.Sprintf("F8=%d F7=%d F6=%d F5=%d F4=%d F3=%d F2=%d F1=%d I321=%d I82=%d I81=%d", self.F8, self.F7, self.F6, self.F5, self.F4, self.F3, self.F2, self.F1, self.I321, self.I82, self.I81)
+	return fmt.Sprintf("I321=%d F1=%d F2=%d F3=%d F4=%d F5=%d F6=%d F7=%d F8=%d I81=%d I82=%d", self.I321, self.F1, self.F2, self.F3, self.F4, self.F5, self.F6, self.F7, self.F8, self.I81, self.I82)
 }
 
 func (self *AslctrlDebug) String() string {
@@ -200,9 +200,9 @@ func (self *AslctrlDebug) String() string {
 // Extended state information for ASLUAVs
 type AsluavStatus struct {
 	MotorRpm     float32  //  Motor RPM
-	ServoStatus  [8]uint8 //  Status vector for up to 8 servos
-	SatcomStatus uint8    //  Status of the IRIDIUM satellite communication system
 	LedStatus    uint8    //  Status of the position-indicator LEDs
+	SatcomStatus uint8    //  Status of the IRIDIUM satellite communication system
+	ServoStatus  [8]uint8 //  Status vector for up to 8 servos
 }
 
 func (self *AsluavStatus) TypeID() uint8 {
@@ -218,11 +218,11 @@ func (self *AsluavStatus) TypeSize() uint8 {
 }
 
 func (self *AsluavStatus) TypeCRCExtra() uint8 {
-	return 58
+	return 165
 }
 
 func (self *AsluavStatus) FieldsString() string {
-	return fmt.Sprintf("MotorRpm=%d ServoStatus=%v SatcomStatus=%d LedStatus=%d", self.MotorRpm, self.ServoStatus, self.SatcomStatus, self.LedStatus)
+	return fmt.Sprintf("MotorRpm=%d LedStatus=%d SatcomStatus=%d ServoStatus=%v", self.MotorRpm, self.LedStatus, self.SatcomStatus, self.ServoStatus)
 }
 
 func (self *AsluavStatus) String() string {

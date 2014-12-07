@@ -63,11 +63,11 @@ const (
 //
 type SetCamShutter struct {
 	Gain       float32 // Camera gain
-	Exposure   uint16  // Exposure time, in microseconds
 	Interval   uint16  // Shutter interval, in microseconds
-	TriggerPin uint8   // Trigger pin, 0-3 for PtGrey FireFly
-	CamMode    uint8   // Camera mode: 0 = auto, 1 = manual
+	Exposure   uint16  // Exposure time, in microseconds
 	CamNo      uint8   // Camera id
+	CamMode    uint8   // Camera mode: 0 = auto, 1 = manual
+	TriggerPin uint8   // Trigger pin, 0-3 for PtGrey FireFly
 }
 
 func (self *SetCamShutter) TypeID() uint8 {
@@ -83,11 +83,11 @@ func (self *SetCamShutter) TypeSize() uint8 {
 }
 
 func (self *SetCamShutter) TypeCRCExtra() uint8 {
-	return 235
+	return 108
 }
 
 func (self *SetCamShutter) FieldsString() string {
-	return fmt.Sprintf("Gain=%d Exposure=%d Interval=%d TriggerPin=%d CamMode=%d CamNo=%d", self.Gain, self.Exposure, self.Interval, self.TriggerPin, self.CamMode, self.CamNo)
+	return fmt.Sprintf("Gain=%d Interval=%d Exposure=%d CamNo=%d CamMode=%d TriggerPin=%d", self.Gain, self.Interval, self.Exposure, self.CamNo, self.CamMode, self.TriggerPin)
 }
 
 func (self *SetCamShutter) String() string {
@@ -97,17 +97,17 @@ func (self *SetCamShutter) String() string {
 //
 type ImageTriggered struct {
 	Timestamp uint64  // Timestamp
-	GroundZ   float32 // Ground truth Z
-	GroundY   float32 // Ground truth Y
-	GroundX   float32 // Ground truth X
-	Alt       float32 // Global frame altitude
-	Lon       float32 // GPS Y coordinate
-	Lat       float32 // GPS X coordinate
-	LocalZ    float32 // Local frame Z coordinate (height over ground)
-	Yaw       float32 // Yaw angle in rad
-	Pitch     float32 // Pitch angle in rad
-	Roll      float32 // Roll angle in rad
 	Seq       uint32  // IMU seq
+	Roll      float32 // Roll angle in rad
+	Pitch     float32 // Pitch angle in rad
+	Yaw       float32 // Yaw angle in rad
+	LocalZ    float32 // Local frame Z coordinate (height over ground)
+	Lat       float32 // GPS X coordinate
+	Lon       float32 // GPS Y coordinate
+	Alt       float32 // Global frame altitude
+	GroundX   float32 // Ground truth X
+	GroundY   float32 // Ground truth Y
+	GroundZ   float32 // Ground truth Z
 }
 
 func (self *ImageTriggered) TypeID() uint8 {
@@ -123,11 +123,11 @@ func (self *ImageTriggered) TypeSize() uint8 {
 }
 
 func (self *ImageTriggered) TypeCRCExtra() uint8 {
-	return 114
+	return 86
 }
 
 func (self *ImageTriggered) FieldsString() string {
-	return fmt.Sprintf("Timestamp=%d GroundZ=%d GroundY=%d GroundX=%d Alt=%d Lon=%d Lat=%d LocalZ=%d Yaw=%d Pitch=%d Roll=%d Seq=%d", self.Timestamp, self.GroundZ, self.GroundY, self.GroundX, self.Alt, self.Lon, self.Lat, self.LocalZ, self.Yaw, self.Pitch, self.Roll, self.Seq)
+	return fmt.Sprintf("Timestamp=%d Seq=%d Roll=%d Pitch=%d Yaw=%d LocalZ=%d Lat=%d Lon=%d Alt=%d GroundX=%d GroundY=%d GroundZ=%d", self.Timestamp, self.Seq, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ)
 }
 
 func (self *ImageTriggered) String() string {
@@ -165,29 +165,29 @@ func (self *ImageTriggerControl) String() string {
 
 //
 type ImageAvailable struct {
-	ValidUntil  uint64  // Until which timestamp this buffer will stay valid
-	Timestamp   uint64  // Timestamp
 	CamId       uint64  // Camera id
-	GroundZ     float32 // Ground truth Z
-	GroundY     float32 // Ground truth Y
-	GroundX     float32 // Ground truth X
-	Alt         float32 // Global frame altitude
-	Lon         float32 // GPS Y coordinate
-	Lat         float32 // GPS X coordinate
-	LocalZ      float32 // Local frame Z coordinate (height over ground)
-	Yaw         float32 // Yaw angle in rad
-	Pitch       float32 // Pitch angle in rad
-	Roll        float32 // Roll angle in rad
-	Gain        float32 // Camera gain
-	Exposure    uint32  // Exposure time, in microseconds
-	Key         uint32  // Shared memory area key
-	ImgBufIndex uint32  // Position of the image in the buffer, starts with 0
+	Timestamp   uint64  // Timestamp
+	ValidUntil  uint64  // Until which timestamp this buffer will stay valid
 	ImgSeq      uint32  // The image sequence number
-	Depth       uint16  // Image depth
-	Height      uint16  // Image height
+	ImgBufIndex uint32  // Position of the image in the buffer, starts with 0
+	Key         uint32  // Shared memory area key
+	Exposure    uint32  // Exposure time, in microseconds
+	Gain        float32 // Camera gain
+	Roll        float32 // Roll angle in rad
+	Pitch       float32 // Pitch angle in rad
+	Yaw         float32 // Yaw angle in rad
+	LocalZ      float32 // Local frame Z coordinate (height over ground)
+	Lat         float32 // GPS X coordinate
+	Lon         float32 // GPS Y coordinate
+	Alt         float32 // Global frame altitude
+	GroundX     float32 // Ground truth X
+	GroundY     float32 // Ground truth Y
+	GroundZ     float32 // Ground truth Z
 	Width       uint16  // Image width
-	Channels    uint8   // Image channels
+	Height      uint16  // Image height
+	Depth       uint16  // Image depth
 	CamNo       uint8   // Camera # (starts with 0)
+	Channels    uint8   // Image channels
 }
 
 func (self *ImageAvailable) TypeID() uint8 {
@@ -203,11 +203,11 @@ func (self *ImageAvailable) TypeSize() uint8 {
 }
 
 func (self *ImageAvailable) TypeCRCExtra() uint8 {
-	return 16
+	return 224
 }
 
 func (self *ImageAvailable) FieldsString() string {
-	return fmt.Sprintf("ValidUntil=%d Timestamp=%d CamId=%d GroundZ=%d GroundY=%d GroundX=%d Alt=%d Lon=%d Lat=%d LocalZ=%d Yaw=%d Pitch=%d Roll=%d Gain=%d Exposure=%d Key=%d ImgBufIndex=%d ImgSeq=%d Depth=%d Height=%d Width=%d Channels=%d CamNo=%d", self.ValidUntil, self.Timestamp, self.CamId, self.GroundZ, self.GroundY, self.GroundX, self.Alt, self.Lon, self.Lat, self.LocalZ, self.Yaw, self.Pitch, self.Roll, self.Gain, self.Exposure, self.Key, self.ImgBufIndex, self.ImgSeq, self.Depth, self.Height, self.Width, self.Channels, self.CamNo)
+	return fmt.Sprintf("CamId=%d Timestamp=%d ValidUntil=%d ImgSeq=%d ImgBufIndex=%d Key=%d Exposure=%d Gain=%d Roll=%d Pitch=%d Yaw=%d LocalZ=%d Lat=%d Lon=%d Alt=%d GroundX=%d GroundY=%d GroundZ=%d Width=%d Height=%d Depth=%d CamNo=%d Channels=%d", self.CamId, self.Timestamp, self.ValidUntil, self.ImgSeq, self.ImgBufIndex, self.Key, self.Exposure, self.Gain, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ, self.Width, self.Height, self.Depth, self.CamNo, self.Channels)
 }
 
 func (self *ImageAvailable) String() string {
@@ -216,12 +216,12 @@ func (self *ImageAvailable) String() string {
 
 // Message sent to the MAV to set a new offset from the currently controlled position
 type SetPositionControlOffset struct {
-	Yaw             float32 // yaw orientation offset in radians, 0 = NORTH
-	Z               float32 // z position offset
-	Y               float32 // y position offset
 	X               float32 // x position offset
-	TargetComponent uint8   // Component ID
+	Y               float32 // y position offset
+	Z               float32 // z position offset
+	Yaw             float32 // yaw orientation offset in radians, 0 = NORTH
 	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
 }
 
 func (self *SetPositionControlOffset) TypeID() uint8 {
@@ -237,11 +237,11 @@ func (self *SetPositionControlOffset) TypeSize() uint8 {
 }
 
 func (self *SetPositionControlOffset) TypeCRCExtra() uint8 {
-	return 203
+	return 22
 }
 
 func (self *SetPositionControlOffset) FieldsString() string {
-	return fmt.Sprintf("Yaw=%d Z=%d Y=%d X=%d TargetComponent=%d TargetSystem=%d", self.Yaw, self.Z, self.Y, self.X, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("X=%d Y=%d Z=%d Yaw=%d TargetSystem=%d TargetComponent=%d", self.X, self.Y, self.Z, self.Yaw, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *SetPositionControlOffset) String() string {
@@ -250,10 +250,10 @@ func (self *SetPositionControlOffset) String() string {
 
 //
 type PositionControlSetpoint struct {
-	Yaw float32 // yaw orientation in radians, 0 = NORTH
-	Z   float32 // z position
-	Y   float32 // y position
 	X   float32 // x position
+	Y   float32 // y position
+	Z   float32 // z position
+	Yaw float32 // yaw orientation in radians, 0 = NORTH
 	Id  uint16  // ID of waypoint, 0 for plain position
 }
 
@@ -270,11 +270,11 @@ func (self *PositionControlSetpoint) TypeSize() uint8 {
 }
 
 func (self *PositionControlSetpoint) TypeCRCExtra() uint8 {
-	return 88
+	return 28
 }
 
 func (self *PositionControlSetpoint) FieldsString() string {
-	return fmt.Sprintf("Yaw=%d Z=%d Y=%d X=%d Id=%d", self.Yaw, self.Z, self.Y, self.X, self.Id)
+	return fmt.Sprintf("X=%d Y=%d Z=%d Yaw=%d Id=%d", self.X, self.Y, self.Z, self.Yaw, self.Id)
 }
 
 func (self *PositionControlSetpoint) String() string {
@@ -283,12 +283,12 @@ func (self *PositionControlSetpoint) String() string {
 
 //
 type Marker struct {
-	Yaw   float32 // yaw orientation
-	Pitch float32 // pitch orientation
-	Roll  float32 // roll orientation
-	Z     float32 // z position
-	Y     float32 // y position
 	X     float32 // x position
+	Y     float32 // y position
+	Z     float32 // z position
+	Roll  float32 // roll orientation
+	Pitch float32 // pitch orientation
+	Yaw   float32 // yaw orientation
 	Id    uint16  // ID
 }
 
@@ -305,11 +305,11 @@ func (self *Marker) TypeSize() uint8 {
 }
 
 func (self *Marker) TypeCRCExtra() uint8 {
-	return 72
+	return 249
 }
 
 func (self *Marker) FieldsString() string {
-	return fmt.Sprintf("Yaw=%d Pitch=%d Roll=%d Z=%d Y=%d X=%d Id=%d", self.Yaw, self.Pitch, self.Roll, self.Z, self.Y, self.X, self.Id)
+	return fmt.Sprintf("X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d Id=%d", self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw, self.Id)
 }
 
 func (self *Marker) String() string {
@@ -319,12 +319,12 @@ func (self *Marker) String() string {
 //
 type RawAux struct {
 	Baro int32  // Barometric pressure (hecto Pascal)
-	Temp int16  // Temperature (degrees celcius)
-	Vbat uint16 // Battery voltage
-	Adc4 uint16 // ADC4 (J405 ADC7, LPC2148 AD1.3)
-	Adc3 uint16 // ADC3 (J405 ADC6, LPC2148 AD0.1)
-	Adc2 uint16 // ADC2 (J405 ADC5, LPC2148 AD0.2)
 	Adc1 uint16 // ADC1 (J405 ADC3, LPC2148 AD0.6)
+	Adc2 uint16 // ADC2 (J405 ADC5, LPC2148 AD0.2)
+	Adc3 uint16 // ADC3 (J405 ADC6, LPC2148 AD0.1)
+	Adc4 uint16 // ADC4 (J405 ADC7, LPC2148 AD1.3)
+	Vbat uint16 // Battery voltage
+	Temp int16  // Temperature (degrees celcius)
 }
 
 func (self *RawAux) TypeID() uint8 {
@@ -340,11 +340,11 @@ func (self *RawAux) TypeSize() uint8 {
 }
 
 func (self *RawAux) TypeCRCExtra() uint8 {
-	return 115
+	return 182
 }
 
 func (self *RawAux) FieldsString() string {
-	return fmt.Sprintf("Baro=%d Temp=%d Vbat=%d Adc4=%d Adc3=%d Adc2=%d Adc1=%d", self.Baro, self.Temp, self.Vbat, self.Adc4, self.Adc3, self.Adc2, self.Adc1)
+	return fmt.Sprintf("Baro=%d Adc1=%d Adc2=%d Adc3=%d Adc4=%d Vbat=%d Temp=%d", self.Baro, self.Adc1, self.Adc2, self.Adc3, self.Adc4, self.Vbat, self.Temp)
 }
 
 func (self *RawAux) String() string {
@@ -353,8 +353,8 @@ func (self *RawAux) String() string {
 
 //
 type WatchdogHeartbeat struct {
-	ProcessCount uint16 // Number of processes
 	WatchdogId   uint16 // Watchdog ID
+	ProcessCount uint16 // Number of processes
 }
 
 func (self *WatchdogHeartbeat) TypeID() uint8 {
@@ -370,11 +370,11 @@ func (self *WatchdogHeartbeat) TypeSize() uint8 {
 }
 
 func (self *WatchdogHeartbeat) TypeCRCExtra() uint8 {
-	return 123
+	return 153
 }
 
 func (self *WatchdogHeartbeat) FieldsString() string {
-	return fmt.Sprintf("ProcessCount=%d WatchdogId=%d", self.ProcessCount, self.WatchdogId)
+	return fmt.Sprintf("WatchdogId=%d ProcessCount=%d", self.WatchdogId, self.ProcessCount)
 }
 
 func (self *WatchdogHeartbeat) String() string {
@@ -384,10 +384,10 @@ func (self *WatchdogHeartbeat) String() string {
 //
 type WatchdogProcessInfo struct {
 	Timeout    int32   // Timeout (seconds)
-	ProcessId  uint16  // Process ID
 	WatchdogId uint16  // Watchdog ID
-	Arguments  Char147 // Process arguments
+	ProcessId  uint16  // Process ID
 	Name       Char100 // Process name
+	Arguments  Char147 // Process arguments
 }
 
 func (self *WatchdogProcessInfo) TypeID() uint8 {
@@ -403,11 +403,11 @@ func (self *WatchdogProcessInfo) TypeSize() uint8 {
 }
 
 func (self *WatchdogProcessInfo) TypeCRCExtra() uint8 {
-	return 133
+	return 42
 }
 
 func (self *WatchdogProcessInfo) FieldsString() string {
-	return fmt.Sprintf("Timeout=%d ProcessId=%d WatchdogId=%d Arguments=\"%s\" Name=\"%s\"", self.Timeout, self.ProcessId, self.WatchdogId, self.Arguments, self.Name)
+	return fmt.Sprintf("Timeout=%d WatchdogId=%d ProcessId=%d Name=\"%s\" Arguments=\"%s\"", self.Timeout, self.WatchdogId, self.ProcessId, self.Name, self.Arguments)
 }
 
 func (self *WatchdogProcessInfo) String() string {
@@ -417,11 +417,11 @@ func (self *WatchdogProcessInfo) String() string {
 //
 type WatchdogProcessStatus struct {
 	Pid        int32  // PID
-	Crashes    uint16 // Number of crashes
-	ProcessId  uint16 // Process ID
 	WatchdogId uint16 // Watchdog ID
-	Muted      uint8  // Is muted
+	ProcessId  uint16 // Process ID
+	Crashes    uint16 // Number of crashes
 	State      uint8  // Is running / finished / suspended / crashed
+	Muted      uint8  // Is muted
 }
 
 func (self *WatchdogProcessStatus) TypeID() uint8 {
@@ -437,11 +437,11 @@ func (self *WatchdogProcessStatus) TypeSize() uint8 {
 }
 
 func (self *WatchdogProcessStatus) TypeCRCExtra() uint8 {
-	return 132
+	return 29
 }
 
 func (self *WatchdogProcessStatus) FieldsString() string {
-	return fmt.Sprintf("Pid=%d Crashes=%d ProcessId=%d WatchdogId=%d Muted=%d State=%d", self.Pid, self.Crashes, self.ProcessId, self.WatchdogId, self.Muted, self.State)
+	return fmt.Sprintf("Pid=%d WatchdogId=%d ProcessId=%d Crashes=%d State=%d Muted=%d", self.Pid, self.WatchdogId, self.ProcessId, self.Crashes, self.State, self.Muted)
 }
 
 func (self *WatchdogProcessStatus) String() string {
@@ -450,10 +450,10 @@ func (self *WatchdogProcessStatus) String() string {
 
 //
 type WatchdogCommand struct {
-	ProcessId      uint16 // Process ID
 	WatchdogId     uint16 // Watchdog ID
-	CommandId      uint8  // Command ID
+	ProcessId      uint16 // Process ID
 	TargetSystemId uint8  // Target system ID
+	CommandId      uint8  // Command ID
 }
 
 func (self *WatchdogCommand) TypeID() uint8 {
@@ -469,11 +469,11 @@ func (self *WatchdogCommand) TypeSize() uint8 {
 }
 
 func (self *WatchdogCommand) TypeCRCExtra() uint8 {
-	return 208
+	return 162
 }
 
 func (self *WatchdogCommand) FieldsString() string {
-	return fmt.Sprintf("ProcessId=%d WatchdogId=%d CommandId=%d TargetSystemId=%d", self.ProcessId, self.WatchdogId, self.CommandId, self.TargetSystemId)
+	return fmt.Sprintf("WatchdogId=%d ProcessId=%d TargetSystemId=%d CommandId=%d", self.WatchdogId, self.ProcessId, self.TargetSystemId, self.CommandId)
 }
 
 func (self *WatchdogCommand) String() string {
@@ -483,9 +483,9 @@ func (self *WatchdogCommand) String() string {
 //
 type PatternDetected struct {
 	Confidence float32 // Confidence of detection
-	Detected   uint8   // Accepted as true detection, 0 no, 1 yes
-	File       Char100 // Pattern file name
 	Type       uint8   // 0: Pattern, 1: Letter
+	File       Char100 // Pattern file name
+	Detected   uint8   // Accepted as true detection, 0 no, 1 yes
 }
 
 func (self *PatternDetected) TypeID() uint8 {
@@ -501,11 +501,11 @@ func (self *PatternDetected) TypeSize() uint8 {
 }
 
 func (self *PatternDetected) TypeCRCExtra() uint8 {
-	return 124
+	return 74
 }
 
 func (self *PatternDetected) FieldsString() string {
-	return fmt.Sprintf("Confidence=%d Detected=%d File=\"%s\" Type=%d", self.Confidence, self.Detected, self.File, self.Type)
+	return fmt.Sprintf("Confidence=%d Type=%d File=\"%s\" Detected=%d", self.Confidence, self.Type, self.File, self.Detected)
 }
 
 func (self *PatternDetected) String() string {
@@ -517,14 +517,14 @@ func (self *PatternDetected) String() string {
 //                 the POI on a map.
 //
 type PointOfInterest struct {
-	Z                float32 // Z Position
-	Y                float32 // Y Position
 	X                float32 // X Position
+	Y                float32 // Y Position
+	Z                float32 // Z Position
 	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
-	Name             Char26  // POI name
-	CoordinateSystem uint8   // 0: global, 1:local
-	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
 	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
+	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
+	CoordinateSystem uint8   // 0: global, 1:local
+	Name             Char26  // POI name
 }
 
 func (self *PointOfInterest) TypeID() uint8 {
@@ -540,11 +540,11 @@ func (self *PointOfInterest) TypeSize() uint8 {
 }
 
 func (self *PointOfInterest) TypeCRCExtra() uint8 {
-	return 115
+	return 19
 }
 
 func (self *PointOfInterest) FieldsString() string {
-	return fmt.Sprintf("Z=%d Y=%d X=%d Timeout=%d Name=\"%s\" CoordinateSystem=%d Color=%d Type=%d", self.Z, self.Y, self.X, self.Timeout, self.Name, self.CoordinateSystem, self.Color, self.Type)
+	return fmt.Sprintf("X=%d Y=%d Z=%d Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.X, self.Y, self.Z, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
 }
 
 func (self *PointOfInterest) String() string {
@@ -556,17 +556,17 @@ func (self *PointOfInterest) String() string {
 //                 the POI on a map.
 //
 type PointOfInterestConnection struct {
-	Zp2              float32 // Z2 Position
-	Yp2              float32 // Y2 Position
-	Xp2              float32 // X2 Position
-	Zp1              float32 // Z1 Position
-	Yp1              float32 // Y1 Position
 	Xp1              float32 // X1 Position
+	Yp1              float32 // Y1 Position
+	Zp1              float32 // Z1 Position
+	Xp2              float32 // X2 Position
+	Yp2              float32 // Y2 Position
+	Zp2              float32 // Z2 Position
 	Timeout          uint16  // 0: no timeout, >1: timeout in seconds
-	Name             Char26  // POI connection name
-	CoordinateSystem uint8   // 0: global, 1:local
-	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
 	Type             uint8   // 0: Notice, 1: Warning, 2: Critical, 3: Emergency, 4: Debug
+	Color            uint8   // 0: blue, 1: yellow, 2: red, 3: orange, 4: green, 5: magenta
+	CoordinateSystem uint8   // 0: global, 1:local
+	Name             Char26  // POI connection name
 }
 
 func (self *PointOfInterestConnection) TypeID() uint8 {
@@ -582,11 +582,11 @@ func (self *PointOfInterestConnection) TypeSize() uint8 {
 }
 
 func (self *PointOfInterestConnection) TypeCRCExtra() uint8 {
-	return 230
+	return 236
 }
 
 func (self *PointOfInterestConnection) FieldsString() string {
-	return fmt.Sprintf("Zp2=%d Yp2=%d Xp2=%d Zp1=%d Yp1=%d Xp1=%d Timeout=%d Name=\"%s\" CoordinateSystem=%d Color=%d Type=%d", self.Zp2, self.Yp2, self.Xp2, self.Zp1, self.Yp1, self.Xp1, self.Timeout, self.Name, self.CoordinateSystem, self.Color, self.Type)
+	return fmt.Sprintf("Xp1=%d Yp1=%d Zp1=%d Xp2=%d Yp2=%d Zp2=%d Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.Xp1, self.Yp1, self.Zp1, self.Xp2, self.Yp2, self.Zp2, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
 }
 
 func (self *PointOfInterestConnection) String() string {
@@ -595,14 +595,14 @@ func (self *PointOfInterestConnection) String() string {
 
 //
 type BriefFeature struct {
-	Response              float32   // Harris operator response at this location
-	Z                     float32   // z position in m
-	Y                     float32   // y position in m
 	X                     float32   // x position in m
-	Orientation           uint16    // Orientation
+	Y                     float32   // y position in m
+	Z                     float32   // z position in m
+	Response              float32   // Harris operator response at this location
 	Size                  uint16    // Size in pixels
-	Descriptor            [32]uint8 // Descriptor
+	Orientation           uint16    // Orientation
 	OrientationAssignment uint8     // Orientation assignment 0: false, 1:true
+	Descriptor            [32]uint8 // Descriptor
 }
 
 func (self *BriefFeature) TypeID() uint8 {
@@ -618,11 +618,11 @@ func (self *BriefFeature) TypeSize() uint8 {
 }
 
 func (self *BriefFeature) TypeCRCExtra() uint8 {
-	return 34
+	return 232
 }
 
 func (self *BriefFeature) FieldsString() string {
-	return fmt.Sprintf("Response=%d Z=%d Y=%d X=%d Orientation=%d Size=%d Descriptor=%v OrientationAssignment=%d", self.Response, self.Z, self.Y, self.X, self.Orientation, self.Size, self.Descriptor, self.OrientationAssignment)
+	return fmt.Sprintf("X=%d Y=%d Z=%d Response=%d Size=%d Orientation=%d OrientationAssignment=%d Descriptor=%v", self.X, self.Y, self.Z, self.Response, self.Size, self.Orientation, self.OrientationAssignment, self.Descriptor)
 }
 
 func (self *BriefFeature) String() string {
@@ -631,15 +631,15 @@ func (self *BriefFeature) String() string {
 
 //
 type AttitudeControl struct {
-	Thrust       float32 // thrust
-	Yaw          float32 // yaw
-	Pitch        float32 // pitch
 	Roll         float32 // roll
-	ThrustManual uint8   // thrust auto:0, manual:1
-	YawManual    uint8   // yaw auto:0, manual:1
-	PitchManual  uint8   // pitch auto:0, manual:1
-	RollManual   uint8   // roll control enabled auto:0, manual:1
+	Pitch        float32 // pitch
+	Yaw          float32 // yaw
+	Thrust       float32 // thrust
 	Target       uint8   // The system to be controlled
+	RollManual   uint8   // roll control enabled auto:0, manual:1
+	PitchManual  uint8   // pitch auto:0, manual:1
+	YawManual    uint8   // yaw auto:0, manual:1
+	ThrustManual uint8   // thrust auto:0, manual:1
 }
 
 func (self *AttitudeControl) TypeID() uint8 {
@@ -655,11 +655,11 @@ func (self *AttitudeControl) TypeSize() uint8 {
 }
 
 func (self *AttitudeControl) TypeCRCExtra() uint8 {
-	return 64
+	return 254
 }
 
 func (self *AttitudeControl) FieldsString() string {
-	return fmt.Sprintf("Thrust=%d Yaw=%d Pitch=%d Roll=%d ThrustManual=%d YawManual=%d PitchManual=%d RollManual=%d Target=%d", self.Thrust, self.Yaw, self.Pitch, self.Roll, self.ThrustManual, self.YawManual, self.PitchManual, self.RollManual, self.Target)
+	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Thrust=%d Target=%d RollManual=%d PitchManual=%d YawManual=%d ThrustManual=%d", self.Roll, self.Pitch, self.Yaw, self.Thrust, self.Target, self.RollManual, self.PitchManual, self.YawManual, self.ThrustManual)
 }
 
 func (self *AttitudeControl) String() string {
@@ -668,18 +668,18 @@ func (self *AttitudeControl) String() string {
 
 //
 type DetectionStats struct {
-	Fps               float32 // Average images per seconds processed
-	ImagesTodo        uint32  // Number of images still to process
-	ImagesDone        uint32  // Number of images already processed
-	BestClusterIterId uint32  // Best cluster ID
-	BestClusterId     uint32  // Best cluster ID
-	BestDetectionId   uint32  // Best detection ID
-	BestAlt           int32   // Altitude of the best detection * 1E3
-	BestLon           int32   // Longitude of the best detection * 1E7
-	BestLat           int32   // Latitude of the best detection * 1E7
-	BestScore         float32 // Best score
-	ClusterIters      uint32  // Number of cluster iterations
 	Detections        uint32  // Number of detections
+	ClusterIters      uint32  // Number of cluster iterations
+	BestScore         float32 // Best score
+	BestLat           int32   // Latitude of the best detection * 1E7
+	BestLon           int32   // Longitude of the best detection * 1E7
+	BestAlt           int32   // Altitude of the best detection * 1E3
+	BestDetectionId   uint32  // Best detection ID
+	BestClusterId     uint32  // Best cluster ID
+	BestClusterIterId uint32  // Best cluster ID
+	ImagesDone        uint32  // Number of images already processed
+	ImagesTodo        uint32  // Number of images still to process
+	Fps               float32 // Average images per seconds processed
 }
 
 func (self *DetectionStats) TypeID() uint8 {
@@ -695,11 +695,11 @@ func (self *DetectionStats) TypeSize() uint8 {
 }
 
 func (self *DetectionStats) TypeCRCExtra() uint8 {
-	return 41
+	return 87
 }
 
 func (self *DetectionStats) FieldsString() string {
-	return fmt.Sprintf("Fps=%d ImagesTodo=%d ImagesDone=%d BestClusterIterId=%d BestClusterId=%d BestDetectionId=%d BestAlt=%d BestLon=%d BestLat=%d BestScore=%d ClusterIters=%d Detections=%d", self.Fps, self.ImagesTodo, self.ImagesDone, self.BestClusterIterId, self.BestClusterId, self.BestDetectionId, self.BestAlt, self.BestLon, self.BestLat, self.BestScore, self.ClusterIters, self.Detections)
+	return fmt.Sprintf("Detections=%d ClusterIters=%d BestScore=%d BestLat=%d BestLon=%d BestAlt=%d BestDetectionId=%d BestClusterId=%d BestClusterIterId=%d ImagesDone=%d ImagesTodo=%d Fps=%d", self.Detections, self.ClusterIters, self.BestScore, self.BestLat, self.BestLon, self.BestAlt, self.BestDetectionId, self.BestClusterId, self.BestClusterIterId, self.ImagesDone, self.ImagesTodo, self.Fps)
 }
 
 func (self *DetectionStats) String() string {
@@ -708,20 +708,20 @@ func (self *DetectionStats) String() string {
 
 //
 type OnboardHealth struct {
-	NetworkLoadOut float32 // Network load outbound in KiB/s
-	NetworkLoadIn  float32 // Network load inbound KiB/s
-	Voltage        float32 // Supply voltage V
-	Temp           float32 // Temperature
-	DiskTotal      float32 // Disk total in GiB
-	SwapTotal      float32 // Swap size in GiB
-	RamTotal       float32 // RAM size in GiB
 	Uptime         uint32  // Uptime of system
+	RamTotal       float32 // RAM size in GiB
+	SwapTotal      float32 // Swap size in GiB
+	DiskTotal      float32 // Disk total in GiB
+	Temp           float32 // Temperature
+	Voltage        float32 // Supply voltage V
+	NetworkLoadIn  float32 // Network load inbound KiB/s
+	NetworkLoadOut float32 // Network load outbound in KiB/s
 	CpuFreq        uint16  // CPU frequency
-	DiskUsage      uint8   // Disk usage in percent
-	DiskHealth     int8    // Disk health (-1: N/A, 0: ERR, 1: RO, 2: RW)
-	SwapUsage      uint8   // Swap usage in percent
-	RamUsage       uint8   // RAM usage in percent
 	CpuLoad        uint8   // CPU load in percent
+	RamUsage       uint8   // RAM usage in percent
+	SwapUsage      uint8   // Swap usage in percent
+	DiskHealth     int8    // Disk health (-1: N/A, 0: ERR, 1: RO, 2: RW)
+	DiskUsage      uint8   // Disk usage in percent
 }
 
 func (self *OnboardHealth) TypeID() uint8 {
@@ -737,11 +737,11 @@ func (self *OnboardHealth) TypeSize() uint8 {
 }
 
 func (self *OnboardHealth) TypeCRCExtra() uint8 {
-	return 164
+	return 19
 }
 
 func (self *OnboardHealth) FieldsString() string {
-	return fmt.Sprintf("NetworkLoadOut=%d NetworkLoadIn=%d Voltage=%d Temp=%d DiskTotal=%d SwapTotal=%d RamTotal=%d Uptime=%d CpuFreq=%d DiskUsage=%d DiskHealth=%d SwapUsage=%d RamUsage=%d CpuLoad=%d", self.NetworkLoadOut, self.NetworkLoadIn, self.Voltage, self.Temp, self.DiskTotal, self.SwapTotal, self.RamTotal, self.Uptime, self.CpuFreq, self.DiskUsage, self.DiskHealth, self.SwapUsage, self.RamUsage, self.CpuLoad)
+	return fmt.Sprintf("Uptime=%d RamTotal=%d SwapTotal=%d DiskTotal=%d Temp=%d Voltage=%d NetworkLoadIn=%d NetworkLoadOut=%d CpuFreq=%d CpuLoad=%d RamUsage=%d SwapUsage=%d DiskHealth=%d DiskUsage=%d", self.Uptime, self.RamTotal, self.SwapTotal, self.DiskTotal, self.Temp, self.Voltage, self.NetworkLoadIn, self.NetworkLoadOut, self.CpuFreq, self.CpuLoad, self.RamUsage, self.SwapUsage, self.DiskHealth, self.DiskUsage)
 }
 
 func (self *OnboardHealth) String() string {

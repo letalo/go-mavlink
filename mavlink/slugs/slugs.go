@@ -89,8 +89,8 @@ const (
 // Sensor and DSC control loads.
 type CpuLoad struct {
 	Batvolt  uint16 // Battery Voltage in millivolts
-	Ctrlload uint8  // Control DSC Load
 	Sensload uint8  // Sensor DSC Load
+	Ctrlload uint8  // Control DSC Load
 }
 
 func (self *CpuLoad) TypeID() uint8 {
@@ -106,11 +106,11 @@ func (self *CpuLoad) TypeSize() uint8 {
 }
 
 func (self *CpuLoad) TypeCRCExtra() uint8 {
-	return 183
+	return 75
 }
 
 func (self *CpuLoad) FieldsString() string {
-	return fmt.Sprintf("Batvolt=%d Ctrlload=%d Sensload=%d", self.Batvolt, self.Ctrlload, self.Sensload)
+	return fmt.Sprintf("Batvolt=%d Sensload=%d Ctrlload=%d", self.Batvolt, self.Sensload, self.Ctrlload)
 }
 
 func (self *CpuLoad) String() string {
@@ -119,12 +119,12 @@ func (self *CpuLoad) String() string {
 
 // Accelerometer and gyro biases.
 type SensorBias struct {
-	Gzbias float32 // Gyro Z bias (rad/s)
-	Gybias float32 // Gyro Y bias (rad/s)
-	Gxbias float32 // Gyro X bias (rad/s)
-	Azbias float32 // Accelerometer Z bias (m/s)
-	Aybias float32 // Accelerometer Y bias (m/s)
 	Axbias float32 // Accelerometer X bias (m/s)
+	Aybias float32 // Accelerometer Y bias (m/s)
+	Azbias float32 // Accelerometer Z bias (m/s)
+	Gxbias float32 // Gyro X bias (rad/s)
+	Gybias float32 // Gyro Y bias (rad/s)
+	Gzbias float32 // Gyro Z bias (rad/s)
 }
 
 func (self *SensorBias) TypeID() uint8 {
@@ -140,11 +140,11 @@ func (self *SensorBias) TypeSize() uint8 {
 }
 
 func (self *SensorBias) TypeCRCExtra() uint8 {
-	return 213
+	return 168
 }
 
 func (self *SensorBias) FieldsString() string {
-	return fmt.Sprintf("Gzbias=%d Gybias=%d Gxbias=%d Azbias=%d Aybias=%d Axbias=%d", self.Gzbias, self.Gybias, self.Gxbias, self.Azbias, self.Aybias, self.Axbias)
+	return fmt.Sprintf("Axbias=%d Aybias=%d Azbias=%d Gxbias=%d Gybias=%d Gzbias=%d", self.Axbias, self.Aybias, self.Azbias, self.Gxbias, self.Gybias, self.Gzbias)
 }
 
 func (self *SensorBias) String() string {
@@ -153,12 +153,12 @@ func (self *SensorBias) String() string {
 
 // Configurable diagnostic messages.
 type Diagnostic struct {
-	Diagfl3 float32 // Diagnostic float 3
-	Diagfl2 float32 // Diagnostic float 2
 	Diagfl1 float32 // Diagnostic float 1
-	Diagsh3 int16   // Diagnostic short 3
-	Diagsh2 int16   // Diagnostic short 2
+	Diagfl2 float32 // Diagnostic float 2
+	Diagfl3 float32 // Diagnostic float 3
 	Diagsh1 int16   // Diagnostic short 1
+	Diagsh2 int16   // Diagnostic short 2
+	Diagsh3 int16   // Diagnostic short 3
 }
 
 func (self *Diagnostic) TypeID() uint8 {
@@ -174,11 +174,11 @@ func (self *Diagnostic) TypeSize() uint8 {
 }
 
 func (self *Diagnostic) TypeCRCExtra() uint8 {
-	return 236
+	return 2
 }
 
 func (self *Diagnostic) FieldsString() string {
-	return fmt.Sprintf("Diagfl3=%d Diagfl2=%d Diagfl1=%d Diagsh3=%d Diagsh2=%d Diagsh1=%d", self.Diagfl3, self.Diagfl2, self.Diagfl1, self.Diagsh3, self.Diagsh2, self.Diagsh1)
+	return fmt.Sprintf("Diagfl1=%d Diagfl2=%d Diagfl3=%d Diagsh1=%d Diagsh2=%d Diagsh3=%d", self.Diagfl1, self.Diagfl2, self.Diagfl3, self.Diagsh1, self.Diagsh2, self.Diagsh3)
 }
 
 func (self *Diagnostic) String() string {
@@ -187,16 +187,16 @@ func (self *Diagnostic) String() string {
 
 // Data used in the navigation algorithm.
 type SlugsNavigation struct {
-	Dist2go   float32 // Remaining distance to Run on this leg of Navigation
-	Totaldist float32 // Total Distance to Run on this leg of Navigation
-	AyBody    float32 // Y component of the body acceleration
-	PsidotC   float32 // Commanded Turn rate
-	ThetaC    float32 // Commanded Pitch
-	PhiC      float32 // Commanded Roll
 	UM        float32 // Measured Airspeed prior to the nav filter in m/s
+	PhiC      float32 // Commanded Roll
+	ThetaC    float32 // Commanded Pitch
+	PsidotC   float32 // Commanded Turn rate
+	AyBody    float32 // Y component of the body acceleration
+	Totaldist float32 // Total Distance to Run on this leg of Navigation
+	Dist2go   float32 // Remaining distance to Run on this leg of Navigation
 	HC        uint16  // Commanded altitude in 0.1 m
-	Towp      uint8   // Destination WP
 	Fromwp    uint8   // Origin WP
+	Towp      uint8   // Destination WP
 }
 
 func (self *SlugsNavigation) TypeID() uint8 {
@@ -212,11 +212,11 @@ func (self *SlugsNavigation) TypeSize() uint8 {
 }
 
 func (self *SlugsNavigation) TypeCRCExtra() uint8 {
-	return 249
+	return 228
 }
 
 func (self *SlugsNavigation) FieldsString() string {
-	return fmt.Sprintf("Dist2go=%d Totaldist=%d AyBody=%d PsidotC=%d ThetaC=%d PhiC=%d UM=%d HC=%d Towp=%d Fromwp=%d", self.Dist2go, self.Totaldist, self.AyBody, self.PsidotC, self.ThetaC, self.PhiC, self.UM, self.HC, self.Towp, self.Fromwp)
+	return fmt.Sprintf("UM=%d PhiC=%d ThetaC=%d PsidotC=%d AyBody=%d Totaldist=%d Dist2go=%d HC=%d Fromwp=%d Towp=%d", self.UM, self.PhiC, self.ThetaC, self.PsidotC, self.AyBody, self.Totaldist, self.Dist2go, self.HC, self.Fromwp, self.Towp)
 }
 
 func (self *SlugsNavigation) String() string {
@@ -225,12 +225,12 @@ func (self *SlugsNavigation) String() string {
 
 // Configurable data log probes to be used inside Simulink
 type DataLog struct {
-	Fl6 float32 // Log value 6
-	Fl5 float32 // Log value 5
-	Fl4 float32 // Log value 4
-	Fl3 float32 // Log value 3
-	Fl2 float32 // Log value 2
 	Fl1 float32 // Log value 1
+	Fl2 float32 // Log value 2
+	Fl3 float32 // Log value 3
+	Fl4 float32 // Log value 4
+	Fl5 float32 // Log value 5
+	Fl6 float32 // Log value 6
 }
 
 func (self *DataLog) TypeID() uint8 {
@@ -246,11 +246,11 @@ func (self *DataLog) TypeSize() uint8 {
 }
 
 func (self *DataLog) TypeCRCExtra() uint8 {
-	return 224
+	return 167
 }
 
 func (self *DataLog) FieldsString() string {
-	return fmt.Sprintf("Fl6=%d Fl5=%d Fl4=%d Fl3=%d Fl2=%d Fl1=%d", self.Fl6, self.Fl5, self.Fl4, self.Fl3, self.Fl2, self.Fl1)
+	return fmt.Sprintf("Fl1=%d Fl2=%d Fl3=%d Fl4=%d Fl5=%d Fl6=%d", self.Fl1, self.Fl2, self.Fl3, self.Fl4, self.Fl5, self.Fl6)
 }
 
 func (self *DataLog) String() string {
@@ -259,18 +259,18 @@ func (self *DataLog) String() string {
 
 // Pilot console PWM messges.
 type GpsDateTime struct {
-	Percentused uint8 // Percent used GPS
-	Sigusedmask uint8 // GPS and GLONASS usage mask (bit 0 GPS_used? bit_4 GLONASS_used?)
-	Gppgl       uint8 // GPS+GLONASS satellites in Solution
-	Usesat      uint8 // Used satellites in Solution
-	Vissat      uint8 // Visible satellites reported by Gps
-	Clockstat   uint8 // Clock Status. See table 47 page 211 OEMStar Manual
-	Sec         uint8 // Sec reported by Gps
-	Min         uint8 // Min reported by Gps
-	Hour        uint8 // Hour reported by Gps
-	Day         uint8 // Day reported by Gps
-	Month       uint8 // Month reported by Gps
 	Year        uint8 // Year reported by Gps
+	Month       uint8 // Month reported by Gps
+	Day         uint8 // Day reported by Gps
+	Hour        uint8 // Hour reported by Gps
+	Min         uint8 // Min reported by Gps
+	Sec         uint8 // Sec reported by Gps
+	Clockstat   uint8 // Clock Status. See table 47 page 211 OEMStar Manual
+	Vissat      uint8 // Visible satellites reported by Gps
+	Usesat      uint8 // Used satellites in Solution
+	Gppgl       uint8 // GPS+GLONASS satellites in Solution
+	Sigusedmask uint8 // GPS and GLONASS usage mask (bit 0 GPS_used? bit_4 GLONASS_used?)
+	Percentused uint8 // Percent used GPS
 }
 
 func (self *GpsDateTime) TypeID() uint8 {
@@ -286,11 +286,11 @@ func (self *GpsDateTime) TypeSize() uint8 {
 }
 
 func (self *GpsDateTime) TypeCRCExtra() uint8 {
-	return 33
+	return 132
 }
 
 func (self *GpsDateTime) FieldsString() string {
-	return fmt.Sprintf("Percentused=%d Sigusedmask=%d Gppgl=%d Usesat=%d Vissat=%d Clockstat=%d Sec=%d Min=%d Hour=%d Day=%d Month=%d Year=%d", self.Percentused, self.Sigusedmask, self.Gppgl, self.Usesat, self.Vissat, self.Clockstat, self.Sec, self.Min, self.Hour, self.Day, self.Month, self.Year)
+	return fmt.Sprintf("Year=%d Month=%d Day=%d Hour=%d Min=%d Sec=%d Clockstat=%d Vissat=%d Usesat=%d Gppgl=%d Sigusedmask=%d Percentused=%d", self.Year, self.Month, self.Day, self.Hour, self.Min, self.Sec, self.Clockstat, self.Vissat, self.Usesat, self.Gppgl, self.Sigusedmask, self.Percentused)
 }
 
 func (self *GpsDateTime) String() string {
@@ -299,9 +299,9 @@ func (self *GpsDateTime) String() string {
 
 // Mid Level commands sent from the GS to the autopilot. These are only sent when being operated in mid-level commands mode from the ground.
 type MidLvlCmds struct {
-	Rcommand float32 // Commanded Turnrate in rad/s
-	Ucommand float32 // Commanded Airspeed in m/s
 	Hcommand float32 // Commanded Altitude in meters
+	Ucommand float32 // Commanded Airspeed in m/s
+	Rcommand float32 // Commanded Turnrate in rad/s
 	Target   uint8   // The system setting the commands
 }
 
@@ -318,11 +318,11 @@ func (self *MidLvlCmds) TypeSize() uint8 {
 }
 
 func (self *MidLvlCmds) TypeCRCExtra() uint8 {
-	return 117
+	return 146
 }
 
 func (self *MidLvlCmds) FieldsString() string {
-	return fmt.Sprintf("Rcommand=%d Ucommand=%d Hcommand=%d Target=%d", self.Rcommand, self.Ucommand, self.Hcommand, self.Target)
+	return fmt.Sprintf("Hcommand=%d Ucommand=%d Rcommand=%d Target=%d", self.Hcommand, self.Ucommand, self.Rcommand, self.Target)
 }
 
 func (self *MidLvlCmds) String() string {
@@ -361,11 +361,11 @@ func (self *CtrlSrfcPt) String() string {
 
 // Orders generated to the SLUGS camera mount.
 type SlugsCameraOrder struct {
-	Movehome int8  // Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored
-	Zoom     int8  // Order the zoom values 0 to 10
-	Tilt     int8  // Order the mount to tilt: -1 down, 0 No tilt motion, +1 up
-	Pan      int8  // Order the mount to pan: -1 left, 0 No pan motion, +1 right
 	Target   uint8 // The system reporting the action
+	Pan      int8  // Order the mount to pan: -1 left, 0 No pan motion, +1 right
+	Tilt     int8  // Order the mount to tilt: -1 down, 0 No tilt motion, +1 up
+	Zoom     int8  // Order the zoom values 0 to 10
+	Movehome int8  // Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored
 }
 
 func (self *SlugsCameraOrder) TypeID() uint8 {
@@ -381,11 +381,11 @@ func (self *SlugsCameraOrder) TypeSize() uint8 {
 }
 
 func (self *SlugsCameraOrder) TypeCRCExtra() uint8 {
-	return 201
+	return 45
 }
 
 func (self *SlugsCameraOrder) FieldsString() string {
-	return fmt.Sprintf("Movehome=%d Zoom=%d Tilt=%d Pan=%d Target=%d", self.Movehome, self.Zoom, self.Tilt, self.Pan, self.Target)
+	return fmt.Sprintf("Target=%d Pan=%d Tilt=%d Zoom=%d Movehome=%d", self.Target, self.Pan, self.Tilt, self.Zoom, self.Movehome)
 }
 
 func (self *SlugsCameraOrder) String() string {
@@ -394,10 +394,10 @@ func (self *SlugsCameraOrder) String() string {
 
 // Control for surface; pending and order to origin.
 type ControlSurface struct {
-	Bcontrol  float32 // Order to origin
 	Mcontrol  float32 // Pending
-	Idsurface uint8   // ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder
+	Bcontrol  float32 // Order to origin
 	Target    uint8   // The system setting the commands
+	Idsurface uint8   // ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder
 }
 
 func (self *ControlSurface) TypeID() uint8 {
@@ -413,11 +413,11 @@ func (self *ControlSurface) TypeSize() uint8 {
 }
 
 func (self *ControlSurface) TypeCRCExtra() uint8 {
-	return 43
+	return 113
 }
 
 func (self *ControlSurface) FieldsString() string {
-	return fmt.Sprintf("Bcontrol=%d Mcontrol=%d Idsurface=%d Target=%d", self.Bcontrol, self.Mcontrol, self.Idsurface, self.Target)
+	return fmt.Sprintf("Mcontrol=%d Bcontrol=%d Target=%d Idsurface=%d", self.Mcontrol, self.Bcontrol, self.Target, self.Idsurface)
 }
 
 func (self *ControlSurface) String() string {
@@ -426,8 +426,8 @@ func (self *ControlSurface) String() string {
 
 // Transmits the last known position of the mobile GS to the UAV. Very relevant when Track Mobile is enabled
 type SlugsMobileLocation struct {
-	Longitude float32 // Mobile Longitude
 	Latitude  float32 // Mobile Latitude
+	Longitude float32 // Mobile Longitude
 	Target    uint8   // The system reporting the action
 }
 
@@ -444,11 +444,11 @@ func (self *SlugsMobileLocation) TypeSize() uint8 {
 }
 
 func (self *SlugsMobileLocation) TypeCRCExtra() uint8 {
-	return 20
+	return 101
 }
 
 func (self *SlugsMobileLocation) FieldsString() string {
-	return fmt.Sprintf("Longitude=%d Latitude=%d Target=%d", self.Longitude, self.Latitude, self.Target)
+	return fmt.Sprintf("Latitude=%d Longitude=%d Target=%d", self.Latitude, self.Longitude, self.Target)
 }
 
 func (self *SlugsMobileLocation) String() string {
@@ -457,9 +457,9 @@ func (self *SlugsMobileLocation) String() string {
 
 // Control for camara.
 type SlugsConfigurationCamera struct {
-	Order   uint8 //  1: up/on 2: down/off 3: auto/reset/no action
-	Idorder uint8 // ID 0: brightness 1: aperture 2: iris 3: ICR 4: backlight
 	Target  uint8 // The system setting the commands
+	Idorder uint8 // ID 0: brightness 1: aperture 2: iris 3: ICR 4: backlight
+	Order   uint8 //  1: up/on 2: down/off 3: auto/reset/no action
 }
 
 func (self *SlugsConfigurationCamera) TypeID() uint8 {
@@ -475,11 +475,11 @@ func (self *SlugsConfigurationCamera) TypeSize() uint8 {
 }
 
 func (self *SlugsConfigurationCamera) TypeCRCExtra() uint8 {
-	return 72
+	return 5
 }
 
 func (self *SlugsConfigurationCamera) FieldsString() string {
-	return fmt.Sprintf("Order=%d Idorder=%d Target=%d", self.Order, self.Idorder, self.Target)
+	return fmt.Sprintf("Target=%d Idorder=%d Order=%d", self.Target, self.Idorder, self.Order)
 }
 
 func (self *SlugsConfigurationCamera) String() string {
@@ -488,13 +488,13 @@ func (self *SlugsConfigurationCamera) String() string {
 
 // Transmits the position of watch
 type IsrLocation struct {
-	Height    float32 // ISR Height
-	Longitude float32 // ISR Longitude
 	Latitude  float32 // ISR Latitude
-	Option3   uint8   // Option 3
-	Option2   uint8   // Option 2
-	Option1   uint8   // Option 1
+	Longitude float32 // ISR Longitude
+	Height    float32 // ISR Height
 	Target    uint8   // The system reporting the action
+	Option1   uint8   // Option 1
+	Option2   uint8   // Option 2
+	Option3   uint8   // Option 3
 }
 
 func (self *IsrLocation) TypeID() uint8 {
@@ -510,11 +510,11 @@ func (self *IsrLocation) TypeSize() uint8 {
 }
 
 func (self *IsrLocation) TypeCRCExtra() uint8 {
-	return 166
+	return 246
 }
 
 func (self *IsrLocation) FieldsString() string {
-	return fmt.Sprintf("Height=%d Longitude=%d Latitude=%d Option3=%d Option2=%d Option1=%d Target=%d", self.Height, self.Longitude, self.Latitude, self.Option3, self.Option2, self.Option1, self.Target)
+	return fmt.Sprintf("Latitude=%d Longitude=%d Height=%d Target=%d Option1=%d Option2=%d Option3=%d", self.Latitude, self.Longitude, self.Height, self.Target, self.Option1, self.Option2, self.Option3)
 }
 
 func (self *IsrLocation) String() string {
@@ -523,8 +523,8 @@ func (self *IsrLocation) String() string {
 
 // Transmits the readings from the voltage and current sensors
 type VoltSensor struct {
-	Reading2 uint16 // Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
 	Voltage  uint16 // Voltage in uS of PWM. 0 uS = 0V, 20 uS = 21.5V
+	Reading2 uint16 // Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
 	R2type   uint8  // It is the value of reading 2: 0 - Current, 1 - Foreward Sonar, 2 - Back Sonar, 3 - RPM
 }
 
@@ -541,11 +541,11 @@ func (self *VoltSensor) TypeSize() uint8 {
 }
 
 func (self *VoltSensor) TypeCRCExtra() uint8 {
-	return 240
+	return 17
 }
 
 func (self *VoltSensor) FieldsString() string {
-	return fmt.Sprintf("Reading2=%d Voltage=%d R2type=%d", self.Reading2, self.Voltage, self.R2type)
+	return fmt.Sprintf("Voltage=%d Reading2=%d R2type=%d", self.Voltage, self.Reading2, self.R2type)
 }
 
 func (self *VoltSensor) String() string {
@@ -554,8 +554,8 @@ func (self *VoltSensor) String() string {
 
 // Transmits the actual Pan, Tilt and Zoom values of the camera unit
 type PtzStatus struct {
-	Tilt int16 // The Tilt value in 10ths of degree
 	Pan  int16 // The Pan value in 10ths of degree
+	Tilt int16 // The Tilt value in 10ths of degree
 	Zoom uint8 // The actual Zoom Value
 }
 
@@ -572,11 +572,11 @@ func (self *PtzStatus) TypeSize() uint8 {
 }
 
 func (self *PtzStatus) TypeCRCExtra() uint8 {
-	return 48
+	return 187
 }
 
 func (self *PtzStatus) FieldsString() string {
-	return fmt.Sprintf("Tilt=%d Pan=%d Zoom=%d", self.Tilt, self.Pan, self.Zoom)
+	return fmt.Sprintf("Pan=%d Tilt=%d Zoom=%d", self.Pan, self.Tilt, self.Zoom)
 }
 
 func (self *PtzStatus) String() string {
@@ -585,11 +585,11 @@ func (self *PtzStatus) String() string {
 
 // Transmits the actual status values UAV in flight
 type UavStatus struct {
-	Course    float32 // Course UAV
-	Speed     float32 // Speed UAV
-	Altitude  float32 // Altitude UAV
-	Longitude float32 // Longitude UAV
 	Latitude  float32 // Latitude UAV
+	Longitude float32 // Longitude UAV
+	Altitude  float32 // Altitude UAV
+	Speed     float32 // Speed UAV
+	Course    float32 // Course UAV
 	Target    uint8   // The ID system reporting the action
 }
 
@@ -606,11 +606,11 @@ func (self *UavStatus) TypeSize() uint8 {
 }
 
 func (self *UavStatus) TypeCRCExtra() uint8 {
-	return 144
+	return 160
 }
 
 func (self *UavStatus) FieldsString() string {
-	return fmt.Sprintf("Course=%d Speed=%d Altitude=%d Longitude=%d Latitude=%d Target=%d", self.Course, self.Speed, self.Altitude, self.Longitude, self.Latitude, self.Target)
+	return fmt.Sprintf("Latitude=%d Longitude=%d Altitude=%d Speed=%d Course=%d Target=%d", self.Latitude, self.Longitude, self.Altitude, self.Speed, self.Course, self.Target)
 }
 
 func (self *UavStatus) String() string {
@@ -621,11 +621,11 @@ func (self *UavStatus) String() string {
 type StatusGps struct {
 	Magvar     float32 // Magnetic variation, degrees
 	Csfails    uint16  // Number of times checksum has failed
-	Modeind    uint8   //  Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid
-	Magdir     int8    //  Magnetic variation direction E/W. Easterly variation (E) subtracts from True course and Westerly variation (W) adds to True course
-	Posstatus  uint8   //  A = data valid, V = data invalid
-	Msgstype   uint8   //  Indicates if GN, GL or GP messages are being received
 	Gpsquality uint8   // The quality indicator, 0=fix not available or invalid, 1=GPS fix, 2=C/A differential GPS, 6=Dead reckoning mode, 7=Manual input mode (fixed position), 8=Simulator mode, 9= WAAS a
+	Msgstype   uint8   //  Indicates if GN, GL or GP messages are being received
+	Posstatus  uint8   //  A = data valid, V = data invalid
+	Magdir     int8    //  Magnetic variation direction E/W. Easterly variation (E) subtracts from True course and Westerly variation (W) adds to True course
+	Modeind    uint8   //  Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid
 }
 
 func (self *StatusGps) TypeID() uint8 {
@@ -641,11 +641,11 @@ func (self *StatusGps) TypeSize() uint8 {
 }
 
 func (self *StatusGps) TypeCRCExtra() uint8 {
-	return 63
+	return 51
 }
 
 func (self *StatusGps) FieldsString() string {
-	return fmt.Sprintf("Magvar=%d Csfails=%d Modeind=%d Magdir=%d Posstatus=%d Msgstype=%d Gpsquality=%d", self.Magvar, self.Csfails, self.Modeind, self.Magdir, self.Posstatus, self.Msgstype, self.Gpsquality)
+	return fmt.Sprintf("Magvar=%d Csfails=%d Gpsquality=%d Msgstype=%d Posstatus=%d Magdir=%d Modeind=%d", self.Magvar, self.Csfails, self.Gpsquality, self.Msgstype, self.Posstatus, self.Magdir, self.Modeind)
 }
 
 func (self *StatusGps) String() string {
@@ -654,13 +654,13 @@ func (self *StatusGps) String() string {
 
 // Transmits the diagnostics data from the Novatel OEMStar GPS
 type NovatelDiag struct {
-	Possolage      float32 // Age of the position solution in seconds
 	Receiverstatus uint32  // Status Bitfield. See table 69 page 350 Novatel OEMstar Manual
+	Possolage      float32 // Age of the position solution in seconds
 	Csfails        uint16  // Times the CRC has failed since boot
-	Veltype        uint8   // velocity type. See table 43 page 196
-	Postype        uint8   // position type. See table 43 page 196
-	Solstatus      uint8   // solution Status. See table 44 page 197
 	Timestatus     uint8   // The Time Status. See Table 8 page 27 Novatel OEMStar Manual
+	Solstatus      uint8   // solution Status. See table 44 page 197
+	Postype        uint8   // position type. See table 43 page 196
+	Veltype        uint8   // velocity type. See table 43 page 196
 }
 
 func (self *NovatelDiag) TypeID() uint8 {
@@ -676,11 +676,11 @@ func (self *NovatelDiag) TypeSize() uint8 {
 }
 
 func (self *NovatelDiag) TypeCRCExtra() uint8 {
-	return 93
+	return 59
 }
 
 func (self *NovatelDiag) FieldsString() string {
-	return fmt.Sprintf("Possolage=%d Receiverstatus=%d Csfails=%d Veltype=%d Postype=%d Solstatus=%d Timestatus=%d", self.Possolage, self.Receiverstatus, self.Csfails, self.Veltype, self.Postype, self.Solstatus, self.Timestatus)
+	return fmt.Sprintf("Receiverstatus=%d Possolage=%d Csfails=%d Timestatus=%d Solstatus=%d Postype=%d Veltype=%d", self.Receiverstatus, self.Possolage, self.Csfails, self.Timestatus, self.Solstatus, self.Postype, self.Veltype)
 }
 
 func (self *NovatelDiag) String() string {
@@ -689,8 +689,8 @@ func (self *NovatelDiag) String() string {
 
 // Diagnostic data Sensor MCU
 type SensorDiag struct {
-	Float2 float32 // Float field 2
 	Float1 float32 // Float field 1
+	Float2 float32 // Float field 2
 	Int1   int16   // Int 16 field 1
 	Char1  int8    // Int 8 field 1
 }
@@ -708,11 +708,11 @@ func (self *SensorDiag) TypeSize() uint8 {
 }
 
 func (self *SensorDiag) TypeCRCExtra() uint8 {
-	return 43
+	return 129
 }
 
 func (self *SensorDiag) FieldsString() string {
-	return fmt.Sprintf("Float2=%d Float1=%d Int1=%d Char1=%d", self.Float2, self.Float1, self.Int1, self.Char1)
+	return fmt.Sprintf("Float1=%d Float2=%d Int1=%d Char1=%d", self.Float1, self.Float2, self.Int1, self.Char1)
 }
 
 func (self *SensorDiag) String() string {

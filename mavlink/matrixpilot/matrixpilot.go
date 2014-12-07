@@ -66,8 +66,8 @@ const (
 
 // Depreciated but used as a compiler flag.  Do not remove
 type FlexifunctionSet struct {
-	TargetComponent uint8 // Component ID
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *FlexifunctionSet) TypeID() uint8 {
@@ -83,11 +83,11 @@ func (self *FlexifunctionSet) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionSet) TypeCRCExtra() uint8 {
-	return 70
+	return 181
 }
 
 func (self *FlexifunctionSet) FieldsString() string {
-	return fmt.Sprintf("TargetComponent=%d TargetSystem=%d", self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d", self.TargetSystem, self.TargetComponent)
 }
 
 func (self *FlexifunctionSet) String() string {
@@ -96,10 +96,10 @@ func (self *FlexifunctionSet) String() string {
 
 // Reqest reading of flexifunction data
 type FlexifunctionReadReq struct {
-	DataIndex       int16 // index into data where needed
 	ReadReqType     int16 // Type of flexifunction data requested
-	TargetComponent uint8 // Component ID
+	DataIndex       int16 // index into data where needed
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *FlexifunctionReadReq) TypeID() uint8 {
@@ -115,11 +115,11 @@ func (self *FlexifunctionReadReq) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionReadReq) TypeCRCExtra() uint8 {
-	return 176
+	return 26
 }
 
 func (self *FlexifunctionReadReq) FieldsString() string {
-	return fmt.Sprintf("DataIndex=%d ReadReqType=%d TargetComponent=%d TargetSystem=%d", self.DataIndex, self.ReadReqType, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("ReadReqType=%d DataIndex=%d TargetSystem=%d TargetComponent=%d", self.ReadReqType, self.DataIndex, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *FlexifunctionReadReq) String() string {
@@ -128,13 +128,13 @@ func (self *FlexifunctionReadReq) String() string {
 
 // Flexifunction type and parameters for component at function index from buffer
 type FlexifunctionBufferFunction struct {
-	DataSize        uint16   // Size of the
-	DataAddress     uint16   // Address in the flexifunction data, Set to 0xFFFF to use address in target memory
-	FuncCount       uint16   // Total count of functions
 	FuncIndex       uint16   // Function index
-	Data            [48]int8 // Settings data
-	TargetComponent uint8    // Component ID
+	FuncCount       uint16   // Total count of functions
+	DataAddress     uint16   // Address in the flexifunction data, Set to 0xFFFF to use address in target memory
+	DataSize        uint16   // Size of the
 	TargetSystem    uint8    // System ID
+	TargetComponent uint8    // Component ID
+	Data            [48]int8 // Settings data
 }
 
 func (self *FlexifunctionBufferFunction) TypeID() uint8 {
@@ -150,11 +150,11 @@ func (self *FlexifunctionBufferFunction) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionBufferFunction) TypeCRCExtra() uint8 {
-	return 106
+	return 105
 }
 
 func (self *FlexifunctionBufferFunction) FieldsString() string {
-	return fmt.Sprintf("DataSize=%d DataAddress=%d FuncCount=%d FuncIndex=%d Data=%v TargetComponent=%d TargetSystem=%d", self.DataSize, self.DataAddress, self.FuncCount, self.FuncIndex, self.Data, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("FuncIndex=%d FuncCount=%d DataAddress=%d DataSize=%d TargetSystem=%d TargetComponent=%d Data=%v", self.FuncIndex, self.FuncCount, self.DataAddress, self.DataSize, self.TargetSystem, self.TargetComponent, self.Data)
 }
 
 func (self *FlexifunctionBufferFunction) String() string {
@@ -163,10 +163,10 @@ func (self *FlexifunctionBufferFunction) String() string {
 
 // Flexifunction type and parameters for component at function index from buffer
 type FlexifunctionBufferFunctionAck struct {
-	Result          uint16 // result of acknowledge, 0=fail, 1=good
 	FuncIndex       uint16 // Function index
-	TargetComponent uint8  // Component ID
+	Result          uint16 // result of acknowledge, 0=fail, 1=good
 	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
 }
 
 func (self *FlexifunctionBufferFunctionAck) TypeID() uint8 {
@@ -182,11 +182,11 @@ func (self *FlexifunctionBufferFunctionAck) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionBufferFunctionAck) TypeCRCExtra() uint8 {
-	return 16
+	return 109
 }
 
 func (self *FlexifunctionBufferFunctionAck) FieldsString() string {
-	return fmt.Sprintf("Result=%d FuncIndex=%d TargetComponent=%d TargetSystem=%d", self.Result, self.FuncIndex, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("FuncIndex=%d Result=%d TargetSystem=%d TargetComponent=%d", self.FuncIndex, self.Result, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *FlexifunctionBufferFunctionAck) String() string {
@@ -195,12 +195,12 @@ func (self *FlexifunctionBufferFunctionAck) String() string {
 
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionDirectory struct {
-	DirectoryData   [48]int8 // Settings data
-	Count           uint8    // count of directory entries to write
-	StartIndex      uint8    // index of first directory entry to write
-	DirectoryType   uint8    // 0=inputs, 1=outputs
-	TargetComponent uint8    // Component ID
 	TargetSystem    uint8    // System ID
+	TargetComponent uint8    // Component ID
+	DirectoryType   uint8    // 0=inputs, 1=outputs
+	StartIndex      uint8    // index of first directory entry to write
+	Count           uint8    // count of directory entries to write
+	DirectoryData   [48]int8 // Settings data
 }
 
 func (self *FlexifunctionDirectory) TypeID() uint8 {
@@ -216,11 +216,11 @@ func (self *FlexifunctionDirectory) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionDirectory) TypeCRCExtra() uint8 {
-	return 18
+	return 163
 }
 
 func (self *FlexifunctionDirectory) FieldsString() string {
-	return fmt.Sprintf("DirectoryData=%v Count=%d StartIndex=%d DirectoryType=%d TargetComponent=%d TargetSystem=%d", self.DirectoryData, self.Count, self.StartIndex, self.DirectoryType, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d DirectoryType=%d StartIndex=%d Count=%d DirectoryData=%v", self.TargetSystem, self.TargetComponent, self.DirectoryType, self.StartIndex, self.Count, self.DirectoryData)
 }
 
 func (self *FlexifunctionDirectory) String() string {
@@ -230,11 +230,11 @@ func (self *FlexifunctionDirectory) String() string {
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionDirectoryAck struct {
 	Result          uint16 // result of acknowledge, 0=fail, 1=good
-	Count           uint8  // count of directory entries to write
-	StartIndex      uint8  // index of first directory entry to write
-	DirectoryType   uint8  // 0=inputs, 1=outputs
-	TargetComponent uint8  // Component ID
 	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	DirectoryType   uint8  // 0=inputs, 1=outputs
+	StartIndex      uint8  // index of first directory entry to write
+	Count           uint8  // count of directory entries to write
 }
 
 func (self *FlexifunctionDirectoryAck) TypeID() uint8 {
@@ -250,11 +250,11 @@ func (self *FlexifunctionDirectoryAck) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionDirectoryAck) TypeCRCExtra() uint8 {
-	return 28
+	return 218
 }
 
 func (self *FlexifunctionDirectoryAck) FieldsString() string {
-	return fmt.Sprintf("Result=%d Count=%d StartIndex=%d DirectoryType=%d TargetComponent=%d TargetSystem=%d", self.Result, self.Count, self.StartIndex, self.DirectoryType, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("Result=%d TargetSystem=%d TargetComponent=%d DirectoryType=%d StartIndex=%d Count=%d", self.Result, self.TargetSystem, self.TargetComponent, self.DirectoryType, self.StartIndex, self.Count)
 }
 
 func (self *FlexifunctionDirectoryAck) String() string {
@@ -263,9 +263,9 @@ func (self *FlexifunctionDirectoryAck) String() string {
 
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionCommand struct {
-	CommandType     uint8 // Flexifunction command type
-	TargetComponent uint8 // Component ID
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	CommandType     uint8 // Flexifunction command type
 }
 
 func (self *FlexifunctionCommand) TypeID() uint8 {
@@ -281,11 +281,11 @@ func (self *FlexifunctionCommand) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionCommand) TypeCRCExtra() uint8 {
-	return 127
+	return 133
 }
 
 func (self *FlexifunctionCommand) FieldsString() string {
-	return fmt.Sprintf("CommandType=%d TargetComponent=%d TargetSystem=%d", self.CommandType, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d CommandType=%d", self.TargetSystem, self.TargetComponent, self.CommandType)
 }
 
 func (self *FlexifunctionCommand) String() string {
@@ -294,8 +294,8 @@ func (self *FlexifunctionCommand) String() string {
 
 // Acknowldge sucess or failure of a flexifunction command
 type FlexifunctionCommandAck struct {
-	Result      uint16 // result of acknowledge
 	CommandType uint16 // Command acknowledged
+	Result      uint16 // result of acknowledge
 }
 
 func (self *FlexifunctionCommandAck) TypeID() uint8 {
@@ -311,11 +311,11 @@ func (self *FlexifunctionCommandAck) TypeSize() uint8 {
 }
 
 func (self *FlexifunctionCommandAck) TypeCRCExtra() uint8 {
-	return 55
+	return 208
 }
 
 func (self *FlexifunctionCommandAck) FieldsString() string {
-	return fmt.Sprintf("Result=%d CommandType=%d", self.Result, self.CommandType)
+	return fmt.Sprintf("CommandType=%d Result=%d", self.CommandType, self.Result)
 }
 
 func (self *FlexifunctionCommandAck) String() string {
@@ -324,33 +324,33 @@ func (self *FlexifunctionCommandAck) String() string {
 
 // Backwards compatible MAVLink version of SERIAL_UDB_EXTRA - F2: Format Part A
 type SerialUdbExtraF2A struct {
-	SueAltitude       int32  // Serial UDB Extra Altitude
-	SueLongitude      int32  // Serial UDB Extra Longitude
-	SueLatitude       int32  // Serial UDB Extra Latitude
 	SueTime           uint32 // Serial UDB Extra Time
-	SueHdop           int16  // Serial UDB Extra GPS Horizontal Dilution of Precision
-	SueSvs            int16  // Serial UDB Extra Number of Sattelites in View
-	SueMagfieldearth2 int16  // Serial UDB Extra Magnetic Field Earth 2
-	SueMagfieldearth1 int16  // Serial UDB Extra Magnetic Field Earth 1
-	SueMagfieldearth0 int16  // Serial UDB Extra Magnetic Field Earth 0
-	SueEstimatedWind2 int16  // Serial UDB Extra Estimated Wind 2
-	SueEstimatedWind1 int16  // Serial UDB Extra Estimated Wind 1
-	SueEstimatedWind0 int16  // Serial UDB Extra Estimated Wind 0
-	SueAirSpeed3dimu  uint16 // Serial UDB Extra 3D IMU Air Speed
-	SueVoltageMilis   int16  // Serial UDB Extra Voltage in MilliVolts
-	SueCpuLoad        uint16 // Serial UDB Extra CPU Load
-	SueSog            int16  // Serial UDB Extra Speed Over Ground
-	SueCog            uint16 // Serial UDB Extra GPS Course Over Ground
-	SueRmat8          int16  // Serial UDB Extra Rmat 8
-	SueRmat7          int16  // Serial UDB Extra Rmat 7
-	SueRmat6          int16  // Serial UDB Extra Rmat 6
-	SueRmat5          int16  // Serial UDB Extra Rmat 5
-	SueRmat4          int16  // Serial UDB Extra Rmat 4
-	SueRmat3          int16  // Serial UDB Extra Rmat 3
-	SueRmat2          int16  // Serial UDB Extra Rmat 2
-	SueRmat1          int16  // Serial UDB Extra Rmat 1
-	SueRmat0          int16  // Serial UDB Extra Rmat 0
+	SueLatitude       int32  // Serial UDB Extra Latitude
+	SueLongitude      int32  // Serial UDB Extra Longitude
+	SueAltitude       int32  // Serial UDB Extra Altitude
 	SueWaypointIndex  uint16 // Serial UDB Extra Waypoint Index
+	SueRmat0          int16  // Serial UDB Extra Rmat 0
+	SueRmat1          int16  // Serial UDB Extra Rmat 1
+	SueRmat2          int16  // Serial UDB Extra Rmat 2
+	SueRmat3          int16  // Serial UDB Extra Rmat 3
+	SueRmat4          int16  // Serial UDB Extra Rmat 4
+	SueRmat5          int16  // Serial UDB Extra Rmat 5
+	SueRmat6          int16  // Serial UDB Extra Rmat 6
+	SueRmat7          int16  // Serial UDB Extra Rmat 7
+	SueRmat8          int16  // Serial UDB Extra Rmat 8
+	SueCog            uint16 // Serial UDB Extra GPS Course Over Ground
+	SueSog            int16  // Serial UDB Extra Speed Over Ground
+	SueCpuLoad        uint16 // Serial UDB Extra CPU Load
+	SueVoltageMilis   int16  // Serial UDB Extra Voltage in MilliVolts
+	SueAirSpeed3dimu  uint16 // Serial UDB Extra 3D IMU Air Speed
+	SueEstimatedWind0 int16  // Serial UDB Extra Estimated Wind 0
+	SueEstimatedWind1 int16  // Serial UDB Extra Estimated Wind 1
+	SueEstimatedWind2 int16  // Serial UDB Extra Estimated Wind 2
+	SueMagfieldearth0 int16  // Serial UDB Extra Magnetic Field Earth 0
+	SueMagfieldearth1 int16  // Serial UDB Extra Magnetic Field Earth 1
+	SueMagfieldearth2 int16  // Serial UDB Extra Magnetic Field Earth 2
+	SueSvs            int16  // Serial UDB Extra Number of Sattelites in View
+	SueHdop           int16  // Serial UDB Extra GPS Horizontal Dilution of Precision
 	SueStatus         uint8  // Serial UDB Extra Status
 }
 
@@ -367,11 +367,11 @@ func (self *SerialUdbExtraF2A) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF2A) TypeCRCExtra() uint8 {
-	return 231
+	return 150
 }
 
 func (self *SerialUdbExtraF2A) FieldsString() string {
-	return fmt.Sprintf("SueAltitude=%d SueLongitude=%d SueLatitude=%d SueTime=%d SueHdop=%d SueSvs=%d SueMagfieldearth2=%d SueMagfieldearth1=%d SueMagfieldearth0=%d SueEstimatedWind2=%d SueEstimatedWind1=%d SueEstimatedWind0=%d SueAirSpeed3dimu=%d SueVoltageMilis=%d SueCpuLoad=%d SueSog=%d SueCog=%d SueRmat8=%d SueRmat7=%d SueRmat6=%d SueRmat5=%d SueRmat4=%d SueRmat3=%d SueRmat2=%d SueRmat1=%d SueRmat0=%d SueWaypointIndex=%d SueStatus=%d", self.SueAltitude, self.SueLongitude, self.SueLatitude, self.SueTime, self.SueHdop, self.SueSvs, self.SueMagfieldearth2, self.SueMagfieldearth1, self.SueMagfieldearth0, self.SueEstimatedWind2, self.SueEstimatedWind1, self.SueEstimatedWind0, self.SueAirSpeed3dimu, self.SueVoltageMilis, self.SueCpuLoad, self.SueSog, self.SueCog, self.SueRmat8, self.SueRmat7, self.SueRmat6, self.SueRmat5, self.SueRmat4, self.SueRmat3, self.SueRmat2, self.SueRmat1, self.SueRmat0, self.SueWaypointIndex, self.SueStatus)
+	return fmt.Sprintf("SueTime=%d SueLatitude=%d SueLongitude=%d SueAltitude=%d SueWaypointIndex=%d SueRmat0=%d SueRmat1=%d SueRmat2=%d SueRmat3=%d SueRmat4=%d SueRmat5=%d SueRmat6=%d SueRmat7=%d SueRmat8=%d SueCog=%d SueSog=%d SueCpuLoad=%d SueVoltageMilis=%d SueAirSpeed3dimu=%d SueEstimatedWind0=%d SueEstimatedWind1=%d SueEstimatedWind2=%d SueMagfieldearth0=%d SueMagfieldearth1=%d SueMagfieldearth2=%d SueSvs=%d SueHdop=%d SueStatus=%d", self.SueTime, self.SueLatitude, self.SueLongitude, self.SueAltitude, self.SueWaypointIndex, self.SueRmat0, self.SueRmat1, self.SueRmat2, self.SueRmat3, self.SueRmat4, self.SueRmat5, self.SueRmat6, self.SueRmat7, self.SueRmat8, self.SueCog, self.SueSog, self.SueCpuLoad, self.SueVoltageMilis, self.SueAirSpeed3dimu, self.SueEstimatedWind0, self.SueEstimatedWind1, self.SueEstimatedWind2, self.SueMagfieldearth0, self.SueMagfieldearth1, self.SueMagfieldearth2, self.SueSvs, self.SueHdop, self.SueStatus)
 }
 
 func (self *SerialUdbExtraF2A) String() string {
@@ -380,39 +380,39 @@ func (self *SerialUdbExtraF2A) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA - F2: Part B
 type SerialUdbExtraF2B struct {
-	SueFlags           uint32 // Serial UDB Extra Status Flags
 	SueTime            uint32 // Serial UDB Extra Time
-	SueMemoryStackFree int16  // Serial UDB Extra Stack Memory Free
-	SueWaypointGoalZ   int16  // Serial UDB Extra Current Waypoint Goal Z
-	SueWaypointGoalY   int16  // Serial UDB Extra Current Waypoint Goal Y
-	SueWaypointGoalX   int16  // Serial UDB Extra Current Waypoint Goal X
-	SueImuVelocityZ    int16  // Serial UDB Extra IMU Velocity Z
-	SueImuVelocityY    int16  // Serial UDB Extra IMU Velocity Y
-	SueImuVelocityX    int16  // Serial UDB Extra IMU Velocity X
-	SueOscFails        int16  // Serial UDB Extra Oscillator Failure Count
-	SueImuLocationZ    int16  // Serial UDB Extra IMU Location Z
-	SueImuLocationY    int16  // Serial UDB Extra IMU Location Y
-	SueImuLocationX    int16  // Serial UDB Extra IMU Location X
-	SuePwmOutput10     int16  // Serial UDB Extra PWM Output Channel 10
-	SuePwmOutput9      int16  // Serial UDB Extra PWM Output Channel 9
-	SuePwmOutput8      int16  // Serial UDB Extra PWM Output Channel 8
-	SuePwmOutput7      int16  // Serial UDB Extra PWM Output Channel 7
-	SuePwmOutput6      int16  // Serial UDB Extra PWM Output Channel 6
-	SuePwmOutput5      int16  // Serial UDB Extra PWM Output Channel 5
-	SuePwmOutput4      int16  // Serial UDB Extra PWM Output Channel 4
-	SuePwmOutput3      int16  // Serial UDB Extra PWM Output Channel 3
-	SuePwmOutput2      int16  // Serial UDB Extra PWM Output Channel 2
-	SuePwmOutput1      int16  // Serial UDB Extra PWM Output Channel 1
-	SuePwmInput10      int16  // Serial UDB Extra PWM Input Channel 10
-	SuePwmInput9       int16  // Serial UDB Extra PWM Input Channel 9
-	SuePwmInput8       int16  // Serial UDB Extra PWM Input Channel 8
-	SuePwmInput7       int16  // Serial UDB Extra PWM Input Channel 7
-	SuePwmInput6       int16  // Serial UDB Extra PWM Input Channel 6
-	SuePwmInput5       int16  // Serial UDB Extra PWM Input Channel 5
-	SuePwmInput4       int16  // Serial UDB Extra PWM Input Channel 4
-	SuePwmInput3       int16  // Serial UDB Extra PWM Input Channel 3
-	SuePwmInput2       int16  // Serial UDB Extra PWM Input Channel 2
+	SueFlags           uint32 // Serial UDB Extra Status Flags
 	SuePwmInput1       int16  // Serial UDB Extra PWM Input Channel 1
+	SuePwmInput2       int16  // Serial UDB Extra PWM Input Channel 2
+	SuePwmInput3       int16  // Serial UDB Extra PWM Input Channel 3
+	SuePwmInput4       int16  // Serial UDB Extra PWM Input Channel 4
+	SuePwmInput5       int16  // Serial UDB Extra PWM Input Channel 5
+	SuePwmInput6       int16  // Serial UDB Extra PWM Input Channel 6
+	SuePwmInput7       int16  // Serial UDB Extra PWM Input Channel 7
+	SuePwmInput8       int16  // Serial UDB Extra PWM Input Channel 8
+	SuePwmInput9       int16  // Serial UDB Extra PWM Input Channel 9
+	SuePwmInput10      int16  // Serial UDB Extra PWM Input Channel 10
+	SuePwmOutput1      int16  // Serial UDB Extra PWM Output Channel 1
+	SuePwmOutput2      int16  // Serial UDB Extra PWM Output Channel 2
+	SuePwmOutput3      int16  // Serial UDB Extra PWM Output Channel 3
+	SuePwmOutput4      int16  // Serial UDB Extra PWM Output Channel 4
+	SuePwmOutput5      int16  // Serial UDB Extra PWM Output Channel 5
+	SuePwmOutput6      int16  // Serial UDB Extra PWM Output Channel 6
+	SuePwmOutput7      int16  // Serial UDB Extra PWM Output Channel 7
+	SuePwmOutput8      int16  // Serial UDB Extra PWM Output Channel 8
+	SuePwmOutput9      int16  // Serial UDB Extra PWM Output Channel 9
+	SuePwmOutput10     int16  // Serial UDB Extra PWM Output Channel 10
+	SueImuLocationX    int16  // Serial UDB Extra IMU Location X
+	SueImuLocationY    int16  // Serial UDB Extra IMU Location Y
+	SueImuLocationZ    int16  // Serial UDB Extra IMU Location Z
+	SueOscFails        int16  // Serial UDB Extra Oscillator Failure Count
+	SueImuVelocityX    int16  // Serial UDB Extra IMU Velocity X
+	SueImuVelocityY    int16  // Serial UDB Extra IMU Velocity Y
+	SueImuVelocityZ    int16  // Serial UDB Extra IMU Velocity Z
+	SueWaypointGoalX   int16  // Serial UDB Extra Current Waypoint Goal X
+	SueWaypointGoalY   int16  // Serial UDB Extra Current Waypoint Goal Y
+	SueWaypointGoalZ   int16  // Serial UDB Extra Current Waypoint Goal Z
+	SueMemoryStackFree int16  // Serial UDB Extra Stack Memory Free
 }
 
 func (self *SerialUdbExtraF2B) TypeID() uint8 {
@@ -428,11 +428,11 @@ func (self *SerialUdbExtraF2B) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF2B) TypeCRCExtra() uint8 {
-	return 201
+	return 169
 }
 
 func (self *SerialUdbExtraF2B) FieldsString() string {
-	return fmt.Sprintf("SueFlags=%d SueTime=%d SueMemoryStackFree=%d SueWaypointGoalZ=%d SueWaypointGoalY=%d SueWaypointGoalX=%d SueImuVelocityZ=%d SueImuVelocityY=%d SueImuVelocityX=%d SueOscFails=%d SueImuLocationZ=%d SueImuLocationY=%d SueImuLocationX=%d SuePwmOutput10=%d SuePwmOutput9=%d SuePwmOutput8=%d SuePwmOutput7=%d SuePwmOutput6=%d SuePwmOutput5=%d SuePwmOutput4=%d SuePwmOutput3=%d SuePwmOutput2=%d SuePwmOutput1=%d SuePwmInput10=%d SuePwmInput9=%d SuePwmInput8=%d SuePwmInput7=%d SuePwmInput6=%d SuePwmInput5=%d SuePwmInput4=%d SuePwmInput3=%d SuePwmInput2=%d SuePwmInput1=%d", self.SueFlags, self.SueTime, self.SueMemoryStackFree, self.SueWaypointGoalZ, self.SueWaypointGoalY, self.SueWaypointGoalX, self.SueImuVelocityZ, self.SueImuVelocityY, self.SueImuVelocityX, self.SueOscFails, self.SueImuLocationZ, self.SueImuLocationY, self.SueImuLocationX, self.SuePwmOutput10, self.SuePwmOutput9, self.SuePwmOutput8, self.SuePwmOutput7, self.SuePwmOutput6, self.SuePwmOutput5, self.SuePwmOutput4, self.SuePwmOutput3, self.SuePwmOutput2, self.SuePwmOutput1, self.SuePwmInput10, self.SuePwmInput9, self.SuePwmInput8, self.SuePwmInput7, self.SuePwmInput6, self.SuePwmInput5, self.SuePwmInput4, self.SuePwmInput3, self.SuePwmInput2, self.SuePwmInput1)
+	return fmt.Sprintf("SueTime=%d SueFlags=%d SuePwmInput1=%d SuePwmInput2=%d SuePwmInput3=%d SuePwmInput4=%d SuePwmInput5=%d SuePwmInput6=%d SuePwmInput7=%d SuePwmInput8=%d SuePwmInput9=%d SuePwmInput10=%d SuePwmOutput1=%d SuePwmOutput2=%d SuePwmOutput3=%d SuePwmOutput4=%d SuePwmOutput5=%d SuePwmOutput6=%d SuePwmOutput7=%d SuePwmOutput8=%d SuePwmOutput9=%d SuePwmOutput10=%d SueImuLocationX=%d SueImuLocationY=%d SueImuLocationZ=%d SueOscFails=%d SueImuVelocityX=%d SueImuVelocityY=%d SueImuVelocityZ=%d SueWaypointGoalX=%d SueWaypointGoalY=%d SueWaypointGoalZ=%d SueMemoryStackFree=%d", self.SueTime, self.SueFlags, self.SuePwmInput1, self.SuePwmInput2, self.SuePwmInput3, self.SuePwmInput4, self.SuePwmInput5, self.SuePwmInput6, self.SuePwmInput7, self.SuePwmInput8, self.SuePwmInput9, self.SuePwmInput10, self.SuePwmOutput1, self.SuePwmOutput2, self.SuePwmOutput3, self.SuePwmOutput4, self.SuePwmOutput5, self.SuePwmOutput6, self.SuePwmOutput7, self.SuePwmOutput8, self.SuePwmOutput9, self.SuePwmOutput10, self.SueImuLocationX, self.SueImuLocationY, self.SueImuLocationZ, self.SueOscFails, self.SueImuVelocityX, self.SueImuVelocityY, self.SueImuVelocityZ, self.SueWaypointGoalX, self.SueWaypointGoalY, self.SueWaypointGoalZ, self.SueMemoryStackFree)
 }
 
 func (self *SerialUdbExtraF2B) String() string {
@@ -441,16 +441,16 @@ func (self *SerialUdbExtraF2B) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F4: format
 type SerialUdbExtraF4 struct {
-	SueRacingMode                uint8 // Serial UDB Extra Firmware racing mode enabled
-	SueAltitudeholdWaypoint      uint8 // Serial UDB Extra Type of Alitude Hold when in Waypoint Mode
-	SueAltitudeholdStabilized    uint8 // Serial UDB Extra Type of Alitude Hold when in Stabilized Mode
-	SueRudderNavigation          uint8 // Serial UDB Extra Navigation with Rudder Enabled
-	SueAileronNavigation         uint8 // Serial UDB Extra Navigation with Ailerons Enabled
-	SueYawStabilizationAileron   uint8 // Serial UDB Extra Yaw Stabilization using Ailerons Enabled
-	SueYawStabilizationRudder    uint8 // Serial UDB Extra Yaw Stabilization using Rudder Enabled
-	SuePitchStabilization        uint8 // Serial UDB Extra Pitch Stabilization Enabled
-	SueRollStabilizationRudder   uint8 // Serial UDB Extra Roll Stabilization with Rudder Enabled
 	SueRollStabilizationAilerons uint8 // Serial UDB Extra Roll Stabilization with Ailerons Enabled
+	SueRollStabilizationRudder   uint8 // Serial UDB Extra Roll Stabilization with Rudder Enabled
+	SuePitchStabilization        uint8 // Serial UDB Extra Pitch Stabilization Enabled
+	SueYawStabilizationRudder    uint8 // Serial UDB Extra Yaw Stabilization using Rudder Enabled
+	SueYawStabilizationAileron   uint8 // Serial UDB Extra Yaw Stabilization using Ailerons Enabled
+	SueAileronNavigation         uint8 // Serial UDB Extra Navigation with Ailerons Enabled
+	SueRudderNavigation          uint8 // Serial UDB Extra Navigation with Rudder Enabled
+	SueAltitudeholdStabilized    uint8 // Serial UDB Extra Type of Alitude Hold when in Stabilized Mode
+	SueAltitudeholdWaypoint      uint8 // Serial UDB Extra Type of Alitude Hold when in Waypoint Mode
+	SueRacingMode                uint8 // Serial UDB Extra Firmware racing mode enabled
 }
 
 func (self *SerialUdbExtraF4) TypeID() uint8 {
@@ -466,11 +466,11 @@ func (self *SerialUdbExtraF4) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF4) TypeCRCExtra() uint8 {
-	return 248
+	return 191
 }
 
 func (self *SerialUdbExtraF4) FieldsString() string {
-	return fmt.Sprintf("SueRacingMode=%d SueAltitudeholdWaypoint=%d SueAltitudeholdStabilized=%d SueRudderNavigation=%d SueAileronNavigation=%d SueYawStabilizationAileron=%d SueYawStabilizationRudder=%d SuePitchStabilization=%d SueRollStabilizationRudder=%d SueRollStabilizationAilerons=%d", self.SueRacingMode, self.SueAltitudeholdWaypoint, self.SueAltitudeholdStabilized, self.SueRudderNavigation, self.SueAileronNavigation, self.SueYawStabilizationAileron, self.SueYawStabilizationRudder, self.SuePitchStabilization, self.SueRollStabilizationRudder, self.SueRollStabilizationAilerons)
+	return fmt.Sprintf("SueRollStabilizationAilerons=%d SueRollStabilizationRudder=%d SuePitchStabilization=%d SueYawStabilizationRudder=%d SueYawStabilizationAileron=%d SueAileronNavigation=%d SueRudderNavigation=%d SueAltitudeholdStabilized=%d SueAltitudeholdWaypoint=%d SueRacingMode=%d", self.SueRollStabilizationAilerons, self.SueRollStabilizationRudder, self.SuePitchStabilization, self.SueYawStabilizationRudder, self.SueYawStabilizationAileron, self.SueAileronNavigation, self.SueRudderNavigation, self.SueAltitudeholdStabilized, self.SueAltitudeholdWaypoint, self.SueRacingMode)
 }
 
 func (self *SerialUdbExtraF4) String() string {
@@ -479,12 +479,12 @@ func (self *SerialUdbExtraF4) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F5: format
 type SerialUdbExtraF5 struct {
-	SueAileronBoost            float32 // Gain For Boosting Manual Aileron control When Plane Stabilized
-	SueYawStabilizationAileron float32 // YAW_STABILIZATION_AILERON Proportional control
-	SueRollkd                  float32 // Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization
-	SueRollkp                  float32 // Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization
-	SueYawkdAileron            float32 // Serial UDB YAWKD_AILERON Gain for Rate control of navigation
 	SueYawkpAileron            float32 // Serial UDB YAWKP_AILERON Gain for Proporional control of navigation
+	SueYawkdAileron            float32 // Serial UDB YAWKD_AILERON Gain for Rate control of navigation
+	SueRollkp                  float32 // Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization
+	SueRollkd                  float32 // Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization
+	SueYawStabilizationAileron float32 // YAW_STABILIZATION_AILERON Proportional control
+	SueAileronBoost            float32 // Gain For Boosting Manual Aileron control When Plane Stabilized
 }
 
 func (self *SerialUdbExtraF5) TypeID() uint8 {
@@ -500,11 +500,11 @@ func (self *SerialUdbExtraF5) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF5) TypeCRCExtra() uint8 {
-	return 151
+	return 121
 }
 
 func (self *SerialUdbExtraF5) FieldsString() string {
-	return fmt.Sprintf("SueAileronBoost=%d SueYawStabilizationAileron=%d SueRollkd=%d SueRollkp=%d SueYawkdAileron=%d SueYawkpAileron=%d", self.SueAileronBoost, self.SueYawStabilizationAileron, self.SueRollkd, self.SueRollkp, self.SueYawkdAileron, self.SueYawkpAileron)
+	return fmt.Sprintf("SueYawkpAileron=%d SueYawkdAileron=%d SueRollkp=%d SueRollkd=%d SueYawStabilizationAileron=%d SueAileronBoost=%d", self.SueYawkpAileron, self.SueYawkdAileron, self.SueRollkp, self.SueRollkd, self.SueYawStabilizationAileron, self.SueAileronBoost)
 }
 
 func (self *SerialUdbExtraF5) String() string {
@@ -513,11 +513,11 @@ func (self *SerialUdbExtraF5) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F6: format
 type SerialUdbExtraF6 struct {
-	SueElevatorBoost float32 // Gain For Boosting Manual Elevator control When Plane Stabilized
-	SueRollElevMix   float32 // Serial UDB Extra Roll to Elevator Mix
-	SueRudderElevMix float32 // Serial UDB Extra Rudder to Elevator Mix
-	SuePitchkd       float32 // Serial UDB Extra Pitch Rate Control
 	SuePitchgain     float32 // Serial UDB Extra PITCHGAIN Proportional Control
+	SuePitchkd       float32 // Serial UDB Extra Pitch Rate Control
+	SueRudderElevMix float32 // Serial UDB Extra Rudder to Elevator Mix
+	SueRollElevMix   float32 // Serial UDB Extra Roll to Elevator Mix
+	SueElevatorBoost float32 // Gain For Boosting Manual Elevator control When Plane Stabilized
 }
 
 func (self *SerialUdbExtraF6) TypeID() uint8 {
@@ -533,11 +533,11 @@ func (self *SerialUdbExtraF6) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF6) TypeCRCExtra() uint8 {
-	return 187
+	return 54
 }
 
 func (self *SerialUdbExtraF6) FieldsString() string {
-	return fmt.Sprintf("SueElevatorBoost=%d SueRollElevMix=%d SueRudderElevMix=%d SuePitchkd=%d SuePitchgain=%d", self.SueElevatorBoost, self.SueRollElevMix, self.SueRudderElevMix, self.SuePitchkd, self.SuePitchgain)
+	return fmt.Sprintf("SuePitchgain=%d SuePitchkd=%d SueRudderElevMix=%d SueRollElevMix=%d SueElevatorBoost=%d", self.SuePitchgain, self.SuePitchkd, self.SueRudderElevMix, self.SueRollElevMix, self.SueElevatorBoost)
 }
 
 func (self *SerialUdbExtraF6) String() string {
@@ -546,12 +546,12 @@ func (self *SerialUdbExtraF6) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F7: format
 type SerialUdbExtraF7 struct {
-	SueRtlPitchDown float32 // Serial UDB Extra Return To Landing - Angle to Pitch Plane Down
-	SueRudderBoost  float32 // SERIAL UDB EXTRA Rudder Boost Gain to Manual Control when stabilized
-	SueRollkdRudder float32 // Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization
-	SueRollkpRudder float32 // Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization
-	SueYawkdRudder  float32 // Serial UDB YAWKD_RUDDER Gain for Rate control of navigation
 	SueYawkpRudder  float32 // Serial UDB YAWKP_RUDDER Gain for Proporional control of navigation
+	SueYawkdRudder  float32 // Serial UDB YAWKD_RUDDER Gain for Rate control of navigation
+	SueRollkpRudder float32 // Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization
+	SueRollkdRudder float32 // Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization
+	SueRudderBoost  float32 // SERIAL UDB EXTRA Rudder Boost Gain to Manual Control when stabilized
+	SueRtlPitchDown float32 // Serial UDB Extra Return To Landing - Angle to Pitch Plane Down
 }
 
 func (self *SerialUdbExtraF7) TypeID() uint8 {
@@ -567,11 +567,11 @@ func (self *SerialUdbExtraF7) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF7) TypeCRCExtra() uint8 {
-	return 61
+	return 171
 }
 
 func (self *SerialUdbExtraF7) FieldsString() string {
-	return fmt.Sprintf("SueRtlPitchDown=%d SueRudderBoost=%d SueRollkdRudder=%d SueRollkpRudder=%d SueYawkdRudder=%d SueYawkpRudder=%d", self.SueRtlPitchDown, self.SueRudderBoost, self.SueRollkdRudder, self.SueRollkpRudder, self.SueYawkdRudder, self.SueYawkpRudder)
+	return fmt.Sprintf("SueYawkpRudder=%d SueYawkdRudder=%d SueRollkpRudder=%d SueRollkdRudder=%d SueRudderBoost=%d SueRtlPitchDown=%d", self.SueYawkpRudder, self.SueYawkdRudder, self.SueRollkpRudder, self.SueRollkdRudder, self.SueRudderBoost, self.SueRtlPitchDown)
 }
 
 func (self *SerialUdbExtraF7) String() string {
@@ -580,13 +580,13 @@ func (self *SerialUdbExtraF7) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F8: format
 type SerialUdbExtraF8 struct {
-	SueAltHoldPitchHigh   float32 // Serial UDB Extra ALT_HOLD_PITCH_HIGH
-	SueAltHoldPitchMax    float32 // Serial UDB Extra ALT_HOLD_PITCH_MAX
-	SueAltHoldPitchMin    float32 // Serial UDB Extra ALT_HOLD_PITCH_MIN
-	SueAltHoldThrottleMax float32 // Serial UDB Extra ALT_HOLD_THROTTLE_MAX
-	SueAltHoldThrottleMin float32 // Serial UDB Extra ALT_HOLD_THROTTLE_MIN
-	SueHeightTargetMin    float32 // Serial UDB Extra HEIGHT_TARGET_MIN
 	SueHeightTargetMax    float32 // Serial UDB Extra HEIGHT_TARGET_MAX
+	SueHeightTargetMin    float32 // Serial UDB Extra HEIGHT_TARGET_MIN
+	SueAltHoldThrottleMin float32 // Serial UDB Extra ALT_HOLD_THROTTLE_MIN
+	SueAltHoldThrottleMax float32 // Serial UDB Extra ALT_HOLD_THROTTLE_MAX
+	SueAltHoldPitchMin    float32 // Serial UDB Extra ALT_HOLD_PITCH_MIN
+	SueAltHoldPitchMax    float32 // Serial UDB Extra ALT_HOLD_PITCH_MAX
+	SueAltHoldPitchHigh   float32 // Serial UDB Extra ALT_HOLD_PITCH_HIGH
 }
 
 func (self *SerialUdbExtraF8) TypeID() uint8 {
@@ -602,11 +602,11 @@ func (self *SerialUdbExtraF8) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF8) TypeCRCExtra() uint8 {
-	return 204
+	return 142
 }
 
 func (self *SerialUdbExtraF8) FieldsString() string {
-	return fmt.Sprintf("SueAltHoldPitchHigh=%d SueAltHoldPitchMax=%d SueAltHoldPitchMin=%d SueAltHoldThrottleMax=%d SueAltHoldThrottleMin=%d SueHeightTargetMin=%d SueHeightTargetMax=%d", self.SueAltHoldPitchHigh, self.SueAltHoldPitchMax, self.SueAltHoldPitchMin, self.SueAltHoldThrottleMax, self.SueAltHoldThrottleMin, self.SueHeightTargetMin, self.SueHeightTargetMax)
+	return fmt.Sprintf("SueHeightTargetMax=%d SueHeightTargetMin=%d SueAltHoldThrottleMin=%d SueAltHoldThrottleMax=%d SueAltHoldPitchMin=%d SueAltHoldPitchMax=%d SueAltHoldPitchHigh=%d", self.SueHeightTargetMax, self.SueHeightTargetMin, self.SueAltHoldThrottleMin, self.SueAltHoldThrottleMax, self.SueAltHoldPitchMin, self.SueAltHoldPitchMax, self.SueAltHoldPitchHigh)
 }
 
 func (self *SerialUdbExtraF8) String() string {
@@ -615,9 +615,9 @@ func (self *SerialUdbExtraF8) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F13: format
 type SerialUdbExtraF13 struct {
-	SueAltOrigin int32 // Serial UDB Extra MP Origin Altitude Above Sea Level
-	SueLonOrigin int32 // Serial UDB Extra MP Origin Longitude
 	SueLatOrigin int32 // Serial UDB Extra MP Origin Latitude
+	SueLonOrigin int32 // Serial UDB Extra MP Origin Longitude
+	SueAltOrigin int32 // Serial UDB Extra MP Origin Altitude Above Sea Level
 	SueWeekNo    int16 // Serial UDB Extra GPS Week Number
 }
 
@@ -634,11 +634,11 @@ func (self *SerialUdbExtraF13) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF13) TypeCRCExtra() uint8 {
-	return 15
+	return 249
 }
 
 func (self *SerialUdbExtraF13) FieldsString() string {
-	return fmt.Sprintf("SueAltOrigin=%d SueLonOrigin=%d SueLatOrigin=%d SueWeekNo=%d", self.SueAltOrigin, self.SueLonOrigin, self.SueLatOrigin, self.SueWeekNo)
+	return fmt.Sprintf("SueLatOrigin=%d SueLonOrigin=%d SueAltOrigin=%d SueWeekNo=%d", self.SueLatOrigin, self.SueLonOrigin, self.SueAltOrigin, self.SueWeekNo)
 }
 
 func (self *SerialUdbExtraF13) String() string {
@@ -648,16 +648,16 @@ func (self *SerialUdbExtraF13) String() string {
 // Backwards compatible version of SERIAL_UDB_EXTRA F14: format
 type SerialUdbExtraF14 struct {
 	SueTrapSource     uint32 // Serial UDB Extra Type Program Address of Last Trap
-	SueOscFailCount   int16  // Serial UDB Extra Number of Ocillator Failures
-	SueTrapFlags      int16  // Serial UDB Extra  Last dspic Trap Flags
 	SueRcon           int16  // Serial UDB Extra Reboot Regitster of DSPIC
-	SueFlightPlanType uint8  // Serial UDB Extra Type of Flight Plan
-	SueClockConfig    uint8  // Serial UDB Extra UDB Internal Clock Configuration
-	SueAirframe       uint8  // Serial UDB Extra Type of Airframe
-	SueBoardType      uint8  // Serial UDB Extra Type of UDB Hardware
-	SueDr             uint8  // Serial UDB Extra Dead Reckoning Enabled
-	SueGpsType        uint8  // Serial UDB Extra Type of GPS Unit
+	SueTrapFlags      int16  // Serial UDB Extra  Last dspic Trap Flags
+	SueOscFailCount   int16  // Serial UDB Extra Number of Ocillator Failures
 	SueWindEstimation uint8  // Serial UDB Extra Wind Estimation Enabled
+	SueGpsType        uint8  // Serial UDB Extra Type of GPS Unit
+	SueDr             uint8  // Serial UDB Extra Dead Reckoning Enabled
+	SueBoardType      uint8  // Serial UDB Extra Type of UDB Hardware
+	SueAirframe       uint8  // Serial UDB Extra Type of Airframe
+	SueClockConfig    uint8  // Serial UDB Extra UDB Internal Clock Configuration
+	SueFlightPlanType uint8  // Serial UDB Extra Type of Flight Plan
 }
 
 func (self *SerialUdbExtraF14) TypeID() uint8 {
@@ -673,11 +673,11 @@ func (self *SerialUdbExtraF14) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF14) TypeCRCExtra() uint8 {
-	return 202
+	return 123
 }
 
 func (self *SerialUdbExtraF14) FieldsString() string {
-	return fmt.Sprintf("SueTrapSource=%d SueOscFailCount=%d SueTrapFlags=%d SueRcon=%d SueFlightPlanType=%d SueClockConfig=%d SueAirframe=%d SueBoardType=%d SueDr=%d SueGpsType=%d SueWindEstimation=%d", self.SueTrapSource, self.SueOscFailCount, self.SueTrapFlags, self.SueRcon, self.SueFlightPlanType, self.SueClockConfig, self.SueAirframe, self.SueBoardType, self.SueDr, self.SueGpsType, self.SueWindEstimation)
+	return fmt.Sprintf("SueTrapSource=%d SueRcon=%d SueTrapFlags=%d SueOscFailCount=%d SueWindEstimation=%d SueGpsType=%d SueDr=%d SueBoardType=%d SueAirframe=%d SueClockConfig=%d SueFlightPlanType=%d", self.SueTrapSource, self.SueRcon, self.SueTrapFlags, self.SueOscFailCount, self.SueWindEstimation, self.SueGpsType, self.SueDr, self.SueBoardType, self.SueAirframe, self.SueClockConfig, self.SueFlightPlanType)
 }
 
 func (self *SerialUdbExtraF14) String() string {
@@ -686,8 +686,8 @@ func (self *SerialUdbExtraF14) String() string {
 
 // Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format
 type SerialUdbExtraF15 struct {
-	SueIdVehicleRegistration [20]uint8 // Serial UDB Extra Registraton Number of Vehicle
 	SueIdVehicleModelName    [40]uint8 // Serial UDB Extra Model Name Of Vehicle
+	SueIdVehicleRegistration [20]uint8 // Serial UDB Extra Registraton Number of Vehicle
 }
 
 func (self *SerialUdbExtraF15) TypeID() uint8 {
@@ -703,11 +703,11 @@ func (self *SerialUdbExtraF15) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF15) TypeCRCExtra() uint8 {
-	return 161
+	return 188
 }
 
 func (self *SerialUdbExtraF15) FieldsString() string {
-	return fmt.Sprintf("SueIdVehicleRegistration=%v SueIdVehicleModelName=%v", self.SueIdVehicleRegistration, self.SueIdVehicleModelName)
+	return fmt.Sprintf("SueIdVehicleModelName=%v SueIdVehicleRegistration=%v", self.SueIdVehicleModelName, self.SueIdVehicleRegistration)
 }
 
 func (self *SerialUdbExtraF15) String() string {
@@ -716,8 +716,8 @@ func (self *SerialUdbExtraF15) String() string {
 
 //
 type SerialUdbExtraF16 struct {
-	SueIdDiyDronesUrl [70]uint8 // Serial UDB Extra URL of Lead Pilot or Team
 	SueIdLeadPilot    [40]uint8 // Serial UDB Extra Name of Expected Lead Pilot
+	SueIdDiyDronesUrl [70]uint8 // Serial UDB Extra URL of Lead Pilot or Team
 }
 
 func (self *SerialUdbExtraF16) TypeID() uint8 {
@@ -733,11 +733,11 @@ func (self *SerialUdbExtraF16) TypeSize() uint8 {
 }
 
 func (self *SerialUdbExtraF16) TypeCRCExtra() uint8 {
-	return 85
+	return 9
 }
 
 func (self *SerialUdbExtraF16) FieldsString() string {
-	return fmt.Sprintf("SueIdDiyDronesUrl=%v SueIdLeadPilot=%v", self.SueIdDiyDronesUrl, self.SueIdLeadPilot)
+	return fmt.Sprintf("SueIdLeadPilot=%v SueIdDiyDronesUrl=%v", self.SueIdLeadPilot, self.SueIdDiyDronesUrl)
 }
 
 func (self *SerialUdbExtraF16) String() string {
@@ -746,13 +746,13 @@ func (self *SerialUdbExtraF16) String() string {
 
 // The altitude measured by sensors and IMU
 type Altitudes struct {
-	AltExtra       int32  // Extra altitude above ground in meters, expressed as * 1000 (millimeters)
-	AltRangeFinder int32  // Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters)
-	AltOpticalFlow int32  // Optical flow altitude above ground in meters, expressed as * 1000 (millimeters)
-	AltBarometric  int32  // barometeric altitude above ground in meters, expressed as * 1000 (millimeters)
-	AltImu         int32  // IMU altitude above ground in meters, expressed as * 1000 (millimeters)
-	AltGps         int32  // GPS altitude in meters, expressed as * 1000 (millimeters), above MSL
 	TimeBootMs     uint32 // Timestamp (milliseconds since system boot)
+	AltGps         int32  // GPS altitude in meters, expressed as * 1000 (millimeters), above MSL
+	AltImu         int32  // IMU altitude above ground in meters, expressed as * 1000 (millimeters)
+	AltBarometric  int32  // barometeric altitude above ground in meters, expressed as * 1000 (millimeters)
+	AltOpticalFlow int32  // Optical flow altitude above ground in meters, expressed as * 1000 (millimeters)
+	AltRangeFinder int32  // Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters)
+	AltExtra       int32  // Extra altitude above ground in meters, expressed as * 1000 (millimeters)
 }
 
 func (self *Altitudes) TypeID() uint8 {
@@ -768,11 +768,11 @@ func (self *Altitudes) TypeSize() uint8 {
 }
 
 func (self *Altitudes) TypeCRCExtra() uint8 {
-	return 81
+	return 55
 }
 
 func (self *Altitudes) FieldsString() string {
-	return fmt.Sprintf("AltExtra=%d AltRangeFinder=%d AltOpticalFlow=%d AltBarometric=%d AltImu=%d AltGps=%d TimeBootMs=%d", self.AltExtra, self.AltRangeFinder, self.AltOpticalFlow, self.AltBarometric, self.AltImu, self.AltGps, self.TimeBootMs)
+	return fmt.Sprintf("TimeBootMs=%d AltGps=%d AltImu=%d AltBarometric=%d AltOpticalFlow=%d AltRangeFinder=%d AltExtra=%d", self.TimeBootMs, self.AltGps, self.AltImu, self.AltBarometric, self.AltOpticalFlow, self.AltRangeFinder, self.AltExtra)
 }
 
 func (self *Altitudes) String() string {
@@ -782,12 +782,12 @@ func (self *Altitudes) String() string {
 // The airspeed measured by sensors and IMU
 type Airspeeds struct {
 	TimeBootMs         uint32 // Timestamp (milliseconds since system boot)
-	Aoy                int16  // Yaw angle sensor, degrees * 10
-	Aoa                int16  // Angle of attack sensor, degrees * 10
-	AirspeedUltrasonic int16  // Ultrasonic measured airspeed, cm/s
-	AirspeedHotWire    int16  // Hot wire anenometer measured airspeed, cm/s
-	AirspeedPitot      int16  // Pitot measured forward airpseed, cm/s
 	AirspeedImu        int16  // Airspeed estimate from IMU, cm/s
+	AirspeedPitot      int16  // Pitot measured forward airpseed, cm/s
+	AirspeedHotWire    int16  // Hot wire anenometer measured airspeed, cm/s
+	AirspeedUltrasonic int16  // Ultrasonic measured airspeed, cm/s
+	Aoa                int16  // Angle of attack sensor, degrees * 10
+	Aoy                int16  // Yaw angle sensor, degrees * 10
 }
 
 func (self *Airspeeds) TypeID() uint8 {
@@ -803,11 +803,11 @@ func (self *Airspeeds) TypeSize() uint8 {
 }
 
 func (self *Airspeeds) TypeCRCExtra() uint8 {
-	return 240
+	return 154
 }
 
 func (self *Airspeeds) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Aoy=%d Aoa=%d AirspeedUltrasonic=%d AirspeedHotWire=%d AirspeedPitot=%d AirspeedImu=%d", self.TimeBootMs, self.Aoy, self.Aoa, self.AirspeedUltrasonic, self.AirspeedHotWire, self.AirspeedPitot, self.AirspeedImu)
+	return fmt.Sprintf("TimeBootMs=%d AirspeedImu=%d AirspeedPitot=%d AirspeedHotWire=%d AirspeedUltrasonic=%d Aoa=%d Aoy=%d", self.TimeBootMs, self.AirspeedImu, self.AirspeedPitot, self.AirspeedHotWire, self.AirspeedUltrasonic, self.Aoa, self.Aoy)
 }
 
 func (self *Airspeeds) String() string {

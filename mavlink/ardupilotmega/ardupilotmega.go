@@ -48,6 +48,7 @@ func init() {
 	mavlink.MessageFactory[179] = func() mavlink.Message { return new(CameraStatus) }
 	mavlink.MessageFactory[180] = func() mavlink.Message { return new(CameraFeedback) }
 	mavlink.MessageFactory[181] = func() mavlink.Message { return new(Battery2) }
+	mavlink.MessageFactory[182] = func() mavlink.Message { return new(Ahrs3) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,18 +130,18 @@ const (
 // Offsets and calibrations values for hardware
 //         sensors. This makes it easier to debug the calibration process.
 type SensorOffsets struct {
-	AccelCalZ      float32 // accel Z calibration
-	AccelCalY      float32 // accel Y calibration
-	AccelCalX      float32 // accel X calibration
-	GyroCalZ       float32 // gyro Z calibration
-	GyroCalY       float32 // gyro Y calibration
-	GyroCalX       float32 // gyro X calibration
-	RawTemp        int32   // raw temperature from barometer
-	RawPress       int32   // raw pressure from barometer
 	MagDeclination float32 // magnetic declination (radians)
-	MagOfsZ        int16   // magnetometer Z offset
-	MagOfsY        int16   // magnetometer Y offset
+	RawPress       int32   // raw pressure from barometer
+	RawTemp        int32   // raw temperature from barometer
+	GyroCalX       float32 // gyro X calibration
+	GyroCalY       float32 // gyro Y calibration
+	GyroCalZ       float32 // gyro Z calibration
+	AccelCalX      float32 // accel X calibration
+	AccelCalY      float32 // accel Y calibration
+	AccelCalZ      float32 // accel Z calibration
 	MagOfsX        int16   // magnetometer X offset
+	MagOfsY        int16   // magnetometer Y offset
+	MagOfsZ        int16   // magnetometer Z offset
 }
 
 func (self *SensorOffsets) TypeID() uint8 {
@@ -156,11 +157,11 @@ func (self *SensorOffsets) TypeSize() uint8 {
 }
 
 func (self *SensorOffsets) TypeCRCExtra() uint8 {
-	return 16
+	return 134
 }
 
 func (self *SensorOffsets) FieldsString() string {
-	return fmt.Sprintf("AccelCalZ=%d AccelCalY=%d AccelCalX=%d GyroCalZ=%d GyroCalY=%d GyroCalX=%d RawTemp=%d RawPress=%d MagDeclination=%d MagOfsZ=%d MagOfsY=%d MagOfsX=%d", self.AccelCalZ, self.AccelCalY, self.AccelCalX, self.GyroCalZ, self.GyroCalY, self.GyroCalX, self.RawTemp, self.RawPress, self.MagDeclination, self.MagOfsZ, self.MagOfsY, self.MagOfsX)
+	return fmt.Sprintf("MagDeclination=%d RawPress=%d RawTemp=%d GyroCalX=%d GyroCalY=%d GyroCalZ=%d AccelCalX=%d AccelCalY=%d AccelCalZ=%d MagOfsX=%d MagOfsY=%d MagOfsZ=%d", self.MagDeclination, self.RawPress, self.RawTemp, self.GyroCalX, self.GyroCalY, self.GyroCalZ, self.AccelCalX, self.AccelCalY, self.AccelCalZ, self.MagOfsX, self.MagOfsY, self.MagOfsZ)
 }
 
 func (self *SensorOffsets) String() string {
@@ -169,11 +170,11 @@ func (self *SensorOffsets) String() string {
 
 // Deprecated. Use MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS instead. Set the magnetometer offsets
 type SetMagOffsets struct {
-	MagOfsZ         int16 // magnetometer Z offset
-	MagOfsY         int16 // magnetometer Y offset
 	MagOfsX         int16 // magnetometer X offset
-	TargetComponent uint8 // Component ID
+	MagOfsY         int16 // magnetometer Y offset
+	MagOfsZ         int16 // magnetometer Z offset
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *SetMagOffsets) TypeID() uint8 {
@@ -189,11 +190,11 @@ func (self *SetMagOffsets) TypeSize() uint8 {
 }
 
 func (self *SetMagOffsets) TypeCRCExtra() uint8 {
-	return 163
+	return 219
 }
 
 func (self *SetMagOffsets) FieldsString() string {
-	return fmt.Sprintf("MagOfsZ=%d MagOfsY=%d MagOfsX=%d TargetComponent=%d TargetSystem=%d", self.MagOfsZ, self.MagOfsY, self.MagOfsX, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("MagOfsX=%d MagOfsY=%d MagOfsZ=%d TargetSystem=%d TargetComponent=%d", self.MagOfsX, self.MagOfsY, self.MagOfsZ, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *SetMagOffsets) String() string {
@@ -202,8 +203,8 @@ func (self *SetMagOffsets) String() string {
 
 // state of APM memory
 type Meminfo struct {
-	Freemem uint16 // free memory
 	Brkval  uint16 // heap top
+	Freemem uint16 // free memory
 }
 
 func (self *Meminfo) TypeID() uint8 {
@@ -219,11 +220,11 @@ func (self *Meminfo) TypeSize() uint8 {
 }
 
 func (self *Meminfo) TypeCRCExtra() uint8 {
-	return 254
+	return 208
 }
 
 func (self *Meminfo) FieldsString() string {
-	return fmt.Sprintf("Freemem=%d Brkval=%d", self.Freemem, self.Brkval)
+	return fmt.Sprintf("Brkval=%d Freemem=%d", self.Brkval, self.Freemem)
 }
 
 func (self *Meminfo) String() string {
@@ -232,12 +233,12 @@ func (self *Meminfo) String() string {
 
 // raw ADC output
 type ApAdc struct {
-	Adc6 uint16 // ADC output 6
-	Adc5 uint16 // ADC output 5
-	Adc4 uint16 // ADC output 4
-	Adc3 uint16 // ADC output 3
-	Adc2 uint16 // ADC output 2
 	Adc1 uint16 // ADC output 1
+	Adc2 uint16 // ADC output 2
+	Adc3 uint16 // ADC output 3
+	Adc4 uint16 // ADC output 4
+	Adc5 uint16 // ADC output 5
+	Adc6 uint16 // ADC output 6
 }
 
 func (self *ApAdc) TypeID() uint8 {
@@ -253,11 +254,11 @@ func (self *ApAdc) TypeSize() uint8 {
 }
 
 func (self *ApAdc) TypeCRCExtra() uint8 {
-	return 181
+	return 188
 }
 
 func (self *ApAdc) FieldsString() string {
-	return fmt.Sprintf("Adc6=%d Adc5=%d Adc4=%d Adc3=%d Adc2=%d Adc1=%d", self.Adc6, self.Adc5, self.Adc4, self.Adc3, self.Adc2, self.Adc1)
+	return fmt.Sprintf("Adc1=%d Adc2=%d Adc3=%d Adc4=%d Adc5=%d Adc6=%d", self.Adc1, self.Adc2, self.Adc3, self.Adc4, self.Adc5, self.Adc6)
 }
 
 func (self *ApAdc) String() string {
@@ -268,15 +269,15 @@ func (self *ApAdc) String() string {
 type DigicamConfigure struct {
 	ExtraValue      float32 // Correspondent value to given extra_param
 	ShutterSpeed    uint16  // Divisor number //e.g. 1000 means 1/1000 (0 means ignore)
-	ExtraParam      uint8   // Extra parameters enumeration (0 means ignore)
-	EngineCutOff    uint8   // Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)
-	CommandId       uint8   // Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
-	ExposureType    uint8   // Exposure type enumeration from 1 to N (0 means ignore)
-	Iso             uint8   // ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore)
-	Aperture        uint8   // F stop number x 10 //e.g. 28 means 2.8 (0 means ignore)
-	Mode            uint8   // Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore)
-	TargetComponent uint8   // Component ID
 	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Mode            uint8   // Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore)
+	Aperture        uint8   // F stop number x 10 //e.g. 28 means 2.8 (0 means ignore)
+	Iso             uint8   // ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore)
+	ExposureType    uint8   // Exposure type enumeration from 1 to N (0 means ignore)
+	CommandId       uint8   // Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
+	EngineCutOff    uint8   // Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)
+	ExtraParam      uint8   // Extra parameters enumeration (0 means ignore)
 }
 
 func (self *DigicamConfigure) TypeID() uint8 {
@@ -292,11 +293,11 @@ func (self *DigicamConfigure) TypeSize() uint8 {
 }
 
 func (self *DigicamConfigure) TypeCRCExtra() uint8 {
-	return 93
+	return 84
 }
 
 func (self *DigicamConfigure) FieldsString() string {
-	return fmt.Sprintf("ExtraValue=%d ShutterSpeed=%d ExtraParam=%d EngineCutOff=%d CommandId=%d ExposureType=%d Iso=%d Aperture=%d Mode=%d TargetComponent=%d TargetSystem=%d", self.ExtraValue, self.ShutterSpeed, self.ExtraParam, self.EngineCutOff, self.CommandId, self.ExposureType, self.Iso, self.Aperture, self.Mode, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("ExtraValue=%d ShutterSpeed=%d TargetSystem=%d TargetComponent=%d Mode=%d Aperture=%d Iso=%d ExposureType=%d CommandId=%d EngineCutOff=%d ExtraParam=%d", self.ExtraValue, self.ShutterSpeed, self.TargetSystem, self.TargetComponent, self.Mode, self.Aperture, self.Iso, self.ExposureType, self.CommandId, self.EngineCutOff, self.ExtraParam)
 }
 
 func (self *DigicamConfigure) String() string {
@@ -306,15 +307,15 @@ func (self *DigicamConfigure) String() string {
 // Control on-board Camera Control System to take shots.
 type DigicamControl struct {
 	ExtraValue      float32 // Correspondent value to given extra_param
-	ExtraParam      uint8   // Extra parameters enumeration (0 means ignore)
-	CommandId       uint8   // Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
-	Shot            uint8   // 0: ignore, 1: shot or start filming
-	FocusLock       uint8   // 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus
-	ZoomStep        int8    // -100 to 100 //Zooming step value to offset zoom from the current position
-	ZoomPos         uint8   // 1 to N //Zoom's absolute position (0 means ignore)
-	Session         uint8   // 0: stop, 1: start or keep it up //Session control e.g. show/hide lens
-	TargetComponent uint8   // Component ID
 	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Session         uint8   // 0: stop, 1: start or keep it up //Session control e.g. show/hide lens
+	ZoomPos         uint8   // 1 to N //Zoom's absolute position (0 means ignore)
+	ZoomStep        int8    // -100 to 100 //Zooming step value to offset zoom from the current position
+	FocusLock       uint8   // 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus
+	Shot            uint8   // 0: ignore, 1: shot or start filming
+	CommandId       uint8   // Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
+	ExtraParam      uint8   // Extra parameters enumeration (0 means ignore)
 }
 
 func (self *DigicamControl) TypeID() uint8 {
@@ -330,11 +331,11 @@ func (self *DigicamControl) TypeSize() uint8 {
 }
 
 func (self *DigicamControl) TypeCRCExtra() uint8 {
-	return 52
+	return 22
 }
 
 func (self *DigicamControl) FieldsString() string {
-	return fmt.Sprintf("ExtraValue=%d ExtraParam=%d CommandId=%d Shot=%d FocusLock=%d ZoomStep=%d ZoomPos=%d Session=%d TargetComponent=%d TargetSystem=%d", self.ExtraValue, self.ExtraParam, self.CommandId, self.Shot, self.FocusLock, self.ZoomStep, self.ZoomPos, self.Session, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("ExtraValue=%d TargetSystem=%d TargetComponent=%d Session=%d ZoomPos=%d ZoomStep=%d FocusLock=%d Shot=%d CommandId=%d ExtraParam=%d", self.ExtraValue, self.TargetSystem, self.TargetComponent, self.Session, self.ZoomPos, self.ZoomStep, self.FocusLock, self.Shot, self.CommandId, self.ExtraParam)
 }
 
 func (self *DigicamControl) String() string {
@@ -343,12 +344,12 @@ func (self *DigicamControl) String() string {
 
 // Message to configure a camera mount, directional antenna, etc.
 type MountConfigure struct {
-	StabYaw         uint8 // (1 = yes, 0 = no)
-	StabPitch       uint8 // (1 = yes, 0 = no)
-	StabRoll        uint8 // (1 = yes, 0 = no)
-	MountMode       uint8 // mount operating mode (see MAV_MOUNT_MODE enum)
-	TargetComponent uint8 // Component ID
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	MountMode       uint8 // mount operating mode (see MAV_MOUNT_MODE enum)
+	StabRoll        uint8 // (1 = yes, 0 = no)
+	StabPitch       uint8 // (1 = yes, 0 = no)
+	StabYaw         uint8 // (1 = yes, 0 = no)
 }
 
 func (self *MountConfigure) TypeID() uint8 {
@@ -364,11 +365,11 @@ func (self *MountConfigure) TypeSize() uint8 {
 }
 
 func (self *MountConfigure) TypeCRCExtra() uint8 {
-	return 208
+	return 19
 }
 
 func (self *MountConfigure) FieldsString() string {
-	return fmt.Sprintf("StabYaw=%d StabPitch=%d StabRoll=%d MountMode=%d TargetComponent=%d TargetSystem=%d", self.StabYaw, self.StabPitch, self.StabRoll, self.MountMode, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d MountMode=%d StabRoll=%d StabPitch=%d StabYaw=%d", self.TargetSystem, self.TargetComponent, self.MountMode, self.StabRoll, self.StabPitch, self.StabYaw)
 }
 
 func (self *MountConfigure) String() string {
@@ -377,12 +378,12 @@ func (self *MountConfigure) String() string {
 
 // Message to control a camera mount, directional antenna, etc.
 type MountControl struct {
-	InputC          int32 // yaw(deg*100) or alt (in cm) depending on mount mode
-	InputB          int32 // roll(deg*100) or lon depending on mount mode
 	InputA          int32 // pitch(deg*100) or lat, depending on mount mode
-	SavePosition    uint8 // if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)
-	TargetComponent uint8 // Component ID
+	InputB          int32 // roll(deg*100) or lon depending on mount mode
+	InputC          int32 // yaw(deg*100) or alt (in cm) depending on mount mode
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	SavePosition    uint8 // if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)
 }
 
 func (self *MountControl) TypeID() uint8 {
@@ -398,11 +399,11 @@ func (self *MountControl) TypeSize() uint8 {
 }
 
 func (self *MountControl) TypeCRCExtra() uint8 {
-	return 244
+	return 21
 }
 
 func (self *MountControl) FieldsString() string {
-	return fmt.Sprintf("InputC=%d InputB=%d InputA=%d SavePosition=%d TargetComponent=%d TargetSystem=%d", self.InputC, self.InputB, self.InputA, self.SavePosition, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("InputA=%d InputB=%d InputC=%d TargetSystem=%d TargetComponent=%d SavePosition=%d", self.InputA, self.InputB, self.InputC, self.TargetSystem, self.TargetComponent, self.SavePosition)
 }
 
 func (self *MountControl) String() string {
@@ -411,11 +412,11 @@ func (self *MountControl) String() string {
 
 // Message with some status from APM to GCS about camera or antenna mount
 type MountStatus struct {
-	PointingC       int32 // yaw(deg*100) or alt (in cm) depending on mount mode
-	PointingB       int32 // roll(deg*100) or lon depending on mount mode
-	PointingA       int32 // pitch(deg*100) or lat, depending on mount mode
-	TargetComponent uint8 // Component ID
+	PointingA       int32 // pitch(deg*100)
+	PointingB       int32 // roll(deg*100)
+	PointingC       int32 // yaw(deg*100)
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
 }
 
 func (self *MountStatus) TypeID() uint8 {
@@ -431,11 +432,11 @@ func (self *MountStatus) TypeSize() uint8 {
 }
 
 func (self *MountStatus) TypeCRCExtra() uint8 {
-	return 47
+	return 134
 }
 
 func (self *MountStatus) FieldsString() string {
-	return fmt.Sprintf("PointingC=%d PointingB=%d PointingA=%d TargetComponent=%d TargetSystem=%d", self.PointingC, self.PointingB, self.PointingA, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("PointingA=%d PointingB=%d PointingC=%d TargetSystem=%d TargetComponent=%d", self.PointingA, self.PointingB, self.PointingC, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *MountStatus) String() string {
@@ -445,12 +446,12 @@ func (self *MountStatus) String() string {
 // A fence point. Used to set a point when from
 // 	      GCS -> MAV. Also used to return a point from MAV -> GCS
 type FencePoint struct {
-	Lng             float32 // Longitude of point
 	Lat             float32 // Latitude of point
-	Count           uint8   // total number of points (for sanity checking)
-	Idx             uint8   // point index (first point is 1, 0 is for return point)
-	TargetComponent uint8   // Component ID
+	Lng             float32 // Longitude of point
 	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+	Idx             uint8   // point index (first point is 1, 0 is for return point)
+	Count           uint8   // total number of points (for sanity checking)
 }
 
 func (self *FencePoint) TypeID() uint8 {
@@ -466,11 +467,11 @@ func (self *FencePoint) TypeSize() uint8 {
 }
 
 func (self *FencePoint) TypeCRCExtra() uint8 {
-	return 142
+	return 78
 }
 
 func (self *FencePoint) FieldsString() string {
-	return fmt.Sprintf("Lng=%d Lat=%d Count=%d Idx=%d TargetComponent=%d TargetSystem=%d", self.Lng, self.Lat, self.Count, self.Idx, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("Lat=%d Lng=%d TargetSystem=%d TargetComponent=%d Idx=%d Count=%d", self.Lat, self.Lng, self.TargetSystem, self.TargetComponent, self.Idx, self.Count)
 }
 
 func (self *FencePoint) String() string {
@@ -479,9 +480,9 @@ func (self *FencePoint) String() string {
 
 // Request a current fence point from MAV
 type FenceFetchPoint struct {
-	Idx             uint8 // point index (first point is 1, 0 is for return point)
-	TargetComponent uint8 // Component ID
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	Idx             uint8 // point index (first point is 1, 0 is for return point)
 }
 
 func (self *FenceFetchPoint) TypeID() uint8 {
@@ -497,11 +498,11 @@ func (self *FenceFetchPoint) TypeSize() uint8 {
 }
 
 func (self *FenceFetchPoint) TypeCRCExtra() uint8 {
-	return 5
+	return 68
 }
 
 func (self *FenceFetchPoint) FieldsString() string {
-	return fmt.Sprintf("Idx=%d TargetComponent=%d TargetSystem=%d", self.Idx, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d Idx=%d", self.TargetSystem, self.TargetComponent, self.Idx)
 }
 
 func (self *FenceFetchPoint) String() string {
@@ -513,8 +514,8 @@ func (self *FenceFetchPoint) String() string {
 type FenceStatus struct {
 	BreachTime   uint32 // time of last breach in milliseconds since boot
 	BreachCount  uint16 // number of fence breaches
-	BreachType   uint8  // last breach type (see FENCE_BREACH_* enum)
 	BreachStatus uint8  // 0 if currently inside fence, 1 if outside
+	BreachType   uint8  // last breach type (see FENCE_BREACH_* enum)
 }
 
 func (self *FenceStatus) TypeID() uint8 {
@@ -530,11 +531,11 @@ func (self *FenceStatus) TypeSize() uint8 {
 }
 
 func (self *FenceStatus) TypeCRCExtra() uint8 {
-	return 116
+	return 189
 }
 
 func (self *FenceStatus) FieldsString() string {
-	return fmt.Sprintf("BreachTime=%d BreachCount=%d BreachType=%d BreachStatus=%d", self.BreachTime, self.BreachCount, self.BreachType, self.BreachStatus)
+	return fmt.Sprintf("BreachTime=%d BreachCount=%d BreachStatus=%d BreachType=%d", self.BreachTime, self.BreachCount, self.BreachStatus, self.BreachType)
 }
 
 func (self *FenceStatus) String() string {
@@ -543,13 +544,13 @@ func (self *FenceStatus) String() string {
 
 // Status of DCM attitude estimator
 type Ahrs struct {
-	ErrorYaw    float32 // average error_yaw value
-	ErrorRp     float32 // average error_roll_pitch value
-	RenormVal   float32 // average renormalisation value
-	AccelWeight float32 // average accel_weight
-	Omegaiz     float32 // Z gyro drift estimate rad/s
-	Omegaiy     float32 // Y gyro drift estimate rad/s
 	Omegaix     float32 // X gyro drift estimate rad/s
+	Omegaiy     float32 // Y gyro drift estimate rad/s
+	Omegaiz     float32 // Z gyro drift estimate rad/s
+	AccelWeight float32 // average accel_weight
+	RenormVal   float32 // average renormalisation value
+	ErrorRp     float32 // average error_roll_pitch value
+	ErrorYaw    float32 // average error_yaw value
 }
 
 func (self *Ahrs) TypeID() uint8 {
@@ -565,11 +566,11 @@ func (self *Ahrs) TypeSize() uint8 {
 }
 
 func (self *Ahrs) TypeCRCExtra() uint8 {
-	return 145
+	return 127
 }
 
 func (self *Ahrs) FieldsString() string {
-	return fmt.Sprintf("ErrorYaw=%d ErrorRp=%d RenormVal=%d AccelWeight=%d Omegaiz=%d Omegaiy=%d Omegaix=%d", self.ErrorYaw, self.ErrorRp, self.RenormVal, self.AccelWeight, self.Omegaiz, self.Omegaiy, self.Omegaix)
+	return fmt.Sprintf("Omegaix=%d Omegaiy=%d Omegaiz=%d AccelWeight=%d RenormVal=%d ErrorRp=%d ErrorYaw=%d", self.Omegaix, self.Omegaiy, self.Omegaiz, self.AccelWeight, self.RenormVal, self.ErrorRp, self.ErrorYaw)
 }
 
 func (self *Ahrs) String() string {
@@ -578,17 +579,17 @@ func (self *Ahrs) String() string {
 
 // Status of simulation environment, if used
 type Simstate struct {
-	Lng   int32   // Longitude in degrees * 1E7
-	Lat   int32   // Latitude in degrees * 1E7
-	Zgyro float32 // Angular speed around Z axis rad/s
-	Ygyro float32 // Angular speed around Y axis rad/s
-	Xgyro float32 // Angular speed around X axis rad/s
-	Zacc  float32 // Z acceleration m/s/s
-	Yacc  float32 // Y acceleration m/s/s
-	Xacc  float32 // X acceleration m/s/s
-	Yaw   float32 // Yaw angle (rad)
-	Pitch float32 // Pitch angle (rad)
 	Roll  float32 // Roll angle (rad)
+	Pitch float32 // Pitch angle (rad)
+	Yaw   float32 // Yaw angle (rad)
+	Xacc  float32 // X acceleration m/s/s
+	Yacc  float32 // Y acceleration m/s/s
+	Zacc  float32 // Z acceleration m/s/s
+	Xgyro float32 // Angular speed around X axis rad/s
+	Ygyro float32 // Angular speed around Y axis rad/s
+	Zgyro float32 // Angular speed around Z axis rad/s
+	Lat   int32   // Latitude in degrees * 1E7
+	Lng   int32   // Longitude in degrees * 1E7
 }
 
 func (self *Simstate) TypeID() uint8 {
@@ -604,11 +605,11 @@ func (self *Simstate) TypeSize() uint8 {
 }
 
 func (self *Simstate) TypeCRCExtra() uint8 {
-	return 12
+	return 154
 }
 
 func (self *Simstate) FieldsString() string {
-	return fmt.Sprintf("Lng=%d Lat=%d Zgyro=%d Ygyro=%d Xgyro=%d Zacc=%d Yacc=%d Xacc=%d Yaw=%d Pitch=%d Roll=%d", self.Lng, self.Lat, self.Zgyro, self.Ygyro, self.Xgyro, self.Zacc, self.Yacc, self.Xacc, self.Yaw, self.Pitch, self.Roll)
+	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Xacc=%d Yacc=%d Zacc=%d Xgyro=%d Ygyro=%d Zgyro=%d Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Lat, self.Lng)
 }
 
 func (self *Simstate) String() string {
@@ -647,13 +648,13 @@ func (self *Hwstatus) String() string {
 
 // Status generated by radio
 type Radio struct {
-	Fixed    uint16 // count of error corrected packets
 	Rxerrors uint16 // receive errors
-	Remnoise uint8  // remote background noise level
-	Noise    uint8  // background noise level
-	Txbuf    uint8  // how full the tx buffer is as a percentage
-	Remrssi  uint8  // remote signal strength
+	Fixed    uint16 // count of error corrected packets
 	Rssi     uint8  // local signal strength
+	Remrssi  uint8  // remote signal strength
+	Txbuf    uint8  // how full the tx buffer is as a percentage
+	Noise    uint8  // background noise level
+	Remnoise uint8  // remote background noise level
 }
 
 func (self *Radio) TypeID() uint8 {
@@ -669,11 +670,11 @@ func (self *Radio) TypeSize() uint8 {
 }
 
 func (self *Radio) TypeCRCExtra() uint8 {
-	return 91
+	return 21
 }
 
 func (self *Radio) FieldsString() string {
-	return fmt.Sprintf("Fixed=%d Rxerrors=%d Remnoise=%d Noise=%d Txbuf=%d Remrssi=%d Rssi=%d", self.Fixed, self.Rxerrors, self.Remnoise, self.Noise, self.Txbuf, self.Remrssi, self.Rssi)
+	return fmt.Sprintf("Rxerrors=%d Fixed=%d Rssi=%d Remrssi=%d Txbuf=%d Noise=%d Remnoise=%d", self.Rxerrors, self.Fixed, self.Rssi, self.Remrssi, self.Txbuf, self.Noise, self.Remnoise)
 }
 
 func (self *Radio) String() string {
@@ -683,15 +684,15 @@ func (self *Radio) String() string {
 // Status of AP_Limits. Sent in extended
 // 	    status stream when AP_Limits is enabled
 type LimitsStatus struct {
-	LastClear     uint32 // time of last all-clear in milliseconds since boot
-	LastRecovery  uint32 // time of last successful recovery in milliseconds since boot
-	LastAction    uint32 // time of last recovery action in milliseconds since boot
 	LastTrigger   uint32 // time of last breach in milliseconds since boot
+	LastAction    uint32 // time of last recovery action in milliseconds since boot
+	LastRecovery  uint32 // time of last successful recovery in milliseconds since boot
+	LastClear     uint32 // time of last all-clear in milliseconds since boot
 	BreachCount   uint16 // number of fence breaches
-	ModsTriggered uint8  // AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)
-	ModsRequired  uint8  // AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
-	ModsEnabled   uint8  // AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
 	LimitsState   uint8  // state of AP_Limits, (see enum LimitState, LIMITS_STATE)
+	ModsEnabled   uint8  // AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
+	ModsRequired  uint8  // AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
+	ModsTriggered uint8  // AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)
 }
 
 func (self *LimitsStatus) TypeID() uint8 {
@@ -707,11 +708,11 @@ func (self *LimitsStatus) TypeSize() uint8 {
 }
 
 func (self *LimitsStatus) TypeCRCExtra() uint8 {
-	return 36
+	return 144
 }
 
 func (self *LimitsStatus) FieldsString() string {
-	return fmt.Sprintf("LastClear=%d LastRecovery=%d LastAction=%d LastTrigger=%d BreachCount=%d ModsTriggered=%d ModsRequired=%d ModsEnabled=%d LimitsState=%d", self.LastClear, self.LastRecovery, self.LastAction, self.LastTrigger, self.BreachCount, self.ModsTriggered, self.ModsRequired, self.ModsEnabled, self.LimitsState)
+	return fmt.Sprintf("LastTrigger=%d LastAction=%d LastRecovery=%d LastClear=%d BreachCount=%d LimitsState=%d ModsEnabled=%d ModsRequired=%d ModsTriggered=%d", self.LastTrigger, self.LastAction, self.LastRecovery, self.LastClear, self.BreachCount, self.LimitsState, self.ModsEnabled, self.ModsRequired, self.ModsTriggered)
 }
 
 func (self *LimitsStatus) String() string {
@@ -720,9 +721,9 @@ func (self *LimitsStatus) String() string {
 
 // Wind estimation
 type Wind struct {
-	SpeedZ    float32 // vertical wind speed (m/s)
-	Speed     float32 // wind speed in ground plane (m/s)
 	Direction float32 // wind direction that wind is coming from (degrees)
+	Speed     float32 // wind speed in ground plane (m/s)
+	SpeedZ    float32 // vertical wind speed (m/s)
 }
 
 func (self *Wind) TypeID() uint8 {
@@ -738,11 +739,11 @@ func (self *Wind) TypeSize() uint8 {
 }
 
 func (self *Wind) TypeCRCExtra() uint8 {
-	return 244
+	return 1
 }
 
 func (self *Wind) FieldsString() string {
-	return fmt.Sprintf("SpeedZ=%d Speed=%d Direction=%d", self.SpeedZ, self.Speed, self.Direction)
+	return fmt.Sprintf("Direction=%d Speed=%d SpeedZ=%d", self.Direction, self.Speed, self.SpeedZ)
 }
 
 func (self *Wind) String() string {
@@ -751,9 +752,9 @@ func (self *Wind) String() string {
 
 // Data packet, size 16
 type Data16 struct {
-	Data [16]uint8 // raw data
-	Len  uint8     // data length
 	Type uint8     // data type
+	Len  uint8     // data length
+	Data [16]uint8 // raw data
 }
 
 func (self *Data16) TypeID() uint8 {
@@ -769,11 +770,11 @@ func (self *Data16) TypeSize() uint8 {
 }
 
 func (self *Data16) TypeCRCExtra() uint8 {
-	return 139
+	return 141
 }
 
 func (self *Data16) FieldsString() string {
-	return fmt.Sprintf("Data=%v Len=%d Type=%d", self.Data, self.Len, self.Type)
+	return fmt.Sprintf("Type=%d Len=%d Data=%v", self.Type, self.Len, self.Data)
 }
 
 func (self *Data16) String() string {
@@ -782,9 +783,9 @@ func (self *Data16) String() string {
 
 // Data packet, size 32
 type Data32 struct {
-	Data [32]uint8 // raw data
-	Len  uint8     // data length
 	Type uint8     // data type
+	Len  uint8     // data length
+	Data [32]uint8 // raw data
 }
 
 func (self *Data32) TypeID() uint8 {
@@ -800,11 +801,11 @@ func (self *Data32) TypeSize() uint8 {
 }
 
 func (self *Data32) TypeCRCExtra() uint8 {
-	return 165
+	return 12
 }
 
 func (self *Data32) FieldsString() string {
-	return fmt.Sprintf("Data=%v Len=%d Type=%d", self.Data, self.Len, self.Type)
+	return fmt.Sprintf("Type=%d Len=%d Data=%v", self.Type, self.Len, self.Data)
 }
 
 func (self *Data32) String() string {
@@ -813,9 +814,9 @@ func (self *Data32) String() string {
 
 // Data packet, size 64
 type Data64 struct {
-	Data [64]uint8 // raw data
-	Len  uint8     // data length
 	Type uint8     // data type
+	Len  uint8     // data length
+	Data [64]uint8 // raw data
 }
 
 func (self *Data64) TypeID() uint8 {
@@ -831,11 +832,11 @@ func (self *Data64) TypeSize() uint8 {
 }
 
 func (self *Data64) TypeCRCExtra() uint8 {
-	return 29
+	return 165
 }
 
 func (self *Data64) FieldsString() string {
-	return fmt.Sprintf("Data=%v Len=%d Type=%d", self.Data, self.Len, self.Type)
+	return fmt.Sprintf("Type=%d Len=%d Data=%v", self.Type, self.Len, self.Data)
 }
 
 func (self *Data64) String() string {
@@ -844,9 +845,9 @@ func (self *Data64) String() string {
 
 // Data packet, size 96
 type Data96 struct {
-	Data [96]uint8 // raw data
-	Len  uint8     // data length
 	Type uint8     // data type
+	Len  uint8     // data length
+	Data [96]uint8 // raw data
 }
 
 func (self *Data96) TypeID() uint8 {
@@ -862,11 +863,11 @@ func (self *Data96) TypeSize() uint8 {
 }
 
 func (self *Data96) TypeCRCExtra() uint8 {
-	return 67
+	return 22
 }
 
 func (self *Data96) FieldsString() string {
-	return fmt.Sprintf("Data=%v Len=%d Type=%d", self.Data, self.Len, self.Type)
+	return fmt.Sprintf("Type=%d Len=%d Data=%v", self.Type, self.Len, self.Data)
 }
 
 func (self *Data96) String() string {
@@ -875,8 +876,8 @@ func (self *Data96) String() string {
 
 // Rangefinder reporting
 type Rangefinder struct {
-	Voltage  float32 // raw voltage if available, zero otherwise
 	Distance float32 // distance in meters
+	Voltage  float32 // raw voltage if available, zero otherwise
 }
 
 func (self *Rangefinder) TypeID() uint8 {
@@ -892,11 +893,11 @@ func (self *Rangefinder) TypeSize() uint8 {
 }
 
 func (self *Rangefinder) TypeCRCExtra() uint8 {
-	return 114
+	return 83
 }
 
 func (self *Rangefinder) FieldsString() string {
-	return fmt.Sprintf("Voltage=%d Distance=%d", self.Voltage, self.Distance)
+	return fmt.Sprintf("Distance=%d Voltage=%d", self.Distance, self.Voltage)
 }
 
 func (self *Rangefinder) String() string {
@@ -905,18 +906,18 @@ func (self *Rangefinder) String() string {
 
 // Airspeed auto-calibration
 type AirspeedAutocal struct {
-	Pcz          float32 // EKF Pcz
-	Pby          float32 // EKF Pby
-	Pax          float32 // EKF Pax
-	StateZ       float32 // EKF state z
-	StateY       float32 // EKF state y
-	StateX       float32 // EKF state x
-	Ratio        float32 // Airspeed ratio
-	Eas2tas      float32 // Estimated to true airspeed ratio
-	DiffPressure float32 // Differential pressure pascals
-	Vz           float32 // GPS velocity down m/s
-	Vy           float32 // GPS velocity east m/s
 	Vx           float32 // GPS velocity north m/s
+	Vy           float32 // GPS velocity east m/s
+	Vz           float32 // GPS velocity down m/s
+	DiffPressure float32 // Differential pressure pascals
+	Eas2tas      float32 // Estimated to true airspeed ratio
+	Ratio        float32 // Airspeed ratio
+	StateX       float32 // EKF state x
+	StateY       float32 // EKF state y
+	StateZ       float32 // EKF state z
+	Pax          float32 // EKF Pax
+	Pby          float32 // EKF Pby
+	Pcz          float32 // EKF Pcz
 }
 
 func (self *AirspeedAutocal) TypeID() uint8 {
@@ -932,11 +933,11 @@ func (self *AirspeedAutocal) TypeSize() uint8 {
 }
 
 func (self *AirspeedAutocal) TypeCRCExtra() uint8 {
-	return 251
+	return 167
 }
 
 func (self *AirspeedAutocal) FieldsString() string {
-	return fmt.Sprintf("Pcz=%d Pby=%d Pax=%d StateZ=%d StateY=%d StateX=%d Ratio=%d Eas2tas=%d DiffPressure=%d Vz=%d Vy=%d Vx=%d", self.Pcz, self.Pby, self.Pax, self.StateZ, self.StateY, self.StateX, self.Ratio, self.Eas2tas, self.DiffPressure, self.Vz, self.Vy, self.Vx)
+	return fmt.Sprintf("Vx=%d Vy=%d Vz=%d DiffPressure=%d Eas2tas=%d Ratio=%d StateX=%d StateY=%d StateZ=%d Pax=%d Pby=%d Pcz=%d", self.Vx, self.Vy, self.Vz, self.DiffPressure, self.Eas2tas, self.Ratio, self.StateX, self.StateY, self.StateZ, self.Pax, self.Pby, self.Pcz)
 }
 
 func (self *AirspeedAutocal) String() string {
@@ -945,16 +946,16 @@ func (self *AirspeedAutocal) String() string {
 
 // A rally point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS
 type RallyPoint struct {
-	Lng             int32  // Longitude of point in degrees * 1E7
 	Lat             int32  // Latitude of point in degrees * 1E7
-	LandDir         uint16 // Heading to aim for when landing. In centi-degrees.
-	BreakAlt        int16  // Break altitude in meters relative to home
+	Lng             int32  // Longitude of point in degrees * 1E7
 	Alt             int16  // Transit / loiter altitude in meters relative to home
-	Flags           uint8  // See RALLY_FLAGS enum for definition of the bitmask.
-	Count           uint8  // total number of points (for sanity checking)
-	Idx             uint8  // point index (first point is 0)
-	TargetComponent uint8  // Component ID
+	BreakAlt        int16  // Break altitude in meters relative to home
+	LandDir         uint16 // Heading to aim for when landing. In centi-degrees.
 	TargetSystem    uint8  // System ID
+	TargetComponent uint8  // Component ID
+	Idx             uint8  // point index (first point is 0)
+	Count           uint8  // total number of points (for sanity checking)
+	Flags           uint8  // See RALLY_FLAGS enum for definition of the bitmask.
 }
 
 func (self *RallyPoint) TypeID() uint8 {
@@ -970,11 +971,11 @@ func (self *RallyPoint) TypeSize() uint8 {
 }
 
 func (self *RallyPoint) TypeCRCExtra() uint8 {
-	return 193
+	return 138
 }
 
 func (self *RallyPoint) FieldsString() string {
-	return fmt.Sprintf("Lng=%d Lat=%d LandDir=%d BreakAlt=%d Alt=%d Flags=%d Count=%d Idx=%d TargetComponent=%d TargetSystem=%d", self.Lng, self.Lat, self.LandDir, self.BreakAlt, self.Alt, self.Flags, self.Count, self.Idx, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("Lat=%d Lng=%d Alt=%d BreakAlt=%d LandDir=%d TargetSystem=%d TargetComponent=%d Idx=%d Count=%d Flags=%d", self.Lat, self.Lng, self.Alt, self.BreakAlt, self.LandDir, self.TargetSystem, self.TargetComponent, self.Idx, self.Count, self.Flags)
 }
 
 func (self *RallyPoint) String() string {
@@ -983,9 +984,9 @@ func (self *RallyPoint) String() string {
 
 // Request a current rally point from MAV. MAV should respond with a RALLY_POINT message. MAV should not respond if the request is invalid.
 type RallyFetchPoint struct {
-	Idx             uint8 // point index (first point is 0)
-	TargetComponent uint8 // Component ID
 	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+	Idx             uint8 // point index (first point is 0)
 }
 
 func (self *RallyFetchPoint) TypeID() uint8 {
@@ -1001,11 +1002,11 @@ func (self *RallyFetchPoint) TypeSize() uint8 {
 }
 
 func (self *RallyFetchPoint) TypeCRCExtra() uint8 {
-	return 171
+	return 234
 }
 
 func (self *RallyFetchPoint) FieldsString() string {
-	return fmt.Sprintf("Idx=%d TargetComponent=%d TargetSystem=%d", self.Idx, self.TargetComponent, self.TargetSystem)
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d Idx=%d", self.TargetSystem, self.TargetComponent, self.Idx)
 }
 
 func (self *RallyFetchPoint) String() string {
@@ -1014,12 +1015,12 @@ func (self *RallyFetchPoint) String() string {
 
 // Status of compassmot calibration
 type CompassmotStatus struct {
-	Compensationz float32 // Motor Compensation Z
-	Compensationy float32 // Motor Compensation Y
-	Compensationx float32 // Motor Compensation X
 	Current       float32 // current (amps)
-	Interference  uint16  // interference (percent)
+	Compensationx float32 // Motor Compensation X
+	Compensationy float32 // Motor Compensation Y
+	Compensationz float32 // Motor Compensation Z
 	Throttle      uint16  // throttle (percent*10)
+	Interference  uint16  // interference (percent)
 }
 
 func (self *CompassmotStatus) TypeID() uint8 {
@@ -1035,11 +1036,11 @@ func (self *CompassmotStatus) TypeSize() uint8 {
 }
 
 func (self *CompassmotStatus) TypeCRCExtra() uint8 {
-	return 90
+	return 240
 }
 
 func (self *CompassmotStatus) FieldsString() string {
-	return fmt.Sprintf("Compensationz=%d Compensationy=%d Compensationx=%d Current=%d Interference=%d Throttle=%d", self.Compensationz, self.Compensationy, self.Compensationx, self.Current, self.Interference, self.Throttle)
+	return fmt.Sprintf("Current=%d Compensationx=%d Compensationy=%d Compensationz=%d Throttle=%d Interference=%d", self.Current, self.Compensationx, self.Compensationy, self.Compensationz, self.Throttle, self.Interference)
 }
 
 func (self *CompassmotStatus) String() string {
@@ -1048,12 +1049,12 @@ func (self *CompassmotStatus) String() string {
 
 // Status of secondary AHRS filter if available
 type Ahrs2 struct {
-	Lng      int32   // Longitude in degrees * 1E7
-	Lat      int32   // Latitude in degrees * 1E7
-	Altitude float32 // Altitude (MSL)
-	Yaw      float32 // Yaw angle (rad)
-	Pitch    float32 // Pitch angle (rad)
 	Roll     float32 // Roll angle (rad)
+	Pitch    float32 // Pitch angle (rad)
+	Yaw      float32 // Yaw angle (rad)
+	Altitude float32 // Altitude (MSL)
+	Lat      int32   // Latitude in degrees * 1E7
+	Lng      int32   // Longitude in degrees * 1E7
 }
 
 func (self *Ahrs2) TypeID() uint8 {
@@ -1069,11 +1070,11 @@ func (self *Ahrs2) TypeSize() uint8 {
 }
 
 func (self *Ahrs2) TypeCRCExtra() uint8 {
-	return 79
+	return 47
 }
 
 func (self *Ahrs2) FieldsString() string {
-	return fmt.Sprintf("Lng=%d Lat=%d Altitude=%d Yaw=%d Pitch=%d Roll=%d", self.Lng, self.Lat, self.Altitude, self.Yaw, self.Pitch, self.Roll)
+	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Altitude=%d Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng)
 }
 
 func (self *Ahrs2) String() string {
@@ -1083,14 +1084,14 @@ func (self *Ahrs2) String() string {
 // Camera Event
 type CameraStatus struct {
 	TimeUsec     uint64  // Image timestamp (microseconds since UNIX epoch, according to camera clock)
-	P4           float32 // Parameter 4 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
-	P3           float32 // Parameter 3 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
-	P2           float32 // Parameter 2 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
 	P1           float32 // Parameter 1 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+	P2           float32 // Parameter 2 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+	P3           float32 // Parameter 3 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
+	P4           float32 // Parameter 4 (meaning depends on event, see CAMERA_STATUS_TYPES enum)
 	ImgIdx       uint16  // Image index
-	EventId      uint8   // See CAMERA_STATUS_TYPES enum for definition of the bitmask
-	CamIdx       uint8   // Camera ID
 	TargetSystem uint8   // System ID
+	CamIdx       uint8   // Camera ID
+	EventId      uint8   // See CAMERA_STATUS_TYPES enum for definition of the bitmask
 }
 
 func (self *CameraStatus) TypeID() uint8 {
@@ -1106,11 +1107,11 @@ func (self *CameraStatus) TypeSize() uint8 {
 }
 
 func (self *CameraStatus) TypeCRCExtra() uint8 {
-	return 9
+	return 189
 }
 
 func (self *CameraStatus) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d P4=%d P3=%d P2=%d P1=%d ImgIdx=%d EventId=%d CamIdx=%d TargetSystem=%d", self.TimeUsec, self.P4, self.P3, self.P2, self.P1, self.ImgIdx, self.EventId, self.CamIdx, self.TargetSystem)
+	return fmt.Sprintf("TimeUsec=%d P1=%d P2=%d P3=%d P4=%d ImgIdx=%d TargetSystem=%d CamIdx=%d EventId=%d", self.TimeUsec, self.P1, self.P2, self.P3, self.P4, self.ImgIdx, self.TargetSystem, self.CamIdx, self.EventId)
 }
 
 func (self *CameraStatus) String() string {
@@ -1120,18 +1121,18 @@ func (self *CameraStatus) String() string {
 // Camera Capture Feedback
 type CameraFeedback struct {
 	TimeUsec     uint64  // Image timestamp (microseconds since UNIX epoch), as passed in by CAMERA_STATUS message (or autopilot if no CCB)
-	FocLen       float32 // Focal Length (mm)
-	Yaw          float32 // Camera Yaw (earth frame, degrees, 0-360, true)
-	Pitch        float32 // Camera Pitch angle (earth frame, degrees, +-180)
-	Roll         float32 // Camera Roll angle (earth frame, degrees, +-180)
-	AltRel       float32 // Altitude Relative (meters above HOME location)
-	AltMsl       float32 // Altitude Absolute (meters AMSL)
-	Lng          int32   // Longitude in (deg * 1E7)
 	Lat          int32   // Latitude in (deg * 1E7)
+	Lng          int32   // Longitude in (deg * 1E7)
+	AltMsl       float32 // Altitude Absolute (meters AMSL)
+	AltRel       float32 // Altitude Relative (meters above HOME location)
+	Roll         float32 // Camera Roll angle (earth frame, degrees, +-180)
+	Pitch        float32 // Camera Pitch angle (earth frame, degrees, +-180)
+	Yaw          float32 // Camera Yaw (earth frame, degrees, 0-360, true)
+	FocLen       float32 // Focal Length (mm)
 	ImgIdx       uint16  // Image index
-	Flags        uint8   // See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask
-	CamIdx       uint8   // Camera ID
 	TargetSystem uint8   // System ID
+	CamIdx       uint8   // Camera ID
+	Flags        uint8   // See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask
 }
 
 func (self *CameraFeedback) TypeID() uint8 {
@@ -1147,11 +1148,11 @@ func (self *CameraFeedback) TypeSize() uint8 {
 }
 
 func (self *CameraFeedback) TypeCRCExtra() uint8 {
-	return 55
+	return 52
 }
 
 func (self *CameraFeedback) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d FocLen=%d Yaw=%d Pitch=%d Roll=%d AltRel=%d AltMsl=%d Lng=%d Lat=%d ImgIdx=%d Flags=%d CamIdx=%d TargetSystem=%d", self.TimeUsec, self.FocLen, self.Yaw, self.Pitch, self.Roll, self.AltRel, self.AltMsl, self.Lng, self.Lat, self.ImgIdx, self.Flags, self.CamIdx, self.TargetSystem)
+	return fmt.Sprintf("TimeUsec=%d Lat=%d Lng=%d AltMsl=%d AltRel=%d Roll=%d Pitch=%d Yaw=%d FocLen=%d ImgIdx=%d TargetSystem=%d CamIdx=%d Flags=%d", self.TimeUsec, self.Lat, self.Lng, self.AltMsl, self.AltRel, self.Roll, self.Pitch, self.Yaw, self.FocLen, self.ImgIdx, self.TargetSystem, self.CamIdx, self.Flags)
 }
 
 func (self *CameraFeedback) String() string {
@@ -1160,8 +1161,8 @@ func (self *CameraFeedback) String() string {
 
 // 2nd Battery status
 type Battery2 struct {
-	CurrentBattery int16  // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
 	Voltage        uint16 // voltage in millivolts
+	CurrentBattery int16  // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
 }
 
 func (self *Battery2) TypeID() uint8 {
@@ -1177,14 +1178,52 @@ func (self *Battery2) TypeSize() uint8 {
 }
 
 func (self *Battery2) TypeCRCExtra() uint8 {
-	return 115
+	return 174
 }
 
 func (self *Battery2) FieldsString() string {
-	return fmt.Sprintf("CurrentBattery=%d Voltage=%d", self.CurrentBattery, self.Voltage)
+	return fmt.Sprintf("Voltage=%d CurrentBattery=%d", self.Voltage, self.CurrentBattery)
 }
 
 func (self *Battery2) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Status of third AHRS filter if available. This is for ANU research group (Ali and Sean)
+type Ahrs3 struct {
+	Roll     float32 // Roll angle (rad)
+	Pitch    float32 // Pitch angle (rad)
+	Yaw      float32 // Yaw angle (rad)
+	Altitude float32 // Altitude (MSL)
+	Lat      int32   // Latitude in degrees * 1E7
+	Lng      int32   // Longitude in degrees * 1E7
+	V1       float32 // test variable1
+	V2       float32 // test variable2
+	V3       float32 // test variable3
+	V4       float32 // test variable4
+}
+
+func (self *Ahrs3) TypeID() uint8 {
+	return 182
+}
+
+func (self *Ahrs3) TypeName() string {
+	return "AHRS3"
+}
+
+func (self *Ahrs3) TypeSize() uint8 {
+	return 40
+}
+
+func (self *Ahrs3) TypeCRCExtra() uint8 {
+	return 229
+}
+
+func (self *Ahrs3) FieldsString() string {
+	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Altitude=%d Lat=%d Lng=%d V1=%d V2=%d V3=%d V4=%d", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng, self.V1, self.V2, self.V3, self.V4)
+}
+
+func (self *Ahrs3) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 

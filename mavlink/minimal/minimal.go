@@ -102,11 +102,11 @@ const (
 // The heartbeat message shows that a system is present and responding. The type of the MAV and Autopilot hardware allow the receiving system to treat further messages from this system appropriate (e.g. by laying out the user interface based on the autopilot).
 type Heartbeat struct {
 	CustomMode     uint32 // A bitfield for use for autopilot-specific flags.
-	MavlinkVersion uint8  // MAVLink version
-	SystemStatus   uint8  // System status flag, see MAV_STATE ENUM
-	BaseMode       uint8  // System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h
-	Autopilot      uint8  // Autopilot type / class. defined in MAV_AUTOPILOT ENUM
 	Type           uint8  // Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
+	Autopilot      uint8  // Autopilot type / class. defined in MAV_AUTOPILOT ENUM
+	BaseMode       uint8  // System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h
+	SystemStatus   uint8  // System status flag, see MAV_STATE ENUM
+	MavlinkVersion uint8  // MAVLink version
 }
 
 func NewHeartbeat() *Heartbeat {
@@ -126,11 +126,11 @@ func (self *Heartbeat) TypeSize() uint8 {
 }
 
 func (self *Heartbeat) TypeCRCExtra() uint8 {
-	return 206
+	return 239
 }
 
 func (self *Heartbeat) FieldsString() string {
-	return fmt.Sprintf("CustomMode=%d MavlinkVersion=%d SystemStatus=%d BaseMode=%d Autopilot=%d Type=%d", self.CustomMode, self.MavlinkVersion, self.SystemStatus, self.BaseMode, self.Autopilot, self.Type)
+	return fmt.Sprintf("CustomMode=%d Type=%d Autopilot=%d BaseMode=%d SystemStatus=%d MavlinkVersion=%d", self.CustomMode, self.Type, self.Autopilot, self.BaseMode, self.SystemStatus, self.MavlinkVersion)
 }
 
 func (self *Heartbeat) String() string {

@@ -57,12 +57,12 @@ const (
 // Accelerometer and Gyro biases from the navigation filter
 type NavFilterBias struct {
 	Usec   uint64  // Timestamp (microseconds)
-	Gyro2  float32 // b_f[2]
-	Gyro1  float32 // b_f[1]
-	Gyro0  float32 // b_f[0]
-	Accel2 float32 // b_f[2]
-	Accel1 float32 // b_f[1]
 	Accel0 float32 // b_f[0]
+	Accel1 float32 // b_f[1]
+	Accel2 float32 // b_f[2]
+	Gyro0  float32 // b_f[0]
+	Gyro1  float32 // b_f[1]
+	Gyro2  float32 // b_f[2]
 }
 
 func (self *NavFilterBias) TypeID() uint8 {
@@ -78,11 +78,11 @@ func (self *NavFilterBias) TypeSize() uint8 {
 }
 
 func (self *NavFilterBias) TypeCRCExtra() uint8 {
-	return 142
+	return 34
 }
 
 func (self *NavFilterBias) FieldsString() string {
-	return fmt.Sprintf("Usec=%d Gyro2=%d Gyro1=%d Gyro0=%d Accel2=%d Accel1=%d Accel0=%d", self.Usec, self.Gyro2, self.Gyro1, self.Gyro0, self.Accel2, self.Accel1, self.Accel0)
+	return fmt.Sprintf("Usec=%d Accel0=%d Accel1=%d Accel2=%d Gyro0=%d Gyro1=%d Gyro2=%d", self.Usec, self.Accel0, self.Accel1, self.Accel2, self.Gyro0, self.Gyro1, self.Gyro2)
 }
 
 func (self *NavFilterBias) String() string {
@@ -91,12 +91,12 @@ func (self *NavFilterBias) String() string {
 
 // Complete set of calibration parameters for the radio
 type RadioCalibration struct {
-	Throttle [5]uint16 // Throttle curve setpoints (every 25%)
-	Pitch    [5]uint16 // Pitch curve setpoints (every 25%)
-	Gyro     [2]uint16 // Tail gyro mode/gain setpoints: heading hold, rate mode
-	Rudder   [3]uint16 // Rudder setpoints: nose left, center, nose right
-	Elevator [3]uint16 // Elevator setpoints: nose down, center, nose up
 	Aileron  [3]uint16 // Aileron setpoints: left, center, right
+	Elevator [3]uint16 // Elevator setpoints: nose down, center, nose up
+	Rudder   [3]uint16 // Rudder setpoints: nose left, center, nose right
+	Gyro     [2]uint16 // Tail gyro mode/gain setpoints: heading hold, rate mode
+	Pitch    [5]uint16 // Pitch curve setpoints (every 25%)
+	Throttle [5]uint16 // Throttle curve setpoints (every 25%)
 }
 
 func (self *RadioCalibration) TypeID() uint8 {
@@ -112,11 +112,11 @@ func (self *RadioCalibration) TypeSize() uint8 {
 }
 
 func (self *RadioCalibration) TypeCRCExtra() uint8 {
-	return 79
+	return 230
 }
 
 func (self *RadioCalibration) FieldsString() string {
-	return fmt.Sprintf("Throttle=%v Pitch=%v Gyro=%v Rudder=%v Elevator=%v Aileron=%v", self.Throttle, self.Pitch, self.Gyro, self.Rudder, self.Elevator, self.Aileron)
+	return fmt.Sprintf("Aileron=%v Elevator=%v Rudder=%v Gyro=%v Pitch=%v Throttle=%v", self.Aileron, self.Elevator, self.Rudder, self.Gyro, self.Pitch, self.Throttle)
 }
 
 func (self *RadioCalibration) String() string {
@@ -125,9 +125,9 @@ func (self *RadioCalibration) String() string {
 
 // System status specific to ualberta uav
 type UalbertaSysStatus struct {
-	Pilot   uint8 // Pilot mode, see UALBERTA_PILOT_MODE
-	NavMode uint8 // Navigation mode, see UALBERTA_NAV_MODE ENUM
 	Mode    uint8 // System mode, see UALBERTA_AUTOPILOT_MODE ENUM
+	NavMode uint8 // Navigation mode, see UALBERTA_NAV_MODE ENUM
+	Pilot   uint8 // Pilot mode, see UALBERTA_PILOT_MODE
 }
 
 func (self *UalbertaSysStatus) TypeID() uint8 {
@@ -143,11 +143,11 @@ func (self *UalbertaSysStatus) TypeSize() uint8 {
 }
 
 func (self *UalbertaSysStatus) TypeCRCExtra() uint8 {
-	return 43
+	return 15
 }
 
 func (self *UalbertaSysStatus) FieldsString() string {
-	return fmt.Sprintf("Pilot=%d NavMode=%d Mode=%d", self.Pilot, self.NavMode, self.Mode)
+	return fmt.Sprintf("Mode=%d NavMode=%d Pilot=%d", self.Mode, self.NavMode, self.Pilot)
 }
 
 func (self *UalbertaSysStatus) String() string {
