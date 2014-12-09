@@ -3,6 +3,8 @@ package mavlink
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
 	"io"
 
 	"github.com/SpaceLeap/go-mavlink/x25"
@@ -29,46 +31,150 @@ func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *
 	}
 }
 
-// func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
-// 	m, err := writer.Write(FRAME_START_BYTE)
-// 	n = int64(m)
-// 	if err != nil {
-// 		return n, err
-// 	}
+func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
+	firstByte := make([]byte, 1)
 
-// 	hashedWriter := x25.MakeHashedWriter(writer)
+	m, err := reader.Read(firstByte)
+	n = int64(m)
+	if err != nil {
+		return n, err
+	}
 
-// 	// Write and hash header
-// 	m, err = hashedWriter.Write(packet.Header.BytesRef())
-// 	n += int64(m)
-// 	if err != nil {
-// 		return n, err
-// 	}
+	// Read until we get FRAME_START
+	skipped := 0
+	for firstByte[0] != FRAME_START {
+		m, err = reader.Read(firstByte)
+		n += int64(m)
+		if err != nil {
+			return n, err
+		}
+		skipped++
+		if skipped > 1024 {
+			return n, errors.New("Receive wasn't able to find FRAME_START within 1kB, giving up now")
+		}
+	}
 
-// 	// Write and hash message
-// 	err = binary.Write(&hashedWriter, binary.LittleEndian, packet.Message)
-// 	if err != nil {
-// 		return n, err
-// 	}
-// 	n += int64(packet.Message.TypeSize())
+	if skipped != 0 && UnreportedErrorsLogger != nil {
+		UnreportedErrorsLogger.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
+	}
 
-// 	// Add CRCExtra to the hash
-// 	hashedWriter.Hash.WriteByte(packet.Message.TypeCRCExtra())
+	var (
+		// Slice uses packet.Header for data storage,
+		// so accessing the slice elements accesses the packet.Header
+		headerBytesRef = packet.Header.BytesRef()
 
-// 	hashBytes := make([]byte, 2)
-// 	binary.LittleEndian.PutUint16(hashBytes, hashedWriter.Hash.Sum)
+		hashedReader = x25.MakeHashedReader(reader)
+	)
 
-// 	// Write hash
-// 	m, err = writer.Write(hashBytes)
-// 	n += int64(m)
+	// Read rest of header directly into packet.Header referenced by headerBytesRef
+	m, err = io.ReadFull(&hashedReader, headerBytesRef)
+	n += int64(m)
+	if err != nil {
+		return n, fmt.Errorf("Read %d of %d header bytes. %s", n, len(headerBytesRef), err)
+	}
 
-// 	return n, err
-// }
+	// log.Println("HEADER", headerBytesRef)
+
+	// to do: check component sequence
+
+	packet.Message = MessageFactory[packet.Header.MessageID]()
+	if packet.Message == nil {
+		m, _ = io.ReadFull(reader, make([]byte, packet.Message.TypeSize())) // Skip rest of message
+		n += int64(m)
+		return n, ErrUnknownMessageID(packet.Header.MessageID)
+	}
+	if packet.Header.PayloadLength != packet.Message.TypeSize() {
+		skip := packet.Header.PayloadLength
+		if skip > packet.Message.TypeSize() {
+			skip = packet.Message.TypeSize() // use smaller size
+		}
+		m, _ = io.ReadFull(reader, make([]byte, skip)) // Skip rest of message
+		n += int64(m)
+		err = fmt.Errorf(
+			"Expected %d as PayloadLength for message type %s, got %d",
+			packet.Message.TypeSize(),
+			MessageName(packet.Header.MessageID),
+			packet.Header.PayloadLength)
+		return n, err
+	}
+	// Just for debugging:
+	if false {
+		if binary.Size(packet.Message) != int(packet.Message.TypeSize()) {
+			panic("Invalid packet size")
+		}
+	}
+
+	m, err = dry.ReadBinary(&hashedReader, binary.LittleEndian, packet.Message)
+	n += int64(m)
+	if err != nil {
+		return n, err
+	}
+
+	hashedReader.Hash.WriteByte(packet.Message.TypeCRCExtra())
+
+	var (
+		calculatedChecksum = hashedReader.Hash.Sum
+		receivedChecksum   uint16
+	)
+
+	m, err = dry.ReadBinary(reader, binary.LittleEndian, &receivedChecksum)
+	n += int64(m)
+	if err != nil {
+		return n, err
+	}
+
+	if receivedChecksum != calculatedChecksum {
+		err = &ErrInvalidChecksum{
+			Packet:             packet,
+			CalculatedChecksum: calculatedChecksum,
+			ReceivedChecksum:   receivedChecksum,
+		}
+		return n, err
+	}
+
+	return n, nil
+}
 
 func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
-	m, err := writer.Write(packet.WireBytes())
-	return int64(m), err
+	m, err := writer.Write(FRAME_START_BYTE)
+	n = int64(m)
+	if err != nil {
+		return n, err
+	}
+
+	hashedWriter := x25.MakeHashedWriter(writer)
+
+	// Write and hash header
+	m, err = hashedWriter.Write(packet.Header.BytesRef())
+	n += int64(m)
+	if err != nil {
+		return n, err
+	}
+
+	// Write and hash message
+	err = binary.Write(&hashedWriter, binary.LittleEndian, packet.Message)
+	if err != nil {
+		return n, err
+	}
+	n += int64(packet.Message.TypeSize())
+
+	// Add CRCExtra to the hash
+	hashedWriter.Hash.WriteByte(packet.Message.TypeCRCExtra())
+
+	hashBytes := make([]byte, 2)
+	binary.LittleEndian.PutUint16(hashBytes, hashedWriter.Hash.Sum)
+
+	// Write hash
+	m, err = writer.Write(hashBytes)
+	n += int64(m)
+
+	return n, err
 }
+
+// func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
+// 	m, err := writer.Write(packet.WireBytes())
+// 	return int64(m), err
+// }
 
 func (packet *Packet) WireSize() int {
 	return 6 + int(packet.Message.TypeSize()) + 2
