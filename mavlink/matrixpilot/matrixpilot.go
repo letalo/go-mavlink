@@ -818,35 +818,26 @@ func (self *Airspeeds) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 type Char20 [20]byte
 
 func (chars *Char20) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char40 [40]byte
 
 func (chars *Char40) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char48 [48]byte
 
 func (chars *Char48) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char70 [70]byte
 
 func (chars *Char70) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }

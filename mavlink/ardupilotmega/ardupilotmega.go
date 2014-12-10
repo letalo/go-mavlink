@@ -1231,35 +1231,26 @@ func (self *Ahrs3) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 type Char16 [16]byte
 
 func (chars *Char16) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char64 [64]byte
 
 func (chars *Char64) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char96 [96]byte
 
 func (chars *Char96) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }

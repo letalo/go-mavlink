@@ -752,35 +752,26 @@ func (self *OnboardHealth) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 type Char26 [26]byte
 
 func (chars *Char26) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char100 [100]byte
 
 func (chars *Char100) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char147 [147]byte
 
 func (chars *Char147) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }

@@ -233,17 +233,8 @@ func (self *AsluavStatus) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 type Char8 [8]byte
 
 func (chars *Char8) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }

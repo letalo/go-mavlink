@@ -79,20 +79,11 @@ func (self *{{$name}}) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 {{range $size, $_ := .StringSizes}}
 type Char{{$size}}[{{$size}}]byte
 
 func (chars *Char{{$size}}) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 {{end}}
 

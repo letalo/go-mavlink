@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
+	"strings"
 
 	"github.com/SpaceLeap/go-mavlink/x25"
 	"github.com/ungerik/go-dry"
@@ -29,6 +31,51 @@ func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *
 		},
 		Message: message,
 	}
+}
+
+func ParsePacket(s string) (packet *Packet, err error) {
+	name, rest := dry.StringSplitOnceChar(s, '(')
+	id, rest := dry.StringSplitOnceChar(rest, ')')
+	i, err := strconv.Atoi(s)
+	if err != nil || i > 255 {
+		return nil, errors.New("Invalid message ID")
+	}
+
+	packet = new(Packet)
+	packet.Message = MessageFactory[i]()
+	if packet.Message == nil {
+		return nil, fmt.Errorf("Unsupported message type: %s(%s)", name, id)
+	}
+	if packet.Message.TypeName() != name {
+		return nil, errors.New("Message ID and name do not match")
+	}
+
+	if len(rest) < 2 || rest[0] != '{' || rest[len(rest)-1] != '}' {
+		return nil, errors.New("Missing {} after message type")
+	}
+	s = rest[1 : len(rest)-1]
+
+	for _, arg := range strings.Split(s, " ") {
+		name, value := dry.StringSplitOnceChar(arg, '=')
+		switch name {
+		case "PayloadLength", "MessageID":
+			continue
+
+		case "PacketSequence", "SystemID", "ComponentID":
+			err = dry.ReflectSetStructFieldString(&packet.Header, name, value)
+			if err != nil {
+				return nil, err
+			}
+
+		default:
+			err = dry.ReflectSetStructFieldString(&packet.Message, name, value)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return packet, nil
 }
 
 func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {

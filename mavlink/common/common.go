@@ -4426,107 +4426,98 @@ func (self *Debug) String() string {
 // String Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
-func truncateZeroTerminator(chars []byte) []byte {
-	for i, c := range chars {
-		if c == 0 {
-			return chars[:i]
-		}
-	}
-	return chars
-}
-
 type Char4 [4]byte
 
 func (chars *Char4) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char8 [8]byte
 
 func (chars *Char8) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char9 [9]byte
 
 func (chars *Char9) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char10 [10]byte
 
 func (chars *Char10) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char16 [16]byte
 
 func (chars *Char16) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char20 [20]byte
 
 func (chars *Char20) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char25 [25]byte
 
 func (chars *Char25) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char32 [32]byte
 
 func (chars *Char32) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char36 [36]byte
 
 func (chars *Char36) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char50 [50]byte
 
 func (chars *Char50) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char70 [70]byte
 
 func (chars *Char70) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char90 [90]byte
 
 func (chars *Char90) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char110 [110]byte
 
 func (chars *Char110) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char249 [249]byte
 
 func (chars *Char249) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char251 [251]byte
 
 func (chars *Char251) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
 
 type Char253 [253]byte
 
 func (chars *Char253) String() string {
-	return string(truncateZeroTerminator(chars[:]))
+	return mavlink.FixString(chars[:])
 }
