@@ -15,9 +15,12 @@ const (
 	PROTOCOL_INCLUDE = {{.IncludeName}}.PROTOCOL_NAME{{end}}
 )
 
-func init() {
+func Init() {
+	{{if .Include}}{{.IncludeName}}.Init(){{else}}for i := range mavlink.MessageFactory { mavlink.MessageFactory[i] = nil }{{end}}
+
 	mavlink.ProtocolName = PROTOCOL_NAME
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
+	
 	{{range .Messages}}
 	mavlink.MessageFactory[{{.ID}}] = func() mavlink.Message { return new({{.Name | UpperCamelCase}}) }{{end}}
 }

@@ -11,7 +11,11 @@ const (
 	PROTOCOL_VERSION = 3
 )
 
-func init() {
+func Init() {
+	for i := range mavlink.MessageFactory {
+		mavlink.MessageFactory[i] = nil
+	}
+
 	mavlink.ProtocolName = PROTOCOL_NAME
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
 

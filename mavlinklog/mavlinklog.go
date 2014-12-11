@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
-	// "github.com/SpaceLeap/go-mavlink/mavlink/minimal"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
 	"github.com/ungerik/go-dry"
 	"github.com/ungerik/goserial"
@@ -25,6 +24,8 @@ var (
 )
 
 func main() {
+	common.Init()
+
 	flag.StringVar(&port, "port", "", "Serial port to connect to")
 	flag.IntVar(&baud, "baud", 115200, "Speed of the connection")
 	flag.IntVar(&maxPackets, "max", 10, "Quit program after this number of packets")

@@ -13,7 +13,9 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
-func init() {
+func Init() {
+	common.Init()
+
 	mavlink.ProtocolName = PROTOCOL_NAME
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
