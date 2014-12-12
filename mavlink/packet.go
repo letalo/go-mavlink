@@ -36,9 +36,9 @@ func NewPacket(systemID, componentID, sequence uint8, message Message) (packet *
 func ParsePacket(s string) (packet *Packet, err error) {
 	name, rest := dry.StringSplitOnceChar(s, '(')
 	id, rest := dry.StringSplitOnceChar(rest, ')')
-	i, err := strconv.Atoi(s)
+	i, err := strconv.Atoi(id)
 	if err != nil || i > 255 {
-		return nil, errors.New("Invalid message ID")
+		return nil, errors.New("Invalid message ID " + id)
 	}
 
 	packet = new(Packet)
@@ -49,6 +49,8 @@ func ParsePacket(s string) (packet *Packet, err error) {
 	if packet.Message.TypeName() != name {
 		return nil, errors.New("Message ID and name do not match")
 	}
+	packet.Header.MessageID = uint8(i)
+	packet.Header.PayloadLength = packet.Message.TypeSize()
 
 	if len(rest) < 2 || rest[0] != '{' || rest[len(rest)-1] != '}' {
 		return nil, errors.New("Missing {} after message type")
@@ -57,6 +59,7 @@ func ParsePacket(s string) (packet *Packet, err error) {
 
 	for _, arg := range strings.Split(s, " ") {
 		name, value := dry.StringSplitOnceChar(arg, '=')
+		value = strings.Trim(value, `"'`)
 		switch name {
 		case "PayloadLength", "MessageID":
 			continue
@@ -68,7 +71,7 @@ func ParsePacket(s string) (packet *Packet, err error) {
 			}
 
 		default:
-			err = dry.ReflectSetStructFieldString(&packet.Message, name, value)
+			err = dry.ReflectSetStructFieldString(packet.Message, name, value)
 			if err != nil {
 				return nil, err
 			}

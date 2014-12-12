@@ -18,11 +18,11 @@ func (header *Header) BytesRef() []byte {
 }
 
 func (header *Header) FieldsShortString() string {
-	return fmt.Sprintf("System=%d Component=%d Sequence=%d", header.SystemID, header.ComponentID, header.PacketSequence)
+	return fmt.Sprintf("SystemID=%d ComponentID=%d PacketSequence=%d", header.SystemID, header.ComponentID, header.PacketSequence)
 }
 
 func (header *Header) FieldsString() string {
-	return fmt.Sprintf("System=%d Component=%d Sequence=%d PayloadLength=%d", header.SystemID, header.ComponentID, header.PacketSequence, header.PayloadLength)
+	return fmt.Sprintf("SystemID=%d ComponentID=%d PacketSequence=%d PayloadLength=%d", header.SystemID, header.ComponentID, header.PacketSequence, header.PayloadLength)
 }
 
 func (header *Header) ShortString() string {
