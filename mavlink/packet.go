@@ -82,6 +82,10 @@ func ParsePacket(s string) (packet *Packet, err error) {
 }
 
 func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
+	if packet == nil {
+		panic("ReadFrom called at nil Packet")
+	}
+
 	firstByte := make([]byte, 1)
 
 	m, err := reader.Read(firstByte)

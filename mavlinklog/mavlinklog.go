@@ -34,13 +34,18 @@ func main() {
 	flag.Parse()
 
 	if port == "" && flag.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "Call mavlink -port=PORT")
-		flag.PrintDefaults()
-		fmt.Fprintln(os.Stderr, "\nAvailable as PORT are:")
-		for _, p := range serial.ListPorts() {
-			fmt.Fprintln(os.Stderr, "  ", p)
+		ports := serial.ListPorts()
+		if len(ports) == 1 {
+			port = ports[0]
+		} else {
+			fmt.Fprintln(os.Stderr, "Call listmavlink -port=PORT")
+			flag.PrintDefaults()
+			fmt.Fprintln(os.Stderr, "\nAvailable as PORT are:")
+			for _, p := range ports {
+				fmt.Fprintln(os.Stderr, "  ", p)
+			}
+			return
 		}
-		return
 	}
 	if port == "" {
 		port = flag.Arg(0)
