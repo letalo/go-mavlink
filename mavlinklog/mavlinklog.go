@@ -19,6 +19,7 @@ var (
 	maxPackets int
 	quitAfter  time.Duration
 	timeout    time.Duration
+	debug      bool
 
 	stop bool
 )
@@ -31,7 +32,12 @@ func main() {
 	flag.IntVar(&maxPackets, "max", 10, "Quit program after this number of packets")
 	flag.DurationVar(&quitAfter, "quitafter", time.Second*3, "Quit program after this duration")
 	flag.DurationVar(&timeout, "timeout", time.Second, "Read timeout per packet")
+	flag.BoolVar(&debug, "debug", false, "Log everything for debugging")
 	flag.Parse()
+
+	if debug {
+		mavlink.LogEverything(log.New(os.Stderr, "", log.LstdFlags))
+	}
 
 	if port == "" {
 		if flag.NArg() > 0 {
@@ -63,20 +69,20 @@ func main() {
 
 	//conn := mavlink.NewConnection(serialConn, 99)
 
-	err = mavlink.Send(serialConn, 0, 0, 0, common.NewHeartbeat())
-	if err != nil {
-		log.Println(err)
-	}
+	// err = mavlink.Send(serialConn, 0, 0, 0, common.NewHeartbeat())
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
-	err = mavlink.Send(serialConn, 0, 0, 0, &common.Ping{})
-	if err != nil {
-		log.Println(err)
-	}
+	// err = mavlink.Send(serialConn, 0, 0, 0, &common.Ping{})
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
-	err = mavlink.Send(serialConn, 0, 0, 0, &common.ParamRequestList{})
-	if err != nil {
-		log.Println(err)
-	}
+	// err = mavlink.Send(serialConn, 0, 0, 0, &common.ParamRequestList{})
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
 	go func() {
 		dry.WaitForStdin("Press any key to quit")

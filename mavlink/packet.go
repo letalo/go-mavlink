@@ -13,6 +13,8 @@ import (
 	"github.com/ungerik/go-dry"
 )
 
+var errConnectionClosed = errors.New("Connection closed")
+
 type Packet struct {
 	Header  Header
 	Message Message
@@ -86,21 +88,26 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 		panic("ReadFrom called at nil Packet")
 	}
 
-	firstByte := make([]byte, 1)
+	var firstByteStorage [1]byte
+	firstByte := firstByteStorage[:]
 
 	m, err := reader.Read(firstByte)
 	n = int64(m)
 	if err != nil {
 		return n, err
+	} else if m == 0 {
+		return n, errConnectionClosed
 	}
 
 	// Read until we get FRAME_START
-	skipped := 0
+	var skipped int
 	for firstByte[0] != FRAME_START {
 		m, err = reader.Read(firstByte)
 		n += int64(m)
 		if err != nil {
 			return n, err
+		} else if m == 0 {
+			return n, errConnectionClosed
 		}
 		skipped++
 		if skipped > 1024 {
@@ -108,7 +115,7 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 		}
 	}
 
-	if skipped != 0 && UnreportedErrorsLogger != nil {
+	if skipped > 0 && UnreportedErrorsLogger != nil {
 		UnreportedErrorsLogger.Printf("Receive skipped %d bytes to find FRAME_START", skipped)
 	}
 
@@ -125,13 +132,19 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 	n += int64(m)
 	if err != nil {
 		return n, fmt.Errorf("Read %d of %d header bytes. %s", n, len(headerBytesRef), err)
+	} else if m == 0 {
+		return n, errConnectionClosed
 	}
 
 	// log.Println("HEADER", headerBytesRef)
 
 	// to do: check component sequence
 
-	packet.Message = MessageFactory[packet.Header.MessageID]()
+	f := MessageFactory[packet.Header.MessageID]
+	if f == nil {
+		return n, fmt.Errorf("Unknown message ID %d", packet.Header.MessageID)
+	}
+	packet.Message = f()
 	if packet.Message == nil {
 		m, _ = io.ReadFull(reader, make([]byte, packet.Message.TypeSize())) // Skip rest of message
 		n += int64(m)
@@ -145,9 +158,10 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 		m, _ = io.ReadFull(reader, make([]byte, skip)) // Skip rest of message
 		n += int64(m)
 		err = fmt.Errorf(
-			"Expected %d as PayloadLength for message type %s, got %d",
+			"Expected %d as PayloadLength for message type %s(%d), got %d",
 			packet.Message.TypeSize(),
 			MessageName(packet.Header.MessageID),
+			packet.Header.MessageID,
 			packet.Header.PayloadLength)
 		return n, err
 	}
@@ -162,6 +176,8 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 	n += int64(m)
 	if err != nil {
 		return n, err
+	} else if m == 0 {
+		return n, errConnectionClosed
 	}
 
 	hashedReader.Hash.WriteByte(packet.Message.TypeCRCExtra())
@@ -175,6 +191,8 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 	n += int64(m)
 	if err != nil {
 		return n, err
+	} else if m == 0 {
+		return n, errConnectionClosed
 	}
 
 	if receivedChecksum != calculatedChecksum {
