@@ -59,7 +59,7 @@ func (self *SensPower) TypeCRCExtra() uint8 {
 }
 
 func (self *SensPower) FieldsString() string {
-	return fmt.Sprintf("Adc121VspbVolt=%d Adc121CspbAmp=%d Adc121Cs1Amp=%d Adc121Cs2Amp=%d", self.Adc121VspbVolt, self.Adc121CspbAmp, self.Adc121Cs1Amp, self.Adc121Cs2Amp)
+	return fmt.Sprintf("Adc121VspbVolt=%f Adc121CspbAmp=%f Adc121Cs1Amp=%f Adc121Cs2Amp=%f", self.Adc121VspbVolt, self.Adc121CspbAmp, self.Adc121Cs1Amp, self.Adc121Cs2Amp)
 }
 
 func (self *SensPower) String() string {
@@ -100,7 +100,7 @@ func (self *SensMppt) TypeCRCExtra() uint8 {
 }
 
 func (self *SensMppt) FieldsString() string {
-	return fmt.Sprintf("MpptTimestamp=%d Mppt1Volt=%d Mppt1Amp=%d Mppt2Volt=%d Mppt2Amp=%d Mppt3Volt=%d Mppt3Amp=%d Mppt1Pwm=%d Mppt2Pwm=%d Mppt3Pwm=%d Mppt1Status=%d Mppt2Status=%d Mppt3Status=%d", self.MpptTimestamp, self.Mppt1Volt, self.Mppt1Amp, self.Mppt2Volt, self.Mppt2Amp, self.Mppt3Volt, self.Mppt3Amp, self.Mppt1Pwm, self.Mppt2Pwm, self.Mppt3Pwm, self.Mppt1Status, self.Mppt2Status, self.Mppt3Status)
+	return fmt.Sprintf("MpptTimestamp=%d Mppt1Volt=%f Mppt1Amp=%f Mppt2Volt=%f Mppt2Amp=%f Mppt3Volt=%f Mppt3Amp=%f Mppt1Pwm=%d Mppt2Pwm=%d Mppt3Pwm=%d Mppt1Status=%d Mppt2Status=%d Mppt3Status=%d", self.MpptTimestamp, self.Mppt1Volt, self.Mppt1Amp, self.Mppt2Volt, self.Mppt2Amp, self.Mppt3Volt, self.Mppt3Amp, self.Mppt1Pwm, self.Mppt2Pwm, self.Mppt3Pwm, self.Mppt1Status, self.Mppt2Status, self.Mppt3Status)
 }
 
 func (self *SensMppt) String() string {
@@ -153,7 +153,7 @@ func (self *AslctrlData) TypeCRCExtra() uint8 {
 }
 
 func (self *AslctrlData) FieldsString() string {
-	return fmt.Sprintf("Timestamp=%d H=%d Href=%d HrefT=%d Pitchangle=%d Pitchangleref=%d Q=%d Qref=%d Uelev=%d Uthrot=%d Uthrot2=%d Az=%d Airspeedref=%d Yawangle=%d Yawangleref=%d Rollangle=%d Rollangleref=%d P=%d Pref=%d R=%d Rref=%d Uail=%d Urud=%d AslctrlMode=%d Spoilersengaged=%d", self.Timestamp, self.H, self.Href, self.HrefT, self.Pitchangle, self.Pitchangleref, self.Q, self.Qref, self.Uelev, self.Uthrot, self.Uthrot2, self.Az, self.Airspeedref, self.Yawangle, self.Yawangleref, self.Rollangle, self.Rollangleref, self.P, self.Pref, self.R, self.Rref, self.Uail, self.Urud, self.AslctrlMode, self.Spoilersengaged)
+	return fmt.Sprintf("Timestamp=%d H=%f Href=%f HrefT=%f Pitchangle=%f Pitchangleref=%f Q=%f Qref=%f Uelev=%f Uthrot=%f Uthrot2=%f Az=%f Airspeedref=%f Yawangle=%f Yawangleref=%f Rollangle=%f Rollangleref=%f P=%f Pref=%f R=%f Rref=%f Uail=%f Urud=%f AslctrlMode=%d Spoilersengaged=%d", self.Timestamp, self.H, self.Href, self.HrefT, self.Pitchangle, self.Pitchangleref, self.Q, self.Qref, self.Uelev, self.Uthrot, self.Uthrot2, self.Az, self.Airspeedref, self.Yawangle, self.Yawangleref, self.Rollangle, self.Rollangleref, self.P, self.Pref, self.R, self.Rref, self.Uail, self.Urud, self.AslctrlMode, self.Spoilersengaged)
 }
 
 func (self *AslctrlData) String() string {
@@ -192,7 +192,7 @@ func (self *AslctrlDebug) TypeCRCExtra() uint8 {
 }
 
 func (self *AslctrlDebug) FieldsString() string {
-	return fmt.Sprintf("I321=%d F1=%d F2=%d F3=%d F4=%d F5=%d F6=%d F7=%d F8=%d I81=%d I82=%d", self.I321, self.F1, self.F2, self.F3, self.F4, self.F5, self.F6, self.F7, self.F8, self.I81, self.I82)
+	return fmt.Sprintf("I321=%d F1=%f F2=%f F3=%f F4=%f F5=%f F6=%f F7=%f F8=%f I81=%d I82=%d", self.I321, self.F1, self.F2, self.F3, self.F4, self.F5, self.F6, self.F7, self.F8, self.I81, self.I82)
 }
 
 func (self *AslctrlDebug) String() string {
@@ -224,7 +224,7 @@ func (self *AsluavStatus) TypeCRCExtra() uint8 {
 }
 
 func (self *AsluavStatus) FieldsString() string {
-	return fmt.Sprintf("MotorRpm=%d LedStatus=%d SatcomStatus=%d ServoStatus=%v", self.MotorRpm, self.LedStatus, self.SatcomStatus, self.ServoStatus)
+	return fmt.Sprintf("MotorRpm=%f LedStatus=%d SatcomStatus=%d ServoStatus=%v", self.MotorRpm, self.LedStatus, self.SatcomStatus, self.ServoStatus)
 }
 
 func (self *AsluavStatus) String() string {

@@ -84,7 +84,7 @@ func (self *NavFilterBias) TypeCRCExtra() uint8 {
 }
 
 func (self *NavFilterBias) FieldsString() string {
-	return fmt.Sprintf("Usec=%d Accel0=%d Accel1=%d Accel2=%d Gyro0=%d Gyro1=%d Gyro2=%d", self.Usec, self.Accel0, self.Accel1, self.Accel2, self.Gyro0, self.Gyro1, self.Gyro2)
+	return fmt.Sprintf("Usec=%d Accel0=%f Accel1=%f Accel2=%f Gyro0=%f Gyro1=%f Gyro2=%f", self.Usec, self.Accel0, self.Accel1, self.Accel2, self.Gyro0, self.Gyro1, self.Gyro2)
 }
 
 func (self *NavFilterBias) String() string {

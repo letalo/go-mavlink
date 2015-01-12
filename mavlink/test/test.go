@@ -73,7 +73,7 @@ func (self *TestTypes) TypeCRCExtra() uint8 {
 }
 
 func (self *TestTypes) FieldsString() string {
-	return fmt.Sprintf("U64=%d S64=%d D=%d U64Array=%v S64Array=%v DArray=%v U32=%d S32=%d F=%d U32Array=%v S32Array=%v FArray=%v U16=%d S16=%d U16Array=%v S16Array=%v C=%d S=\"%s\" U8=%d S8=%d U8Array=%v S8Array=%v", self.U64, self.S64, self.D, self.U64Array, self.S64Array, self.DArray, self.U32, self.S32, self.F, self.U32Array, self.S32Array, self.FArray, self.U16, self.S16, self.U16Array, self.S16Array, self.C, self.S, self.U8, self.S8, self.U8Array, self.S8Array)
+	return fmt.Sprintf("U64=%d S64=%d D=%f U64Array=%v S64Array=%v DArray=%v U32=%d S32=%d F=%f U32Array=%v S32Array=%v FArray=%v U16=%d S16=%d U16Array=%v S16Array=%v C=%d S=\"%s\" U8=%d S8=%d U8Array=%v S8Array=%v", self.U64, self.S64, self.D, self.U64Array, self.S64Array, self.DArray, self.U32, self.S32, self.F, self.U32Array, self.S32Array, self.FArray, self.U16, self.S16, self.U16Array, self.S16Array, self.C, self.S, self.U8, self.S8, self.U8Array, self.S8Array)
 }
 
 func (self *TestTypes) String() string {

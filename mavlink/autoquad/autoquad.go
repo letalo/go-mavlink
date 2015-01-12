@@ -98,7 +98,7 @@ func (self *AqTelemetryF) TypeCRCExtra() uint8 {
 }
 
 func (self *AqTelemetryF) FieldsString() string {
-	return fmt.Sprintf("Value1=%d Value2=%d Value3=%d Value4=%d Value5=%d Value6=%d Value7=%d Value8=%d Value9=%d Value10=%d Value11=%d Value12=%d Value13=%d Value14=%d Value15=%d Value16=%d Value17=%d Value18=%d Value19=%d Value20=%d Index=%d", self.Value1, self.Value2, self.Value3, self.Value4, self.Value5, self.Value6, self.Value7, self.Value8, self.Value9, self.Value10, self.Value11, self.Value12, self.Value13, self.Value14, self.Value15, self.Value16, self.Value17, self.Value18, self.Value19, self.Value20, self.Index)
+	return fmt.Sprintf("Value1=%f Value2=%f Value3=%f Value4=%f Value5=%f Value6=%f Value7=%f Value8=%f Value9=%f Value10=%f Value11=%f Value12=%f Value13=%f Value14=%f Value15=%f Value16=%f Value17=%f Value18=%f Value19=%f Value20=%f Index=%d", self.Value1, self.Value2, self.Value3, self.Value4, self.Value5, self.Value6, self.Value7, self.Value8, self.Value9, self.Value10, self.Value11, self.Value12, self.Value13, self.Value14, self.Value15, self.Value16, self.Value17, self.Value18, self.Value19, self.Value20, self.Index)
 }
 
 func (self *AqTelemetryF) String() string {

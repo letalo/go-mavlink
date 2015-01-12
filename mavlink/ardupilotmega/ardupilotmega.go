@@ -163,7 +163,7 @@ func (self *SensorOffsets) TypeCRCExtra() uint8 {
 }
 
 func (self *SensorOffsets) FieldsString() string {
-	return fmt.Sprintf("MagDeclination=%d RawPress=%d RawTemp=%d GyroCalX=%d GyroCalY=%d GyroCalZ=%d AccelCalX=%d AccelCalY=%d AccelCalZ=%d MagOfsX=%d MagOfsY=%d MagOfsZ=%d", self.MagDeclination, self.RawPress, self.RawTemp, self.GyroCalX, self.GyroCalY, self.GyroCalZ, self.AccelCalX, self.AccelCalY, self.AccelCalZ, self.MagOfsX, self.MagOfsY, self.MagOfsZ)
+	return fmt.Sprintf("MagDeclination=%f RawPress=%d RawTemp=%d GyroCalX=%f GyroCalY=%f GyroCalZ=%f AccelCalX=%f AccelCalY=%f AccelCalZ=%f MagOfsX=%d MagOfsY=%d MagOfsZ=%d", self.MagDeclination, self.RawPress, self.RawTemp, self.GyroCalX, self.GyroCalY, self.GyroCalZ, self.AccelCalX, self.AccelCalY, self.AccelCalZ, self.MagOfsX, self.MagOfsY, self.MagOfsZ)
 }
 
 func (self *SensorOffsets) String() string {
@@ -299,7 +299,7 @@ func (self *DigicamConfigure) TypeCRCExtra() uint8 {
 }
 
 func (self *DigicamConfigure) FieldsString() string {
-	return fmt.Sprintf("ExtraValue=%d ShutterSpeed=%d TargetSystem=%d TargetComponent=%d Mode=%d Aperture=%d Iso=%d ExposureType=%d CommandId=%d EngineCutOff=%d ExtraParam=%d", self.ExtraValue, self.ShutterSpeed, self.TargetSystem, self.TargetComponent, self.Mode, self.Aperture, self.Iso, self.ExposureType, self.CommandId, self.EngineCutOff, self.ExtraParam)
+	return fmt.Sprintf("ExtraValue=%f ShutterSpeed=%d TargetSystem=%d TargetComponent=%d Mode=%d Aperture=%d Iso=%d ExposureType=%d CommandId=%d EngineCutOff=%d ExtraParam=%d", self.ExtraValue, self.ShutterSpeed, self.TargetSystem, self.TargetComponent, self.Mode, self.Aperture, self.Iso, self.ExposureType, self.CommandId, self.EngineCutOff, self.ExtraParam)
 }
 
 func (self *DigicamConfigure) String() string {
@@ -337,7 +337,7 @@ func (self *DigicamControl) TypeCRCExtra() uint8 {
 }
 
 func (self *DigicamControl) FieldsString() string {
-	return fmt.Sprintf("ExtraValue=%d TargetSystem=%d TargetComponent=%d Session=%d ZoomPos=%d ZoomStep=%d FocusLock=%d Shot=%d CommandId=%d ExtraParam=%d", self.ExtraValue, self.TargetSystem, self.TargetComponent, self.Session, self.ZoomPos, self.ZoomStep, self.FocusLock, self.Shot, self.CommandId, self.ExtraParam)
+	return fmt.Sprintf("ExtraValue=%f TargetSystem=%d TargetComponent=%d Session=%d ZoomPos=%d ZoomStep=%d FocusLock=%d Shot=%d CommandId=%d ExtraParam=%d", self.ExtraValue, self.TargetSystem, self.TargetComponent, self.Session, self.ZoomPos, self.ZoomStep, self.FocusLock, self.Shot, self.CommandId, self.ExtraParam)
 }
 
 func (self *DigicamControl) String() string {
@@ -473,7 +473,7 @@ func (self *FencePoint) TypeCRCExtra() uint8 {
 }
 
 func (self *FencePoint) FieldsString() string {
-	return fmt.Sprintf("Lat=%d Lng=%d TargetSystem=%d TargetComponent=%d Idx=%d Count=%d", self.Lat, self.Lng, self.TargetSystem, self.TargetComponent, self.Idx, self.Count)
+	return fmt.Sprintf("Lat=%f Lng=%f TargetSystem=%d TargetComponent=%d Idx=%d Count=%d", self.Lat, self.Lng, self.TargetSystem, self.TargetComponent, self.Idx, self.Count)
 }
 
 func (self *FencePoint) String() string {
@@ -572,7 +572,7 @@ func (self *Ahrs) TypeCRCExtra() uint8 {
 }
 
 func (self *Ahrs) FieldsString() string {
-	return fmt.Sprintf("Omegaix=%d Omegaiy=%d Omegaiz=%d AccelWeight=%d RenormVal=%d ErrorRp=%d ErrorYaw=%d", self.Omegaix, self.Omegaiy, self.Omegaiz, self.AccelWeight, self.RenormVal, self.ErrorRp, self.ErrorYaw)
+	return fmt.Sprintf("Omegaix=%f Omegaiy=%f Omegaiz=%f AccelWeight=%f RenormVal=%f ErrorRp=%f ErrorYaw=%f", self.Omegaix, self.Omegaiy, self.Omegaiz, self.AccelWeight, self.RenormVal, self.ErrorRp, self.ErrorYaw)
 }
 
 func (self *Ahrs) String() string {
@@ -611,7 +611,7 @@ func (self *Simstate) TypeCRCExtra() uint8 {
 }
 
 func (self *Simstate) FieldsString() string {
-	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Xacc=%d Yacc=%d Zacc=%d Xgyro=%d Ygyro=%d Zgyro=%d Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Lat, self.Lng)
+	return fmt.Sprintf("Roll=%f Pitch=%f Yaw=%f Xacc=%f Yacc=%f Zacc=%f Xgyro=%f Ygyro=%f Zgyro=%f Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Lat, self.Lng)
 }
 
 func (self *Simstate) String() string {
@@ -745,7 +745,7 @@ func (self *Wind) TypeCRCExtra() uint8 {
 }
 
 func (self *Wind) FieldsString() string {
-	return fmt.Sprintf("Direction=%d Speed=%d SpeedZ=%d", self.Direction, self.Speed, self.SpeedZ)
+	return fmt.Sprintf("Direction=%f Speed=%f SpeedZ=%f", self.Direction, self.Speed, self.SpeedZ)
 }
 
 func (self *Wind) String() string {
@@ -899,7 +899,7 @@ func (self *Rangefinder) TypeCRCExtra() uint8 {
 }
 
 func (self *Rangefinder) FieldsString() string {
-	return fmt.Sprintf("Distance=%d Voltage=%d", self.Distance, self.Voltage)
+	return fmt.Sprintf("Distance=%f Voltage=%f", self.Distance, self.Voltage)
 }
 
 func (self *Rangefinder) String() string {
@@ -939,7 +939,7 @@ func (self *AirspeedAutocal) TypeCRCExtra() uint8 {
 }
 
 func (self *AirspeedAutocal) FieldsString() string {
-	return fmt.Sprintf("Vx=%d Vy=%d Vz=%d DiffPressure=%d Eas2tas=%d Ratio=%d StateX=%d StateY=%d StateZ=%d Pax=%d Pby=%d Pcz=%d", self.Vx, self.Vy, self.Vz, self.DiffPressure, self.Eas2tas, self.Ratio, self.StateX, self.StateY, self.StateZ, self.Pax, self.Pby, self.Pcz)
+	return fmt.Sprintf("Vx=%f Vy=%f Vz=%f DiffPressure=%f Eas2tas=%f Ratio=%f StateX=%f StateY=%f StateZ=%f Pax=%f Pby=%f Pcz=%f", self.Vx, self.Vy, self.Vz, self.DiffPressure, self.Eas2tas, self.Ratio, self.StateX, self.StateY, self.StateZ, self.Pax, self.Pby, self.Pcz)
 }
 
 func (self *AirspeedAutocal) String() string {
@@ -1042,7 +1042,7 @@ func (self *CompassmotStatus) TypeCRCExtra() uint8 {
 }
 
 func (self *CompassmotStatus) FieldsString() string {
-	return fmt.Sprintf("Current=%d Compensationx=%d Compensationy=%d Compensationz=%d Throttle=%d Interference=%d", self.Current, self.Compensationx, self.Compensationy, self.Compensationz, self.Throttle, self.Interference)
+	return fmt.Sprintf("Current=%f Compensationx=%f Compensationy=%f Compensationz=%f Throttle=%d Interference=%d", self.Current, self.Compensationx, self.Compensationy, self.Compensationz, self.Throttle, self.Interference)
 }
 
 func (self *CompassmotStatus) String() string {
@@ -1076,7 +1076,7 @@ func (self *Ahrs2) TypeCRCExtra() uint8 {
 }
 
 func (self *Ahrs2) FieldsString() string {
-	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Altitude=%d Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng)
+	return fmt.Sprintf("Roll=%f Pitch=%f Yaw=%f Altitude=%f Lat=%d Lng=%d", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng)
 }
 
 func (self *Ahrs2) String() string {
@@ -1113,7 +1113,7 @@ func (self *CameraStatus) TypeCRCExtra() uint8 {
 }
 
 func (self *CameraStatus) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d P1=%d P2=%d P3=%d P4=%d ImgIdx=%d TargetSystem=%d CamIdx=%d EventId=%d", self.TimeUsec, self.P1, self.P2, self.P3, self.P4, self.ImgIdx, self.TargetSystem, self.CamIdx, self.EventId)
+	return fmt.Sprintf("TimeUsec=%d P1=%f P2=%f P3=%f P4=%f ImgIdx=%d TargetSystem=%d CamIdx=%d EventId=%d", self.TimeUsec, self.P1, self.P2, self.P3, self.P4, self.ImgIdx, self.TargetSystem, self.CamIdx, self.EventId)
 }
 
 func (self *CameraStatus) String() string {
@@ -1154,7 +1154,7 @@ func (self *CameraFeedback) TypeCRCExtra() uint8 {
 }
 
 func (self *CameraFeedback) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d Lat=%d Lng=%d AltMsl=%d AltRel=%d Roll=%d Pitch=%d Yaw=%d FocLen=%d ImgIdx=%d TargetSystem=%d CamIdx=%d Flags=%d", self.TimeUsec, self.Lat, self.Lng, self.AltMsl, self.AltRel, self.Roll, self.Pitch, self.Yaw, self.FocLen, self.ImgIdx, self.TargetSystem, self.CamIdx, self.Flags)
+	return fmt.Sprintf("TimeUsec=%d Lat=%d Lng=%d AltMsl=%f AltRel=%f Roll=%f Pitch=%f Yaw=%f FocLen=%f ImgIdx=%d TargetSystem=%d CamIdx=%d Flags=%d", self.TimeUsec, self.Lat, self.Lng, self.AltMsl, self.AltRel, self.Roll, self.Pitch, self.Yaw, self.FocLen, self.ImgIdx, self.TargetSystem, self.CamIdx, self.Flags)
 }
 
 func (self *CameraFeedback) String() string {
@@ -1222,7 +1222,7 @@ func (self *Ahrs3) TypeCRCExtra() uint8 {
 }
 
 func (self *Ahrs3) FieldsString() string {
-	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Altitude=%d Lat=%d Lng=%d V1=%d V2=%d V3=%d V4=%d", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng, self.V1, self.V2, self.V3, self.V4)
+	return fmt.Sprintf("Roll=%f Pitch=%f Yaw=%f Altitude=%f Lat=%d Lng=%d V1=%f V2=%f V3=%f V4=%f", self.Roll, self.Pitch, self.Yaw, self.Altitude, self.Lat, self.Lng, self.V1, self.V2, self.V3, self.V4)
 }
 
 func (self *Ahrs3) String() string {

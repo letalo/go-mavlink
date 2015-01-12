@@ -146,7 +146,7 @@ func (self *SensorBias) TypeCRCExtra() uint8 {
 }
 
 func (self *SensorBias) FieldsString() string {
-	return fmt.Sprintf("Axbias=%d Aybias=%d Azbias=%d Gxbias=%d Gybias=%d Gzbias=%d", self.Axbias, self.Aybias, self.Azbias, self.Gxbias, self.Gybias, self.Gzbias)
+	return fmt.Sprintf("Axbias=%f Aybias=%f Azbias=%f Gxbias=%f Gybias=%f Gzbias=%f", self.Axbias, self.Aybias, self.Azbias, self.Gxbias, self.Gybias, self.Gzbias)
 }
 
 func (self *SensorBias) String() string {
@@ -180,7 +180,7 @@ func (self *Diagnostic) TypeCRCExtra() uint8 {
 }
 
 func (self *Diagnostic) FieldsString() string {
-	return fmt.Sprintf("Diagfl1=%d Diagfl2=%d Diagfl3=%d Diagsh1=%d Diagsh2=%d Diagsh3=%d", self.Diagfl1, self.Diagfl2, self.Diagfl3, self.Diagsh1, self.Diagsh2, self.Diagsh3)
+	return fmt.Sprintf("Diagfl1=%f Diagfl2=%f Diagfl3=%f Diagsh1=%d Diagsh2=%d Diagsh3=%d", self.Diagfl1, self.Diagfl2, self.Diagfl3, self.Diagsh1, self.Diagsh2, self.Diagsh3)
 }
 
 func (self *Diagnostic) String() string {
@@ -218,7 +218,7 @@ func (self *SlugsNavigation) TypeCRCExtra() uint8 {
 }
 
 func (self *SlugsNavigation) FieldsString() string {
-	return fmt.Sprintf("UM=%d PhiC=%d ThetaC=%d PsidotC=%d AyBody=%d Totaldist=%d Dist2go=%d HC=%d Fromwp=%d Towp=%d", self.UM, self.PhiC, self.ThetaC, self.PsidotC, self.AyBody, self.Totaldist, self.Dist2go, self.HC, self.Fromwp, self.Towp)
+	return fmt.Sprintf("UM=%f PhiC=%f ThetaC=%f PsidotC=%f AyBody=%f Totaldist=%f Dist2go=%f HC=%d Fromwp=%d Towp=%d", self.UM, self.PhiC, self.ThetaC, self.PsidotC, self.AyBody, self.Totaldist, self.Dist2go, self.HC, self.Fromwp, self.Towp)
 }
 
 func (self *SlugsNavigation) String() string {
@@ -252,7 +252,7 @@ func (self *DataLog) TypeCRCExtra() uint8 {
 }
 
 func (self *DataLog) FieldsString() string {
-	return fmt.Sprintf("Fl1=%d Fl2=%d Fl3=%d Fl4=%d Fl5=%d Fl6=%d", self.Fl1, self.Fl2, self.Fl3, self.Fl4, self.Fl5, self.Fl6)
+	return fmt.Sprintf("Fl1=%f Fl2=%f Fl3=%f Fl4=%f Fl5=%f Fl6=%f", self.Fl1, self.Fl2, self.Fl3, self.Fl4, self.Fl5, self.Fl6)
 }
 
 func (self *DataLog) String() string {
@@ -324,7 +324,7 @@ func (self *MidLvlCmds) TypeCRCExtra() uint8 {
 }
 
 func (self *MidLvlCmds) FieldsString() string {
-	return fmt.Sprintf("Hcommand=%d Ucommand=%d Rcommand=%d Target=%d", self.Hcommand, self.Ucommand, self.Rcommand, self.Target)
+	return fmt.Sprintf("Hcommand=%f Ucommand=%f Rcommand=%f Target=%d", self.Hcommand, self.Ucommand, self.Rcommand, self.Target)
 }
 
 func (self *MidLvlCmds) String() string {
@@ -419,7 +419,7 @@ func (self *ControlSurface) TypeCRCExtra() uint8 {
 }
 
 func (self *ControlSurface) FieldsString() string {
-	return fmt.Sprintf("Mcontrol=%d Bcontrol=%d Target=%d Idsurface=%d", self.Mcontrol, self.Bcontrol, self.Target, self.Idsurface)
+	return fmt.Sprintf("Mcontrol=%f Bcontrol=%f Target=%d Idsurface=%d", self.Mcontrol, self.Bcontrol, self.Target, self.Idsurface)
 }
 
 func (self *ControlSurface) String() string {
@@ -450,7 +450,7 @@ func (self *SlugsMobileLocation) TypeCRCExtra() uint8 {
 }
 
 func (self *SlugsMobileLocation) FieldsString() string {
-	return fmt.Sprintf("Latitude=%d Longitude=%d Target=%d", self.Latitude, self.Longitude, self.Target)
+	return fmt.Sprintf("Latitude=%f Longitude=%f Target=%d", self.Latitude, self.Longitude, self.Target)
 }
 
 func (self *SlugsMobileLocation) String() string {
@@ -516,7 +516,7 @@ func (self *IsrLocation) TypeCRCExtra() uint8 {
 }
 
 func (self *IsrLocation) FieldsString() string {
-	return fmt.Sprintf("Latitude=%d Longitude=%d Height=%d Target=%d Option1=%d Option2=%d Option3=%d", self.Latitude, self.Longitude, self.Height, self.Target, self.Option1, self.Option2, self.Option3)
+	return fmt.Sprintf("Latitude=%f Longitude=%f Height=%f Target=%d Option1=%d Option2=%d Option3=%d", self.Latitude, self.Longitude, self.Height, self.Target, self.Option1, self.Option2, self.Option3)
 }
 
 func (self *IsrLocation) String() string {
@@ -612,7 +612,7 @@ func (self *UavStatus) TypeCRCExtra() uint8 {
 }
 
 func (self *UavStatus) FieldsString() string {
-	return fmt.Sprintf("Latitude=%d Longitude=%d Altitude=%d Speed=%d Course=%d Target=%d", self.Latitude, self.Longitude, self.Altitude, self.Speed, self.Course, self.Target)
+	return fmt.Sprintf("Latitude=%f Longitude=%f Altitude=%f Speed=%f Course=%f Target=%d", self.Latitude, self.Longitude, self.Altitude, self.Speed, self.Course, self.Target)
 }
 
 func (self *UavStatus) String() string {
@@ -647,7 +647,7 @@ func (self *StatusGps) TypeCRCExtra() uint8 {
 }
 
 func (self *StatusGps) FieldsString() string {
-	return fmt.Sprintf("Magvar=%d Csfails=%d Gpsquality=%d Msgstype=%d Posstatus=%d Magdir=%d Modeind=%d", self.Magvar, self.Csfails, self.Gpsquality, self.Msgstype, self.Posstatus, self.Magdir, self.Modeind)
+	return fmt.Sprintf("Magvar=%f Csfails=%d Gpsquality=%d Msgstype=%d Posstatus=%d Magdir=%d Modeind=%d", self.Magvar, self.Csfails, self.Gpsquality, self.Msgstype, self.Posstatus, self.Magdir, self.Modeind)
 }
 
 func (self *StatusGps) String() string {
@@ -682,7 +682,7 @@ func (self *NovatelDiag) TypeCRCExtra() uint8 {
 }
 
 func (self *NovatelDiag) FieldsString() string {
-	return fmt.Sprintf("Receiverstatus=%d Possolage=%d Csfails=%d Timestatus=%d Solstatus=%d Postype=%d Veltype=%d", self.Receiverstatus, self.Possolage, self.Csfails, self.Timestatus, self.Solstatus, self.Postype, self.Veltype)
+	return fmt.Sprintf("Receiverstatus=%d Possolage=%f Csfails=%d Timestatus=%d Solstatus=%d Postype=%d Veltype=%d", self.Receiverstatus, self.Possolage, self.Csfails, self.Timestatus, self.Solstatus, self.Postype, self.Veltype)
 }
 
 func (self *NovatelDiag) String() string {
@@ -714,7 +714,7 @@ func (self *SensorDiag) TypeCRCExtra() uint8 {
 }
 
 func (self *SensorDiag) FieldsString() string {
-	return fmt.Sprintf("Float1=%d Float2=%d Int1=%d Char1=%d", self.Float1, self.Float2, self.Int1, self.Char1)
+	return fmt.Sprintf("Float1=%f Float2=%f Int1=%d Char1=%d", self.Float1, self.Float2, self.Int1, self.Char1)
 }
 
 func (self *SensorDiag) String() string {

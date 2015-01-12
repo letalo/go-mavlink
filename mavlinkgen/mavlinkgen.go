@@ -252,7 +252,7 @@ func (msg *Message) FieldsString() string {
 		case strings.Contains(t, "int"), t == "byte":
 			placeholder = "%d"
 		case strings.Contains(t, "float"):
-			placeholder = "%d"
+			placeholder = "%f"
 		default:
 			panic("Unknown message field type: " + t)
 		}

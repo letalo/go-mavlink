@@ -89,7 +89,7 @@ func (self *SetCamShutter) TypeCRCExtra() uint8 {
 }
 
 func (self *SetCamShutter) FieldsString() string {
-	return fmt.Sprintf("Gain=%d Interval=%d Exposure=%d CamNo=%d CamMode=%d TriggerPin=%d", self.Gain, self.Interval, self.Exposure, self.CamNo, self.CamMode, self.TriggerPin)
+	return fmt.Sprintf("Gain=%f Interval=%d Exposure=%d CamNo=%d CamMode=%d TriggerPin=%d", self.Gain, self.Interval, self.Exposure, self.CamNo, self.CamMode, self.TriggerPin)
 }
 
 func (self *SetCamShutter) String() string {
@@ -129,7 +129,7 @@ func (self *ImageTriggered) TypeCRCExtra() uint8 {
 }
 
 func (self *ImageTriggered) FieldsString() string {
-	return fmt.Sprintf("Timestamp=%d Seq=%d Roll=%d Pitch=%d Yaw=%d LocalZ=%d Lat=%d Lon=%d Alt=%d GroundX=%d GroundY=%d GroundZ=%d", self.Timestamp, self.Seq, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ)
+	return fmt.Sprintf("Timestamp=%d Seq=%d Roll=%f Pitch=%f Yaw=%f LocalZ=%f Lat=%f Lon=%f Alt=%f GroundX=%f GroundY=%f GroundZ=%f", self.Timestamp, self.Seq, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ)
 }
 
 func (self *ImageTriggered) String() string {
@@ -209,7 +209,7 @@ func (self *ImageAvailable) TypeCRCExtra() uint8 {
 }
 
 func (self *ImageAvailable) FieldsString() string {
-	return fmt.Sprintf("CamId=%d Timestamp=%d ValidUntil=%d ImgSeq=%d ImgBufIndex=%d Key=%d Exposure=%d Gain=%d Roll=%d Pitch=%d Yaw=%d LocalZ=%d Lat=%d Lon=%d Alt=%d GroundX=%d GroundY=%d GroundZ=%d Width=%d Height=%d Depth=%d CamNo=%d Channels=%d", self.CamId, self.Timestamp, self.ValidUntil, self.ImgSeq, self.ImgBufIndex, self.Key, self.Exposure, self.Gain, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ, self.Width, self.Height, self.Depth, self.CamNo, self.Channels)
+	return fmt.Sprintf("CamId=%d Timestamp=%d ValidUntil=%d ImgSeq=%d ImgBufIndex=%d Key=%d Exposure=%d Gain=%f Roll=%f Pitch=%f Yaw=%f LocalZ=%f Lat=%f Lon=%f Alt=%f GroundX=%f GroundY=%f GroundZ=%f Width=%d Height=%d Depth=%d CamNo=%d Channels=%d", self.CamId, self.Timestamp, self.ValidUntil, self.ImgSeq, self.ImgBufIndex, self.Key, self.Exposure, self.Gain, self.Roll, self.Pitch, self.Yaw, self.LocalZ, self.Lat, self.Lon, self.Alt, self.GroundX, self.GroundY, self.GroundZ, self.Width, self.Height, self.Depth, self.CamNo, self.Channels)
 }
 
 func (self *ImageAvailable) String() string {
@@ -243,7 +243,7 @@ func (self *SetPositionControlOffset) TypeCRCExtra() uint8 {
 }
 
 func (self *SetPositionControlOffset) FieldsString() string {
-	return fmt.Sprintf("X=%d Y=%d Z=%d Yaw=%d TargetSystem=%d TargetComponent=%d", self.X, self.Y, self.Z, self.Yaw, self.TargetSystem, self.TargetComponent)
+	return fmt.Sprintf("X=%f Y=%f Z=%f Yaw=%f TargetSystem=%d TargetComponent=%d", self.X, self.Y, self.Z, self.Yaw, self.TargetSystem, self.TargetComponent)
 }
 
 func (self *SetPositionControlOffset) String() string {
@@ -276,7 +276,7 @@ func (self *PositionControlSetpoint) TypeCRCExtra() uint8 {
 }
 
 func (self *PositionControlSetpoint) FieldsString() string {
-	return fmt.Sprintf("X=%d Y=%d Z=%d Yaw=%d Id=%d", self.X, self.Y, self.Z, self.Yaw, self.Id)
+	return fmt.Sprintf("X=%f Y=%f Z=%f Yaw=%f Id=%d", self.X, self.Y, self.Z, self.Yaw, self.Id)
 }
 
 func (self *PositionControlSetpoint) String() string {
@@ -311,7 +311,7 @@ func (self *Marker) TypeCRCExtra() uint8 {
 }
 
 func (self *Marker) FieldsString() string {
-	return fmt.Sprintf("X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d Id=%d", self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw, self.Id)
+	return fmt.Sprintf("X=%f Y=%f Z=%f Roll=%f Pitch=%f Yaw=%f Id=%d", self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw, self.Id)
 }
 
 func (self *Marker) String() string {
@@ -507,7 +507,7 @@ func (self *PatternDetected) TypeCRCExtra() uint8 {
 }
 
 func (self *PatternDetected) FieldsString() string {
-	return fmt.Sprintf("Confidence=%d Type=%d File=\"%s\" Detected=%d", self.Confidence, self.Type, self.File, self.Detected)
+	return fmt.Sprintf("Confidence=%f Type=%d File=\"%s\" Detected=%d", self.Confidence, self.Type, self.File, self.Detected)
 }
 
 func (self *PatternDetected) String() string {
@@ -546,7 +546,7 @@ func (self *PointOfInterest) TypeCRCExtra() uint8 {
 }
 
 func (self *PointOfInterest) FieldsString() string {
-	return fmt.Sprintf("X=%d Y=%d Z=%d Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.X, self.Y, self.Z, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
+	return fmt.Sprintf("X=%f Y=%f Z=%f Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.X, self.Y, self.Z, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
 }
 
 func (self *PointOfInterest) String() string {
@@ -588,7 +588,7 @@ func (self *PointOfInterestConnection) TypeCRCExtra() uint8 {
 }
 
 func (self *PointOfInterestConnection) FieldsString() string {
-	return fmt.Sprintf("Xp1=%d Yp1=%d Zp1=%d Xp2=%d Yp2=%d Zp2=%d Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.Xp1, self.Yp1, self.Zp1, self.Xp2, self.Yp2, self.Zp2, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
+	return fmt.Sprintf("Xp1=%f Yp1=%f Zp1=%f Xp2=%f Yp2=%f Zp2=%f Timeout=%d Type=%d Color=%d CoordinateSystem=%d Name=\"%s\"", self.Xp1, self.Yp1, self.Zp1, self.Xp2, self.Yp2, self.Zp2, self.Timeout, self.Type, self.Color, self.CoordinateSystem, self.Name)
 }
 
 func (self *PointOfInterestConnection) String() string {
@@ -624,7 +624,7 @@ func (self *BriefFeature) TypeCRCExtra() uint8 {
 }
 
 func (self *BriefFeature) FieldsString() string {
-	return fmt.Sprintf("X=%d Y=%d Z=%d Response=%d Size=%d Orientation=%d OrientationAssignment=%d Descriptor=%v", self.X, self.Y, self.Z, self.Response, self.Size, self.Orientation, self.OrientationAssignment, self.Descriptor)
+	return fmt.Sprintf("X=%f Y=%f Z=%f Response=%f Size=%d Orientation=%d OrientationAssignment=%d Descriptor=%v", self.X, self.Y, self.Z, self.Response, self.Size, self.Orientation, self.OrientationAssignment, self.Descriptor)
 }
 
 func (self *BriefFeature) String() string {
@@ -661,7 +661,7 @@ func (self *AttitudeControl) TypeCRCExtra() uint8 {
 }
 
 func (self *AttitudeControl) FieldsString() string {
-	return fmt.Sprintf("Roll=%d Pitch=%d Yaw=%d Thrust=%d Target=%d RollManual=%d PitchManual=%d YawManual=%d ThrustManual=%d", self.Roll, self.Pitch, self.Yaw, self.Thrust, self.Target, self.RollManual, self.PitchManual, self.YawManual, self.ThrustManual)
+	return fmt.Sprintf("Roll=%f Pitch=%f Yaw=%f Thrust=%f Target=%d RollManual=%d PitchManual=%d YawManual=%d ThrustManual=%d", self.Roll, self.Pitch, self.Yaw, self.Thrust, self.Target, self.RollManual, self.PitchManual, self.YawManual, self.ThrustManual)
 }
 
 func (self *AttitudeControl) String() string {
@@ -701,7 +701,7 @@ func (self *DetectionStats) TypeCRCExtra() uint8 {
 }
 
 func (self *DetectionStats) FieldsString() string {
-	return fmt.Sprintf("Detections=%d ClusterIters=%d BestScore=%d BestLat=%d BestLon=%d BestAlt=%d BestDetectionId=%d BestClusterId=%d BestClusterIterId=%d ImagesDone=%d ImagesTodo=%d Fps=%d", self.Detections, self.ClusterIters, self.BestScore, self.BestLat, self.BestLon, self.BestAlt, self.BestDetectionId, self.BestClusterId, self.BestClusterIterId, self.ImagesDone, self.ImagesTodo, self.Fps)
+	return fmt.Sprintf("Detections=%d ClusterIters=%d BestScore=%f BestLat=%d BestLon=%d BestAlt=%d BestDetectionId=%d BestClusterId=%d BestClusterIterId=%d ImagesDone=%d ImagesTodo=%d Fps=%f", self.Detections, self.ClusterIters, self.BestScore, self.BestLat, self.BestLon, self.BestAlt, self.BestDetectionId, self.BestClusterId, self.BestClusterIterId, self.ImagesDone, self.ImagesTodo, self.Fps)
 }
 
 func (self *DetectionStats) String() string {
@@ -743,7 +743,7 @@ func (self *OnboardHealth) TypeCRCExtra() uint8 {
 }
 
 func (self *OnboardHealth) FieldsString() string {
-	return fmt.Sprintf("Uptime=%d RamTotal=%d SwapTotal=%d DiskTotal=%d Temp=%d Voltage=%d NetworkLoadIn=%d NetworkLoadOut=%d CpuFreq=%d CpuLoad=%d RamUsage=%d SwapUsage=%d DiskHealth=%d DiskUsage=%d", self.Uptime, self.RamTotal, self.SwapTotal, self.DiskTotal, self.Temp, self.Voltage, self.NetworkLoadIn, self.NetworkLoadOut, self.CpuFreq, self.CpuLoad, self.RamUsage, self.SwapUsage, self.DiskHealth, self.DiskUsage)
+	return fmt.Sprintf("Uptime=%d RamTotal=%f SwapTotal=%f DiskTotal=%f Temp=%f Voltage=%f NetworkLoadIn=%f NetworkLoadOut=%f CpuFreq=%d CpuLoad=%d RamUsage=%d SwapUsage=%d DiskHealth=%d DiskUsage=%d", self.Uptime, self.RamTotal, self.SwapTotal, self.DiskTotal, self.Temp, self.Voltage, self.NetworkLoadIn, self.NetworkLoadOut, self.CpuFreq, self.CpuLoad, self.RamUsage, self.SwapUsage, self.DiskHealth, self.DiskUsage)
 }
 
 func (self *OnboardHealth) String() string {

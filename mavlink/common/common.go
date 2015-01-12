@@ -932,7 +932,7 @@ func (self *ParamValue) TypeCRCExtra() uint8 {
 }
 
 func (self *ParamValue) FieldsString() string {
-	return fmt.Sprintf("ParamValue=%d ParamCount=%d ParamIndex=%d ParamId=\"%s\" ParamType=%d", self.ParamValue, self.ParamCount, self.ParamIndex, self.ParamId, self.ParamType)
+	return fmt.Sprintf("ParamValue=%f ParamCount=%d ParamIndex=%d ParamId=\"%s\" ParamType=%d", self.ParamValue, self.ParamCount, self.ParamIndex, self.ParamId, self.ParamType)
 }
 
 func (self *ParamValue) String() string {
@@ -965,7 +965,7 @@ func (self *ParamSet) TypeCRCExtra() uint8 {
 }
 
 func (self *ParamSet) FieldsString() string {
-	return fmt.Sprintf("ParamValue=%d TargetSystem=%d TargetComponent=%d ParamId=\"%s\" ParamType=%d", self.ParamValue, self.TargetSystem, self.TargetComponent, self.ParamId, self.ParamType)
+	return fmt.Sprintf("ParamValue=%f TargetSystem=%d TargetComponent=%d ParamId=\"%s\" ParamType=%d", self.ParamValue, self.TargetSystem, self.TargetComponent, self.ParamId, self.ParamType)
 }
 
 func (self *ParamSet) String() string {
@@ -1179,7 +1179,7 @@ func (self *ScaledPressure) TypeCRCExtra() uint8 {
 }
 
 func (self *ScaledPressure) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d PressAbs=%d PressDiff=%d Temperature=%d", self.TimeBootMs, self.PressAbs, self.PressDiff, self.Temperature)
+	return fmt.Sprintf("TimeBootMs=%d PressAbs=%f PressDiff=%f Temperature=%d", self.TimeBootMs, self.PressAbs, self.PressDiff, self.Temperature)
 }
 
 func (self *ScaledPressure) String() string {
@@ -1214,7 +1214,7 @@ func (self *Attitude) TypeCRCExtra() uint8 {
 }
 
 func (self *Attitude) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Roll=%d Pitch=%d Yaw=%d Rollspeed=%d Pitchspeed=%d Yawspeed=%d", self.TimeBootMs, self.Roll, self.Pitch, self.Yaw, self.Rollspeed, self.Pitchspeed, self.Yawspeed)
+	return fmt.Sprintf("TimeBootMs=%d Roll=%f Pitch=%f Yaw=%f Rollspeed=%f Pitchspeed=%f Yawspeed=%f", self.TimeBootMs, self.Roll, self.Pitch, self.Yaw, self.Rollspeed, self.Pitchspeed, self.Yawspeed)
 }
 
 func (self *Attitude) String() string {
@@ -1250,7 +1250,7 @@ func (self *AttitudeQuaternion) TypeCRCExtra() uint8 {
 }
 
 func (self *AttitudeQuaternion) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Q1=%d Q2=%d Q3=%d Q4=%d Rollspeed=%d Pitchspeed=%d Yawspeed=%d", self.TimeBootMs, self.Q1, self.Q2, self.Q3, self.Q4, self.Rollspeed, self.Pitchspeed, self.Yawspeed)
+	return fmt.Sprintf("TimeBootMs=%d Q1=%f Q2=%f Q3=%f Q4=%f Rollspeed=%f Pitchspeed=%f Yawspeed=%f", self.TimeBootMs, self.Q1, self.Q2, self.Q3, self.Q4, self.Rollspeed, self.Pitchspeed, self.Yawspeed)
 }
 
 func (self *AttitudeQuaternion) String() string {
@@ -1285,7 +1285,7 @@ func (self *LocalPositionNed) TypeCRCExtra() uint8 {
 }
 
 func (self *LocalPositionNed) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d X=%d Y=%d Z=%d Vx=%d Vy=%d Vz=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz)
+	return fmt.Sprintf("TimeBootMs=%d X=%f Y=%f Z=%f Vx=%f Vy=%f Vz=%f", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz)
 }
 
 func (self *LocalPositionNed) String() string {
@@ -1546,7 +1546,7 @@ func (self *MissionItem) TypeCRCExtra() uint8 {
 }
 
 func (self *MissionItem) FieldsString() string {
-	return fmt.Sprintf("Param1=%d Param2=%d Param3=%d Param4=%d X=%d Y=%d Z=%d Seq=%d Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Seq, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
+	return fmt.Sprintf("Param1=%f Param2=%f Param3=%f Param4=%f X=%f Y=%f Z=%f Seq=%d Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Seq, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
 }
 
 func (self *MissionItem) String() string {
@@ -1888,7 +1888,7 @@ func (self *SafetySetAllowedArea) TypeCRCExtra() uint8 {
 }
 
 func (self *SafetySetAllowedArea) FieldsString() string {
-	return fmt.Sprintf("P1x=%d P1y=%d P1z=%d P2x=%d P2y=%d P2z=%d TargetSystem=%d TargetComponent=%d Frame=%d", self.P1x, self.P1y, self.P1z, self.P2x, self.P2y, self.P2z, self.TargetSystem, self.TargetComponent, self.Frame)
+	return fmt.Sprintf("P1x=%f P1y=%f P1z=%f P2x=%f P2y=%f P2z=%f TargetSystem=%d TargetComponent=%d Frame=%d", self.P1x, self.P1y, self.P1z, self.P2x, self.P2y, self.P2z, self.TargetSystem, self.TargetComponent, self.Frame)
 }
 
 func (self *SafetySetAllowedArea) String() string {
@@ -1923,7 +1923,7 @@ func (self *SafetyAllowedArea) TypeCRCExtra() uint8 {
 }
 
 func (self *SafetyAllowedArea) FieldsString() string {
-	return fmt.Sprintf("P1x=%d P1y=%d P1z=%d P2x=%d P2y=%d P2z=%d Frame=%d", self.P1x, self.P1y, self.P1z, self.P2x, self.P2y, self.P2z, self.Frame)
+	return fmt.Sprintf("P1x=%f P1y=%f P1z=%f P2x=%f P2y=%f P2z=%f Frame=%d", self.P1x, self.P1y, self.P1z, self.P2x, self.P2y, self.P2z, self.Frame)
 }
 
 func (self *SafetyAllowedArea) String() string {
@@ -1957,7 +1957,7 @@ func (self *AttitudeQuaternionCov) TypeCRCExtra() uint8 {
 }
 
 func (self *AttitudeQuaternionCov) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Q=%v Rollspeed=%d Pitchspeed=%d Yawspeed=%d Covariance=%v", self.TimeBootMs, self.Q, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Covariance)
+	return fmt.Sprintf("TimeBootMs=%d Q=%v Rollspeed=%f Pitchspeed=%f Yawspeed=%f Covariance=%v", self.TimeBootMs, self.Q, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Covariance)
 }
 
 func (self *AttitudeQuaternionCov) String() string {
@@ -1993,7 +1993,7 @@ func (self *NavControllerOutput) TypeCRCExtra() uint8 {
 }
 
 func (self *NavControllerOutput) FieldsString() string {
-	return fmt.Sprintf("NavRoll=%d NavPitch=%d AltError=%d AspdError=%d XtrackError=%d NavBearing=%d TargetBearing=%d WpDist=%d", self.NavRoll, self.NavPitch, self.AltError, self.AspdError, self.XtrackError, self.NavBearing, self.TargetBearing, self.WpDist)
+	return fmt.Sprintf("NavRoll=%f NavPitch=%f AltError=%f AspdError=%f XtrackError=%f NavBearing=%d TargetBearing=%d WpDist=%d", self.NavRoll, self.NavPitch, self.AltError, self.AspdError, self.XtrackError, self.NavBearing, self.TargetBearing, self.WpDist)
 }
 
 func (self *NavControllerOutput) String() string {
@@ -2032,7 +2032,7 @@ func (self *GlobalPositionIntCov) TypeCRCExtra() uint8 {
 }
 
 func (self *GlobalPositionIntCov) FieldsString() string {
-	return fmt.Sprintf("TimeUtc=%d TimeBootMs=%d Lat=%d Lon=%d Alt=%d RelativeAlt=%d Vx=%d Vy=%d Vz=%d Covariance=%v EstimatorType=%d", self.TimeUtc, self.TimeBootMs, self.Lat, self.Lon, self.Alt, self.RelativeAlt, self.Vx, self.Vy, self.Vz, self.Covariance, self.EstimatorType)
+	return fmt.Sprintf("TimeUtc=%d TimeBootMs=%d Lat=%d Lon=%d Alt=%d RelativeAlt=%d Vx=%f Vy=%f Vz=%f Covariance=%v EstimatorType=%d", self.TimeUtc, self.TimeBootMs, self.Lat, self.Lon, self.Alt, self.RelativeAlt, self.Vx, self.Vy, self.Vz, self.Covariance, self.EstimatorType)
 }
 
 func (self *GlobalPositionIntCov) String() string {
@@ -2070,7 +2070,7 @@ func (self *LocalPositionNedCov) TypeCRCExtra() uint8 {
 }
 
 func (self *LocalPositionNedCov) FieldsString() string {
-	return fmt.Sprintf("TimeUtc=%d TimeBootMs=%d X=%d Y=%d Z=%d Vx=%d Vy=%d Vz=%d Covariance=%v EstimatorType=%d", self.TimeUtc, self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Covariance, self.EstimatorType)
+	return fmt.Sprintf("TimeUtc=%d TimeBootMs=%d X=%f Y=%f Z=%f Vx=%f Vy=%f Vz=%f Covariance=%v EstimatorType=%d", self.TimeUtc, self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Covariance, self.EstimatorType)
 }
 
 func (self *LocalPositionNedCov) String() string {
@@ -2298,7 +2298,7 @@ func (self *MissionItemInt) TypeCRCExtra() uint8 {
 }
 
 func (self *MissionItemInt) FieldsString() string {
-	return fmt.Sprintf("Param1=%d Param2=%d Param3=%d Param4=%d X=%d Y=%d Z=%d Seq=%d Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Seq, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
+	return fmt.Sprintf("Param1=%f Param2=%f Param3=%f Param4=%f X=%d Y=%d Z=%f Seq=%d Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Seq, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
 }
 
 func (self *MissionItemInt) String() string {
@@ -2332,7 +2332,7 @@ func (self *VfrHud) TypeCRCExtra() uint8 {
 }
 
 func (self *VfrHud) FieldsString() string {
-	return fmt.Sprintf("Airspeed=%d Groundspeed=%d Alt=%d Climb=%d Heading=%d Throttle=%d", self.Airspeed, self.Groundspeed, self.Alt, self.Climb, self.Heading, self.Throttle)
+	return fmt.Sprintf("Airspeed=%f Groundspeed=%f Alt=%f Climb=%f Heading=%d Throttle=%d", self.Airspeed, self.Groundspeed, self.Alt, self.Climb, self.Heading, self.Throttle)
 }
 
 func (self *VfrHud) String() string {
@@ -2373,7 +2373,7 @@ func (self *CommandInt) TypeCRCExtra() uint8 {
 }
 
 func (self *CommandInt) FieldsString() string {
-	return fmt.Sprintf("Param1=%d Param2=%d Param3=%d Param4=%d X=%d Y=%d Z=%d Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
+	return fmt.Sprintf("Param1=%f Param2=%f Param3=%f Param4=%f X=%d Y=%d Z=%f Command=%d TargetSystem=%d TargetComponent=%d Frame=%d Current=%d Autocontinue=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.X, self.Y, self.Z, self.Command, self.TargetSystem, self.TargetComponent, self.Frame, self.Current, self.Autocontinue)
 }
 
 func (self *CommandInt) String() string {
@@ -2412,7 +2412,7 @@ func (self *CommandLong) TypeCRCExtra() uint8 {
 }
 
 func (self *CommandLong) FieldsString() string {
-	return fmt.Sprintf("Param1=%d Param2=%d Param3=%d Param4=%d Param5=%d Param6=%d Param7=%d Command=%d TargetSystem=%d TargetComponent=%d Confirmation=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.Param5, self.Param6, self.Param7, self.Command, self.TargetSystem, self.TargetComponent, self.Confirmation)
+	return fmt.Sprintf("Param1=%f Param2=%f Param3=%f Param4=%f Param5=%f Param6=%f Param7=%f Command=%d TargetSystem=%d TargetComponent=%d Confirmation=%d", self.Param1, self.Param2, self.Param3, self.Param4, self.Param5, self.Param6, self.Param7, self.Command, self.TargetSystem, self.TargetComponent, self.Confirmation)
 }
 
 func (self *CommandLong) String() string {
@@ -2477,7 +2477,7 @@ func (self *ManualSetpoint) TypeCRCExtra() uint8 {
 }
 
 func (self *ManualSetpoint) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Roll=%d Pitch=%d Yaw=%d Thrust=%d ModeSwitch=%d ManualOverrideSwitch=%d", self.TimeBootMs, self.Roll, self.Pitch, self.Yaw, self.Thrust, self.ModeSwitch, self.ManualOverrideSwitch)
+	return fmt.Sprintf("TimeBootMs=%d Roll=%f Pitch=%f Yaw=%f Thrust=%f ModeSwitch=%d ManualOverrideSwitch=%d", self.TimeBootMs, self.Roll, self.Pitch, self.Yaw, self.Thrust, self.ModeSwitch, self.ManualOverrideSwitch)
 }
 
 func (self *ManualSetpoint) String() string {
@@ -2514,7 +2514,7 @@ func (self *SetAttitudeTarget) TypeCRCExtra() uint8 {
 }
 
 func (self *SetAttitudeTarget) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Q=%v BodyRollRate=%d BodyPitchRate=%d BodyYawRate=%d Thrust=%d TargetSystem=%d TargetComponent=%d TypeMask=%d", self.TimeBootMs, self.Q, self.BodyRollRate, self.BodyPitchRate, self.BodyYawRate, self.Thrust, self.TargetSystem, self.TargetComponent, self.TypeMask)
+	return fmt.Sprintf("TimeBootMs=%d Q=%v BodyRollRate=%f BodyPitchRate=%f BodyYawRate=%f Thrust=%f TargetSystem=%d TargetComponent=%d TypeMask=%d", self.TimeBootMs, self.Q, self.BodyRollRate, self.BodyPitchRate, self.BodyYawRate, self.Thrust, self.TargetSystem, self.TargetComponent, self.TypeMask)
 }
 
 func (self *SetAttitudeTarget) String() string {
@@ -2549,7 +2549,7 @@ func (self *AttitudeTarget) TypeCRCExtra() uint8 {
 }
 
 func (self *AttitudeTarget) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Q=%v BodyRollRate=%d BodyPitchRate=%d BodyYawRate=%d Thrust=%d TypeMask=%d", self.TimeBootMs, self.Q, self.BodyRollRate, self.BodyPitchRate, self.BodyYawRate, self.Thrust, self.TypeMask)
+	return fmt.Sprintf("TimeBootMs=%d Q=%v BodyRollRate=%f BodyPitchRate=%f BodyYawRate=%f Thrust=%f TypeMask=%d", self.TimeBootMs, self.Q, self.BodyRollRate, self.BodyPitchRate, self.BodyYawRate, self.Thrust, self.TypeMask)
 }
 
 func (self *AttitudeTarget) String() string {
@@ -2593,7 +2593,7 @@ func (self *SetPositionTargetLocalNed) TypeCRCExtra() uint8 {
 }
 
 func (self *SetPositionTargetLocalNed) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d X=%d Y=%d Z=%d Vx=%d Vy=%d Vz=%d Afx=%d Afy=%d Afz=%d Yaw=%d YawRate=%d TypeMask=%d TargetSystem=%d TargetComponent=%d CoordinateFrame=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.TargetSystem, self.TargetComponent, self.CoordinateFrame)
+	return fmt.Sprintf("TimeBootMs=%d X=%f Y=%f Z=%f Vx=%f Vy=%f Vz=%f Afx=%f Afy=%f Afz=%f Yaw=%f YawRate=%f TypeMask=%d TargetSystem=%d TargetComponent=%d CoordinateFrame=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.TargetSystem, self.TargetComponent, self.CoordinateFrame)
 }
 
 func (self *SetPositionTargetLocalNed) String() string {
@@ -2635,7 +2635,7 @@ func (self *PositionTargetLocalNed) TypeCRCExtra() uint8 {
 }
 
 func (self *PositionTargetLocalNed) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d X=%d Y=%d Z=%d Vx=%d Vy=%d Vz=%d Afx=%d Afy=%d Afz=%d Yaw=%d YawRate=%d TypeMask=%d CoordinateFrame=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.CoordinateFrame)
+	return fmt.Sprintf("TimeBootMs=%d X=%f Y=%f Z=%f Vx=%f Vy=%f Vz=%f Afx=%f Afy=%f Afz=%f Yaw=%f YawRate=%f TypeMask=%d CoordinateFrame=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.CoordinateFrame)
 }
 
 func (self *PositionTargetLocalNed) String() string {
@@ -2679,7 +2679,7 @@ func (self *SetPositionTargetGlobalInt) TypeCRCExtra() uint8 {
 }
 
 func (self *SetPositionTargetGlobalInt) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d LatInt=%d LonInt=%d Alt=%d Vx=%d Vy=%d Vz=%d Afx=%d Afy=%d Afz=%d Yaw=%d YawRate=%d TypeMask=%d TargetSystem=%d TargetComponent=%d CoordinateFrame=%d", self.TimeBootMs, self.LatInt, self.LonInt, self.Alt, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.TargetSystem, self.TargetComponent, self.CoordinateFrame)
+	return fmt.Sprintf("TimeBootMs=%d LatInt=%d LonInt=%d Alt=%f Vx=%f Vy=%f Vz=%f Afx=%f Afy=%f Afz=%f Yaw=%f YawRate=%f TypeMask=%d TargetSystem=%d TargetComponent=%d CoordinateFrame=%d", self.TimeBootMs, self.LatInt, self.LonInt, self.Alt, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.TargetSystem, self.TargetComponent, self.CoordinateFrame)
 }
 
 func (self *SetPositionTargetGlobalInt) String() string {
@@ -2721,7 +2721,7 @@ func (self *PositionTargetGlobalInt) TypeCRCExtra() uint8 {
 }
 
 func (self *PositionTargetGlobalInt) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d LatInt=%d LonInt=%d Alt=%d Vx=%d Vy=%d Vz=%d Afx=%d Afy=%d Afz=%d Yaw=%d YawRate=%d TypeMask=%d CoordinateFrame=%d", self.TimeBootMs, self.LatInt, self.LonInt, self.Alt, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.CoordinateFrame)
+	return fmt.Sprintf("TimeBootMs=%d LatInt=%d LonInt=%d Alt=%f Vx=%f Vy=%f Vz=%f Afx=%f Afy=%f Afz=%f Yaw=%f YawRate=%f TypeMask=%d CoordinateFrame=%d", self.TimeBootMs, self.LatInt, self.LonInt, self.Alt, self.Vx, self.Vy, self.Vz, self.Afx, self.Afy, self.Afz, self.Yaw, self.YawRate, self.TypeMask, self.CoordinateFrame)
 }
 
 func (self *PositionTargetGlobalInt) String() string {
@@ -2756,7 +2756,7 @@ func (self *LocalPositionNedSystemGlobalOffset) TypeCRCExtra() uint8 {
 }
 
 func (self *LocalPositionNedSystemGlobalOffset) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d", self.TimeBootMs, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
+	return fmt.Sprintf("TimeBootMs=%d X=%f Y=%f Z=%f Roll=%f Pitch=%f Yaw=%f", self.TimeBootMs, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
 }
 
 func (self *LocalPositionNedSystemGlobalOffset) String() string {
@@ -2800,7 +2800,7 @@ func (self *HilState) TypeCRCExtra() uint8 {
 }
 
 func (self *HilState) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d Roll=%d Pitch=%d Yaw=%d Rollspeed=%d Pitchspeed=%d Yawspeed=%d Lat=%d Lon=%d Alt=%d Vx=%d Vy=%d Vz=%d Xacc=%d Yacc=%d Zacc=%d", self.TimeUsec, self.Roll, self.Pitch, self.Yaw, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Lat, self.Lon, self.Alt, self.Vx, self.Vy, self.Vz, self.Xacc, self.Yacc, self.Zacc)
+	return fmt.Sprintf("TimeUsec=%d Roll=%f Pitch=%f Yaw=%f Rollspeed=%f Pitchspeed=%f Yawspeed=%f Lat=%d Lon=%d Alt=%d Vx=%d Vy=%d Vz=%d Xacc=%d Yacc=%d Zacc=%d", self.TimeUsec, self.Roll, self.Pitch, self.Yaw, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Lat, self.Lon, self.Alt, self.Vx, self.Vy, self.Vz, self.Xacc, self.Yacc, self.Zacc)
 }
 
 func (self *HilState) String() string {
@@ -2839,7 +2839,7 @@ func (self *HilControls) TypeCRCExtra() uint8 {
 }
 
 func (self *HilControls) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d RollAilerons=%d PitchElevator=%d YawRudder=%d Throttle=%d Aux1=%d Aux2=%d Aux3=%d Aux4=%d Mode=%d NavMode=%d", self.TimeUsec, self.RollAilerons, self.PitchElevator, self.YawRudder, self.Throttle, self.Aux1, self.Aux2, self.Aux3, self.Aux4, self.Mode, self.NavMode)
+	return fmt.Sprintf("TimeUsec=%d RollAilerons=%f PitchElevator=%f YawRudder=%f Throttle=%f Aux1=%f Aux2=%f Aux3=%f Aux4=%f Mode=%d NavMode=%d", self.TimeUsec, self.RollAilerons, self.PitchElevator, self.YawRudder, self.Throttle, self.Aux1, self.Aux2, self.Aux3, self.Aux4, self.Mode, self.NavMode)
 }
 
 func (self *HilControls) String() string {
@@ -2917,7 +2917,7 @@ func (self *OpticalFlow) TypeCRCExtra() uint8 {
 }
 
 func (self *OpticalFlow) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d FlowCompMX=%d FlowCompMY=%d GroundDistance=%d FlowX=%d FlowY=%d SensorId=%d Quality=%d", self.TimeUsec, self.FlowCompMX, self.FlowCompMY, self.GroundDistance, self.FlowX, self.FlowY, self.SensorId, self.Quality)
+	return fmt.Sprintf("TimeUsec=%d FlowCompMX=%f FlowCompMY=%f GroundDistance=%f FlowX=%d FlowY=%d SensorId=%d Quality=%d", self.TimeUsec, self.FlowCompMX, self.FlowCompMY, self.GroundDistance, self.FlowX, self.FlowY, self.SensorId, self.Quality)
 }
 
 func (self *OpticalFlow) String() string {
@@ -2952,7 +2952,7 @@ func (self *GlobalVisionPositionEstimate) TypeCRCExtra() uint8 {
 }
 
 func (self *GlobalVisionPositionEstimate) FieldsString() string {
-	return fmt.Sprintf("Usec=%d X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
+	return fmt.Sprintf("Usec=%d X=%f Y=%f Z=%f Roll=%f Pitch=%f Yaw=%f", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
 }
 
 func (self *GlobalVisionPositionEstimate) String() string {
@@ -2987,7 +2987,7 @@ func (self *VisionPositionEstimate) TypeCRCExtra() uint8 {
 }
 
 func (self *VisionPositionEstimate) FieldsString() string {
-	return fmt.Sprintf("Usec=%d X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
+	return fmt.Sprintf("Usec=%d X=%f Y=%f Z=%f Roll=%f Pitch=%f Yaw=%f", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
 }
 
 func (self *VisionPositionEstimate) String() string {
@@ -3019,7 +3019,7 @@ func (self *VisionSpeedEstimate) TypeCRCExtra() uint8 {
 }
 
 func (self *VisionSpeedEstimate) FieldsString() string {
-	return fmt.Sprintf("Usec=%d X=%d Y=%d Z=%d", self.Usec, self.X, self.Y, self.Z)
+	return fmt.Sprintf("Usec=%d X=%f Y=%f Z=%f", self.Usec, self.X, self.Y, self.Z)
 }
 
 func (self *VisionSpeedEstimate) String() string {
@@ -3054,7 +3054,7 @@ func (self *ViconPositionEstimate) TypeCRCExtra() uint8 {
 }
 
 func (self *ViconPositionEstimate) FieldsString() string {
-	return fmt.Sprintf("Usec=%d X=%d Y=%d Z=%d Roll=%d Pitch=%d Yaw=%d", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
+	return fmt.Sprintf("Usec=%d X=%f Y=%f Z=%f Roll=%f Pitch=%f Yaw=%f", self.Usec, self.X, self.Y, self.Z, self.Roll, self.Pitch, self.Yaw)
 }
 
 func (self *ViconPositionEstimate) String() string {
@@ -3097,7 +3097,7 @@ func (self *HighresImu) TypeCRCExtra() uint8 {
 }
 
 func (self *HighresImu) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d Xacc=%d Yacc=%d Zacc=%d Xgyro=%d Ygyro=%d Zgyro=%d Xmag=%d Ymag=%d Zmag=%d AbsPressure=%d DiffPressure=%d PressureAlt=%d Temperature=%d FieldsUpdated=%d", self.TimeUsec, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Xmag, self.Ymag, self.Zmag, self.AbsPressure, self.DiffPressure, self.PressureAlt, self.Temperature, self.FieldsUpdated)
+	return fmt.Sprintf("TimeUsec=%d Xacc=%f Yacc=%f Zacc=%f Xgyro=%f Ygyro=%f Zgyro=%f Xmag=%f Ymag=%f Zmag=%f AbsPressure=%f DiffPressure=%f PressureAlt=%f Temperature=%f FieldsUpdated=%d", self.TimeUsec, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Xmag, self.Ymag, self.Zmag, self.AbsPressure, self.DiffPressure, self.PressureAlt, self.Temperature, self.FieldsUpdated)
 }
 
 func (self *HighresImu) String() string {
@@ -3137,7 +3137,7 @@ func (self *OpticalFlowRad) TypeCRCExtra() uint8 {
 }
 
 func (self *OpticalFlowRad) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d IntegrationTimeUs=%d IntegratedX=%d IntegratedY=%d IntegratedXgyro=%d IntegratedYgyro=%d IntegratedZgyro=%d TimeDeltaDistanceUs=%d Distance=%d Temperature=%d SensorId=%d Quality=%d", self.TimeUsec, self.IntegrationTimeUs, self.IntegratedX, self.IntegratedY, self.IntegratedXgyro, self.IntegratedYgyro, self.IntegratedZgyro, self.TimeDeltaDistanceUs, self.Distance, self.Temperature, self.SensorId, self.Quality)
+	return fmt.Sprintf("TimeUsec=%d IntegrationTimeUs=%d IntegratedX=%f IntegratedY=%f IntegratedXgyro=%f IntegratedYgyro=%f IntegratedZgyro=%f TimeDeltaDistanceUs=%d Distance=%f Temperature=%d SensorId=%d Quality=%d", self.TimeUsec, self.IntegrationTimeUs, self.IntegratedX, self.IntegratedY, self.IntegratedXgyro, self.IntegratedYgyro, self.IntegratedZgyro, self.TimeDeltaDistanceUs, self.Distance, self.Temperature, self.SensorId, self.Quality)
 }
 
 func (self *OpticalFlowRad) String() string {
@@ -3180,7 +3180,7 @@ func (self *HilSensor) TypeCRCExtra() uint8 {
 }
 
 func (self *HilSensor) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d Xacc=%d Yacc=%d Zacc=%d Xgyro=%d Ygyro=%d Zgyro=%d Xmag=%d Ymag=%d Zmag=%d AbsPressure=%d DiffPressure=%d PressureAlt=%d Temperature=%d FieldsUpdated=%d", self.TimeUsec, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Xmag, self.Ymag, self.Zmag, self.AbsPressure, self.DiffPressure, self.PressureAlt, self.Temperature, self.FieldsUpdated)
+	return fmt.Sprintf("TimeUsec=%d Xacc=%f Yacc=%f Zacc=%f Xgyro=%f Ygyro=%f Zgyro=%f Xmag=%f Ymag=%f Zmag=%f AbsPressure=%f DiffPressure=%f PressureAlt=%f Temperature=%f FieldsUpdated=%d", self.TimeUsec, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Xmag, self.Ymag, self.Zmag, self.AbsPressure, self.DiffPressure, self.PressureAlt, self.Temperature, self.FieldsUpdated)
 }
 
 func (self *HilSensor) String() string {
@@ -3229,7 +3229,7 @@ func (self *SimState) TypeCRCExtra() uint8 {
 }
 
 func (self *SimState) FieldsString() string {
-	return fmt.Sprintf("Q1=%d Q2=%d Q3=%d Q4=%d Roll=%d Pitch=%d Yaw=%d Xacc=%d Yacc=%d Zacc=%d Xgyro=%d Ygyro=%d Zgyro=%d Lat=%d Lon=%d Alt=%d StdDevHorz=%d StdDevVert=%d Vn=%d Ve=%d Vd=%d", self.Q1, self.Q2, self.Q3, self.Q4, self.Roll, self.Pitch, self.Yaw, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Lat, self.Lon, self.Alt, self.StdDevHorz, self.StdDevVert, self.Vn, self.Ve, self.Vd)
+	return fmt.Sprintf("Q1=%f Q2=%f Q3=%f Q4=%f Roll=%f Pitch=%f Yaw=%f Xacc=%f Yacc=%f Zacc=%f Xgyro=%f Ygyro=%f Zgyro=%f Lat=%f Lon=%f Alt=%f StdDevHorz=%f StdDevVert=%f Vn=%f Ve=%f Vd=%f", self.Q1, self.Q2, self.Q3, self.Q4, self.Roll, self.Pitch, self.Yaw, self.Xacc, self.Yacc, self.Zacc, self.Xgyro, self.Ygyro, self.Zgyro, self.Lat, self.Lon, self.Alt, self.StdDevHorz, self.StdDevVert, self.Vn, self.Ve, self.Vd)
 }
 
 func (self *SimState) String() string {
@@ -3408,7 +3408,7 @@ func (self *HilOpticalFlow) TypeCRCExtra() uint8 {
 }
 
 func (self *HilOpticalFlow) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d IntegrationTimeUs=%d IntegratedX=%d IntegratedY=%d IntegratedXgyro=%d IntegratedYgyro=%d IntegratedZgyro=%d TimeDeltaDistanceUs=%d Distance=%d Temperature=%d SensorId=%d Quality=%d", self.TimeUsec, self.IntegrationTimeUs, self.IntegratedX, self.IntegratedY, self.IntegratedXgyro, self.IntegratedYgyro, self.IntegratedZgyro, self.TimeDeltaDistanceUs, self.Distance, self.Temperature, self.SensorId, self.Quality)
+	return fmt.Sprintf("TimeUsec=%d IntegrationTimeUs=%d IntegratedX=%f IntegratedY=%f IntegratedXgyro=%f IntegratedYgyro=%f IntegratedZgyro=%f TimeDeltaDistanceUs=%d Distance=%f Temperature=%d SensorId=%d Quality=%d", self.TimeUsec, self.IntegrationTimeUs, self.IntegratedX, self.IntegratedY, self.IntegratedXgyro, self.IntegratedYgyro, self.IntegratedZgyro, self.TimeDeltaDistanceUs, self.Distance, self.Temperature, self.SensorId, self.Quality)
 }
 
 func (self *HilOpticalFlow) String() string {
@@ -3452,7 +3452,7 @@ func (self *HilStateQuaternion) TypeCRCExtra() uint8 {
 }
 
 func (self *HilStateQuaternion) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d AttitudeQuaternion=%v Rollspeed=%d Pitchspeed=%d Yawspeed=%d Lat=%d Lon=%d Alt=%d Vx=%d Vy=%d Vz=%d IndAirspeed=%d TrueAirspeed=%d Xacc=%d Yacc=%d Zacc=%d", self.TimeUsec, self.AttitudeQuaternion, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Lat, self.Lon, self.Alt, self.Vx, self.Vy, self.Vz, self.IndAirspeed, self.TrueAirspeed, self.Xacc, self.Yacc, self.Zacc)
+	return fmt.Sprintf("TimeUsec=%d AttitudeQuaternion=%v Rollspeed=%f Pitchspeed=%f Yawspeed=%f Lat=%d Lon=%d Alt=%d Vx=%d Vy=%d Vz=%d IndAirspeed=%d TrueAirspeed=%d Xacc=%d Yacc=%d Zacc=%d", self.TimeUsec, self.AttitudeQuaternion, self.Rollspeed, self.Pitchspeed, self.Yawspeed, self.Lat, self.Lon, self.Alt, self.Vx, self.Vy, self.Vz, self.IndAirspeed, self.TrueAirspeed, self.Xacc, self.Yacc, self.Zacc)
 }
 
 func (self *HilStateQuaternion) String() string {
@@ -4130,7 +4130,7 @@ func (self *TerrainReport) TypeCRCExtra() uint8 {
 }
 
 func (self *TerrainReport) FieldsString() string {
-	return fmt.Sprintf("Lat=%d Lon=%d TerrainHeight=%d CurrentHeight=%d Spacing=%d Pending=%d Loaded=%d", self.Lat, self.Lon, self.TerrainHeight, self.CurrentHeight, self.Spacing, self.Pending, self.Loaded)
+	return fmt.Sprintf("Lat=%d Lon=%d TerrainHeight=%f CurrentHeight=%f Spacing=%d Pending=%d Loaded=%d", self.Lat, self.Lon, self.TerrainHeight, self.CurrentHeight, self.Spacing, self.Pending, self.Loaded)
 }
 
 func (self *TerrainReport) String() string {
@@ -4296,7 +4296,7 @@ func (self *DebugVect) TypeCRCExtra() uint8 {
 }
 
 func (self *DebugVect) FieldsString() string {
-	return fmt.Sprintf("TimeUsec=%d X=%d Y=%d Z=%d Name=\"%s\"", self.TimeUsec, self.X, self.Y, self.Z, self.Name)
+	return fmt.Sprintf("TimeUsec=%d X=%f Y=%f Z=%f Name=\"%s\"", self.TimeUsec, self.X, self.Y, self.Z, self.Name)
 }
 
 func (self *DebugVect) String() string {
@@ -4327,7 +4327,7 @@ func (self *NamedValueFloat) TypeCRCExtra() uint8 {
 }
 
 func (self *NamedValueFloat) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Value=%d Name=\"%s\"", self.TimeBootMs, self.Value, self.Name)
+	return fmt.Sprintf("TimeBootMs=%d Value=%f Name=\"%s\"", self.TimeBootMs, self.Value, self.Name)
 }
 
 func (self *NamedValueFloat) String() string {
@@ -4419,7 +4419,7 @@ func (self *Debug) TypeCRCExtra() uint8 {
 }
 
 func (self *Debug) FieldsString() string {
-	return fmt.Sprintf("TimeBootMs=%d Value=%d Ind=%d", self.TimeBootMs, self.Value, self.Ind)
+	return fmt.Sprintf("TimeBootMs=%d Value=%f Ind=%d", self.TimeBootMs, self.Value, self.Ind)
 }
 
 func (self *Debug) String() string {

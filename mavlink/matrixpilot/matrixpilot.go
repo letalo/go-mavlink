@@ -506,7 +506,7 @@ func (self *SerialUdbExtraF5) TypeCRCExtra() uint8 {
 }
 
 func (self *SerialUdbExtraF5) FieldsString() string {
-	return fmt.Sprintf("SueYawkpAileron=%d SueYawkdAileron=%d SueRollkp=%d SueRollkd=%d SueYawStabilizationAileron=%d SueAileronBoost=%d", self.SueYawkpAileron, self.SueYawkdAileron, self.SueRollkp, self.SueRollkd, self.SueYawStabilizationAileron, self.SueAileronBoost)
+	return fmt.Sprintf("SueYawkpAileron=%f SueYawkdAileron=%f SueRollkp=%f SueRollkd=%f SueYawStabilizationAileron=%f SueAileronBoost=%f", self.SueYawkpAileron, self.SueYawkdAileron, self.SueRollkp, self.SueRollkd, self.SueYawStabilizationAileron, self.SueAileronBoost)
 }
 
 func (self *SerialUdbExtraF5) String() string {
@@ -539,7 +539,7 @@ func (self *SerialUdbExtraF6) TypeCRCExtra() uint8 {
 }
 
 func (self *SerialUdbExtraF6) FieldsString() string {
-	return fmt.Sprintf("SuePitchgain=%d SuePitchkd=%d SueRudderElevMix=%d SueRollElevMix=%d SueElevatorBoost=%d", self.SuePitchgain, self.SuePitchkd, self.SueRudderElevMix, self.SueRollElevMix, self.SueElevatorBoost)
+	return fmt.Sprintf("SuePitchgain=%f SuePitchkd=%f SueRudderElevMix=%f SueRollElevMix=%f SueElevatorBoost=%f", self.SuePitchgain, self.SuePitchkd, self.SueRudderElevMix, self.SueRollElevMix, self.SueElevatorBoost)
 }
 
 func (self *SerialUdbExtraF6) String() string {
@@ -573,7 +573,7 @@ func (self *SerialUdbExtraF7) TypeCRCExtra() uint8 {
 }
 
 func (self *SerialUdbExtraF7) FieldsString() string {
-	return fmt.Sprintf("SueYawkpRudder=%d SueYawkdRudder=%d SueRollkpRudder=%d SueRollkdRudder=%d SueRudderBoost=%d SueRtlPitchDown=%d", self.SueYawkpRudder, self.SueYawkdRudder, self.SueRollkpRudder, self.SueRollkdRudder, self.SueRudderBoost, self.SueRtlPitchDown)
+	return fmt.Sprintf("SueYawkpRudder=%f SueYawkdRudder=%f SueRollkpRudder=%f SueRollkdRudder=%f SueRudderBoost=%f SueRtlPitchDown=%f", self.SueYawkpRudder, self.SueYawkdRudder, self.SueRollkpRudder, self.SueRollkdRudder, self.SueRudderBoost, self.SueRtlPitchDown)
 }
 
 func (self *SerialUdbExtraF7) String() string {
@@ -608,7 +608,7 @@ func (self *SerialUdbExtraF8) TypeCRCExtra() uint8 {
 }
 
 func (self *SerialUdbExtraF8) FieldsString() string {
-	return fmt.Sprintf("SueHeightTargetMax=%d SueHeightTargetMin=%d SueAltHoldThrottleMin=%d SueAltHoldThrottleMax=%d SueAltHoldPitchMin=%d SueAltHoldPitchMax=%d SueAltHoldPitchHigh=%d", self.SueHeightTargetMax, self.SueHeightTargetMin, self.SueAltHoldThrottleMin, self.SueAltHoldThrottleMax, self.SueAltHoldPitchMin, self.SueAltHoldPitchMax, self.SueAltHoldPitchHigh)
+	return fmt.Sprintf("SueHeightTargetMax=%f SueHeightTargetMin=%f SueAltHoldThrottleMin=%f SueAltHoldThrottleMax=%f SueAltHoldPitchMin=%f SueAltHoldPitchMax=%f SueAltHoldPitchHigh=%f", self.SueHeightTargetMax, self.SueHeightTargetMin, self.SueAltHoldThrottleMin, self.SueAltHoldThrottleMax, self.SueAltHoldPitchMin, self.SueAltHoldPitchMax, self.SueAltHoldPitchHigh)
 }
 
 func (self *SerialUdbExtraF8) String() string {
