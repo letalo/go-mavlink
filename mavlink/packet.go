@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	// "log"
 	"strconv"
 	"strings"
 
@@ -122,26 +123,31 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 	var (
 		// Slice uses packet.Header for data storage,
 		// so accessing the slice elements accesses the packet.Header
-		headerBytesRef = packet.Header.BytesRef()
+		// headerBytesRef = packet.Header.BytesRef()
+		headerBytes = make([]byte, 5)
 
 		hashedReader = x25.MakeHashedReader(reader)
 	)
 
 	// Read rest of header directly into packet.Header referenced by headerBytesRef
-	m, err = io.ReadFull(&hashedReader, headerBytesRef)
+	m, err = io.ReadFull(&hashedReader, headerBytes)
 	n += int64(m)
 	if err != nil {
-		return n, fmt.Errorf("Read %d of %d header bytes. %s", n, len(headerBytesRef), err)
+		return n, fmt.Errorf("Read %d of 5 remaining header bytes. %s", n, err)
 	} else if m == 0 {
 		return n, errConnectionClosed
 	}
 
-	// log.Println("HEADER", headerBytesRef)
+	packet.Header.SetBytes(headerBytes)
+
+	// log.Println("HEADER", append(firstByte, headerBytes...))
 
 	// to do: check component sequence
 
 	f := MessageFactory[packet.Header.MessageID]
 	if f == nil {
+		m, _ = io.ReadFull(reader, make([]byte, packet.Header.PayloadLength+2)) // Skip rest of message
+		n += int64(m)
 		return n, fmt.Errorf("Unknown message ID %d", packet.Header.MessageID)
 	}
 	packet.Message = f()
@@ -151,11 +157,14 @@ func (packet *Packet) ReadFrom(reader io.Reader) (n int64, err error) {
 		return n, ErrUnknownMessageID(packet.Header.MessageID)
 	}
 	if packet.Header.PayloadLength != packet.Message.TypeSize() {
+		// Header does not match of what we know about the message,
+		// so let's skip this message
 		skip := packet.Header.PayloadLength
 		if skip > packet.Message.TypeSize() {
-			skip = packet.Message.TypeSize() // use smaller size
+			// use smaller size to minimize data loss when we don't know which number is true
+			skip = packet.Message.TypeSize()
 		}
-		m, _ = io.ReadFull(reader, make([]byte, skip)) // Skip rest of message
+		m, _ = io.ReadFull(reader, make([]byte, skip+2)) // Skip rest of message
 		n += int64(m)
 		err = fmt.Errorf(
 			"Expected %d as PayloadLength for message type %s(%d), got %d",
@@ -217,7 +226,7 @@ func (packet *Packet) WriteTo(writer io.Writer) (n int64, err error) {
 	hashedWriter := x25.MakeHashedWriter(writer)
 
 	// Write and hash header
-	m, err = hashedWriter.Write(packet.Header.BytesRef())
+	m, err = hashedWriter.Write(packet.Header.Bytes())
 	n += int64(m)
 	if err != nil {
 		return n, err
@@ -257,7 +266,7 @@ func (packet *Packet) WireBytes() []byte {
 	buf.WriteByte(FRAME_START)
 
 	writer := x25.MakeHashedWriter(buf)
-	writer.Write(packet.Header.BytesRef())
+	writer.Write(packet.Header.Bytes())
 	binary.Write(&writer, binary.LittleEndian, packet.Message)
 	writer.Hash.WriteByte(packet.Message.TypeCRCExtra())
 

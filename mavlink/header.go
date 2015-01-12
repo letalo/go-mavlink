@@ -2,7 +2,7 @@ package mavlink
 
 import (
 	"fmt"
-	"unsafe"
+	// "unsafe"
 )
 
 type Header struct {
@@ -13,8 +13,20 @@ type Header struct {
 	MessageID      uint8
 }
 
-func (header *Header) BytesRef() []byte {
-	return (*[5]byte)(unsafe.Pointer(header))[:]
+// func (header *Header) BytesRef() []byte {
+// 	return (*[5]byte)(unsafe.Pointer(header))[:]
+// }
+
+func (header *Header) Bytes() []byte {
+	return []byte{header.PayloadLength, header.PacketSequence, header.SystemID, header.ComponentID, header.MessageID}
+}
+
+func (header *Header) SetBytes(data []byte) {
+	header.PayloadLength = data[0]
+	header.PacketSequence = data[1]
+	header.SystemID = data[2]
+	header.ComponentID = data[3]
+	header.MessageID = data[4]
 }
 
 func (header *Header) FieldsShortString() string {
