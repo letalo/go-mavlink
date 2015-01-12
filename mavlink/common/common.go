@@ -57,6 +57,7 @@ func Init() {
 	mavlink.MessageFactory[47] = func() mavlink.Message { return new(MissionAck) }
 	mavlink.MessageFactory[48] = func() mavlink.Message { return new(SetGpsGlobalOrigin) }
 	mavlink.MessageFactory[49] = func() mavlink.Message { return new(GpsGlobalOrigin) }
+	mavlink.MessageFactory[50] = func() mavlink.Message { return new(ParamMapRc) }
 	mavlink.MessageFactory[54] = func() mavlink.Message { return new(SafetySetAllowedArea) }
 	mavlink.MessageFactory[55] = func() mavlink.Message { return new(SafetyAllowedArea) }
 	mavlink.MessageFactory[61] = func() mavlink.Message { return new(AttitudeQuaternionCov) }
@@ -119,6 +120,7 @@ func Init() {
 	mavlink.MessageFactory[134] = func() mavlink.Message { return new(TerrainData) }
 	mavlink.MessageFactory[135] = func() mavlink.Message { return new(TerrainCheck) }
 	mavlink.MessageFactory[136] = func() mavlink.Message { return new(TerrainReport) }
+	mavlink.MessageFactory[137] = func() mavlink.Message { return new(ScaledPressure2) }
 	mavlink.MessageFactory[147] = func() mavlink.Message { return new(BatteryStatus) }
 	mavlink.MessageFactory[148] = func() mavlink.Message { return new(AutopilotVersion) }
 	mavlink.MessageFactory[248] = func() mavlink.Message { return new(V2Extension) }
@@ -355,6 +357,7 @@ const (
 	MAV_CMD_NAV_RETURN_TO_LAUNCH         = 20  // Return to launch location
 	MAV_CMD_NAV_LAND                     = 21  // Land at location
 	MAV_CMD_NAV_TAKEOFF                  = 22  // Takeoff from ground / hand
+	MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT  = 30  // Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached.
 	MAV_CMD_NAV_ROI                      = 80  // Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.
 	MAV_CMD_NAV_PATHPLANNING             = 81  // Control autonomous path planning on the MAV.
 	MAV_CMD_NAV_SPLINE_WAYPOINT          = 82  // Navigate to MISSION using a spline path.
@@ -973,12 +976,12 @@ func (self *ParamSet) String() string {
 }
 
 // The global position, as returned by the Global Positioning System (GPS). This is
-//                 NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
+//                 NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
 type GpsRawInt struct {
 	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	Lat               int32  // Latitude (WGS84), in degrees * 1E7
 	Lon               int32  // Longitude (WGS84), in degrees * 1E7
-	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Alt               int32  // Altitude (AMSL, NOT WGS84), in meters * 1000 (positive for up). Note that virtually all GPS modules provide the AMSL altitude in addition to the WGS84 altitude.
 	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
 	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
 	Vel               uint16 // GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
@@ -1298,7 +1301,7 @@ type GlobalPositionInt struct {
 	TimeBootMs  uint32 // Timestamp (milliseconds since system boot)
 	Lat         int32  // Latitude, expressed as * 1E7
 	Lon         int32  // Longitude, expressed as * 1E7
-	Alt         int32  // Altitude in meters, expressed as * 1000 (millimeters), WGS84 (not AMSL)
+	Alt         int32  // Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well)
 	RelativeAlt int32  // Altitude above ground in meters, expressed as * 1000 (millimeters)
 	Vx          int16  // Ground X Speed (Latitude), expressed as m/s * 100
 	Vy          int16  // Ground Y Speed (Longitude), expressed as m/s * 100
@@ -1799,7 +1802,7 @@ func (self *MissionAck) String() string {
 type SetGpsGlobalOrigin struct {
 	Latitude     int32 // Latitude (WGS84), in degrees * 1E7
 	Longitude    int32 // Longitude (WGS84, in degrees * 1E7
-	Altitude     int32 // Altitude (WGS84), in meters * 1000 (positive for up)
+	Altitude     int32 // Altitude (AMSL), in meters * 1000 (positive for up)
 	TargetSystem uint8 // System ID
 }
 
@@ -1831,7 +1834,7 @@ func (self *SetGpsGlobalOrigin) String() string {
 type GpsGlobalOrigin struct {
 	Latitude  int32 // Latitude (WGS84), in degrees * 1E7
 	Longitude int32 // Longitude (WGS84), in degrees * 1E7
-	Altitude  int32 // Altitude (WGS84), in meters * 1000 (positive for up)
+	Altitude  int32 // Altitude (AMSL), in meters * 1000 (positive for up)
 }
 
 func (self *GpsGlobalOrigin) TypeID() uint8 {
@@ -1855,6 +1858,43 @@ func (self *GpsGlobalOrigin) FieldsString() string {
 }
 
 func (self *GpsGlobalOrigin) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Bind a RC channel to a parameter. The parameter should change accoding to the RC channel value.
+type ParamMapRc struct {
+	ParamValue0             float32 // Initial parameter value
+	Scale                   float32 // Scale, maps the RC range [-1, 1] to a parameter value
+	ParamValueMin           float32 // Minimum param value. The protocol does not define if this overwrites an onboard minimum value. (Depends on implementation)
+	ParamValueMax           float32 // Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation)
+	ParamIndex              int16   // Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored), send -2 to disable any existing map for this rc_channel_index.
+	TargetSystem            uint8   // System ID
+	TargetComponent         uint8   // Component ID
+	ParamId                 Char16  // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
+	ParameterRcChannelIndex uint8   // Index of parameter RC channel. Not equal to the RC channel id. Typically correpsonds to a potentiometer-knob on the RC.
+}
+
+func (self *ParamMapRc) TypeID() uint8 {
+	return 50
+}
+
+func (self *ParamMapRc) TypeName() string {
+	return "PARAM_MAP_RC"
+}
+
+func (self *ParamMapRc) TypeSize() uint8 {
+	return 37
+}
+
+func (self *ParamMapRc) TypeCRCExtra() uint8 {
+	return 121
+}
+
+func (self *ParamMapRc) FieldsString() string {
+	return fmt.Sprintf("ParamValue0=%f Scale=%f ParamValueMin=%f ParamValueMax=%f ParamIndex=%d TargetSystem=%d TargetComponent=%d ParamId=\"%s\" ParameterRcChannelIndex=%d", self.ParamValue0, self.Scale, self.ParamValueMin, self.ParamValueMax, self.ParamIndex, self.TargetSystem, self.TargetComponent, self.ParamId, self.ParameterRcChannelIndex)
+}
+
+func (self *ParamMapRc) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
@@ -2647,7 +2687,7 @@ type SetPositionTargetGlobalInt struct {
 	TimeBootMs      uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
 	LatInt          int32   // X Position in WGS84 frame in 1e7 * meters
 	LonInt          int32   // Y Position in WGS84 frame in 1e7 * meters
-	Alt             float32 // Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+	Alt             float32 // Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
 	Vx              float32 // X velocity in NED frame in meter / s
 	Vy              float32 // Y velocity in NED frame in meter / s
 	Vz              float32 // Z velocity in NED frame in meter / s
@@ -2691,7 +2731,7 @@ type PositionTargetGlobalInt struct {
 	TimeBootMs      uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
 	LatInt          int32   // X Position in WGS84 frame in 1e7 * meters
 	LonInt          int32   // Y Position in WGS84 frame in 1e7 * meters
-	Alt             float32 // Altitude in meters in WGS84 altitude, not AMSL if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+	Alt             float32 // Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
 	Vx              float32 // X velocity in NED frame in meter / s
 	Vy              float32 // Y velocity in NED frame in meter / s
 	Vz              float32 // Z velocity in NED frame in meter / s
@@ -3339,7 +3379,7 @@ type HilGps struct {
 	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	Lat               int32  // Latitude (WGS84), in degrees * 1E7
 	Lon               int32  // Longitude (WGS84), in degrees * 1E7
-	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Alt               int32  // Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
 	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: 65535
 	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: 65535
 	Vel               uint16 // GPS ground speed (m/s * 100). If unknown, set to: 65535
@@ -3724,7 +3764,7 @@ type Gps2Raw struct {
 	TimeUsec          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	Lat               int32  // Latitude (WGS84), in degrees * 1E7
 	Lon               int32  // Longitude (WGS84), in degrees * 1E7
-	Alt               int32  // Altitude (WGS84), in meters * 1000 (positive for up)
+	Alt               int32  // Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
 	DgpsAge           uint32 // Age of DGPS info
 	Eph               uint16 // GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
 	Epv               uint16 // GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
@@ -4137,6 +4177,38 @@ func (self *TerrainReport) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
+// Barometer readings for 2nd barometer
+type ScaledPressure2 struct {
+	TimeBootMs  uint32  // Timestamp (milliseconds since system boot)
+	PressAbs    float32 // Absolute pressure (hectopascal)
+	PressDiff   float32 // Differential pressure 1 (hectopascal)
+	Temperature int16   // Temperature measurement (0.01 degrees celsius)
+}
+
+func (self *ScaledPressure2) TypeID() uint8 {
+	return 137
+}
+
+func (self *ScaledPressure2) TypeName() string {
+	return "SCALED_PRESSURE2"
+}
+
+func (self *ScaledPressure2) TypeSize() uint8 {
+	return 14
+}
+
+func (self *ScaledPressure2) TypeCRCExtra() uint8 {
+	return 195
+}
+
+func (self *ScaledPressure2) FieldsString() string {
+	return fmt.Sprintf("TimeBootMs=%d PressAbs=%f PressDiff=%f Temperature=%d", self.TimeBootMs, self.PressAbs, self.PressDiff, self.Temperature)
+}
+
+func (self *ScaledPressure2) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
 // Battery information
 type BatteryStatus struct {
 	CurrentConsumed  int32      // Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
@@ -4176,9 +4248,17 @@ func (self *BatteryStatus) String() string {
 
 // Version and capability of autopilot software
 type AutopilotVersion struct {
-	Capabilities  uint64   // bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)
-	Version       uint32   // Firmware version number
-	CustomVersion [8]uint8 // Custom version field, commonly the first 8 bytes (16 characters) of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+	Capabilities            uint64   // bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)
+	Uid                     uint64   // UID if provided by hardware
+	FlightSwVersion         uint32   // Firmware version number
+	MiddlewareSwVersion     uint32   // Middleware version number
+	OsSwVersion             uint32   // Operating system version number
+	BoardVersion            uint32   // HW / board version (last 8 bytes should be silicon ID, if any)
+	VendorId                uint16   // ID of the board vendor
+	ProductId               uint16   // ID of the product
+	FlightCustomVersion     [8]uint8 // Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+	MiddlewareCustomVersion [8]uint8 // Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+	OsCustomVersion         [8]uint8 // Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
 }
 
 func (self *AutopilotVersion) TypeID() uint8 {
@@ -4190,15 +4270,15 @@ func (self *AutopilotVersion) TypeName() string {
 }
 
 func (self *AutopilotVersion) TypeSize() uint8 {
-	return 20
+	return 60
 }
 
 func (self *AutopilotVersion) TypeCRCExtra() uint8 {
-	return 216
+	return 224
 }
 
 func (self *AutopilotVersion) FieldsString() string {
-	return fmt.Sprintf("Capabilities=%d Version=%d CustomVersion=%v", self.Capabilities, self.Version, self.CustomVersion)
+	return fmt.Sprintf("Capabilities=%d Uid=%d FlightSwVersion=%d MiddlewareSwVersion=%d OsSwVersion=%d BoardVersion=%d VendorId=%d ProductId=%d FlightCustomVersion=%v MiddlewareCustomVersion=%v OsCustomVersion=%v", self.Capabilities, self.Uid, self.FlightSwVersion, self.MiddlewareSwVersion, self.OsSwVersion, self.BoardVersion, self.VendorId, self.ProductId, self.FlightCustomVersion, self.MiddlewareCustomVersion, self.OsCustomVersion)
 }
 
 func (self *AutopilotVersion) String() string {
