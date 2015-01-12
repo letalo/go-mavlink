@@ -9,6 +9,7 @@ import (
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
 	"github.com/SpaceLeap/go-mavlink/mavlink/common"
+	tarm "github.com/tarm/goserial"
 	"github.com/ungerik/go-dry"
 	"github.com/ungerik/goserial"
 )
@@ -52,7 +53,8 @@ func main() {
 		}
 	}
 
-	serialConn, err := serial.OpenDefault(port, serial.Baud(baud), timeout)
+	// serialConn, err := serial.OpenDefault(port, serial.Baud(baud), timeout)
+	serialConn, err := tarm.OpenPort(&tarm.Config{Name: port, Baud: baud})
 	if err != nil {
 		log.Fatal(err)
 	}
