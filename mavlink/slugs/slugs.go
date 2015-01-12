@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	PROTOCOL_NAME    = "slugs"
-	PROTOCOL_VERSION = 0
+	PROTOCOL_NAME = "slugs"
+
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
@@ -17,7 +17,6 @@ func Init() {
 	common.Init()
 
 	mavlink.ProtocolName = PROTOCOL_NAME
-	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
 	mavlink.MessageFactory[170] = func() mavlink.Message { return new(CpuLoad) }
 	mavlink.MessageFactory[172] = func() mavlink.Message { return new(SensorBias) }

@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	PROTOCOL_NAME    = "matrixpilot"
-	PROTOCOL_VERSION = 0
+	PROTOCOL_NAME = "matrixpilot"
+
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
@@ -17,7 +17,6 @@ func Init() {
 	common.Init()
 
 	mavlink.ProtocolName = PROTOCOL_NAME
-	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
 	mavlink.MessageFactory[150] = func() mavlink.Message { return new(FlexifunctionSet) }
 	mavlink.MessageFactory[151] = func() mavlink.Message { return new(FlexifunctionReadReq) }

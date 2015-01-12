@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	PROTOCOL_NAME    = "pixhawk"
-	PROTOCOL_VERSION = 0
+	PROTOCOL_NAME = "pixhawk"
+
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
@@ -17,7 +17,6 @@ func Init() {
 	common.Init()
 
 	mavlink.ProtocolName = PROTOCOL_NAME
-	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
 	mavlink.MessageFactory[151] = func() mavlink.Message { return new(SetCamShutter) }
 	mavlink.MessageFactory[152] = func() mavlink.Message { return new(ImageTriggered) }

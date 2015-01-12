@@ -130,7 +130,7 @@ func (self *Heartbeat) TypeSize() uint8 {
 }
 
 func (self *Heartbeat) TypeCRCExtra() uint8 {
-	return 239
+	return 50
 }
 
 func (self *Heartbeat) FieldsString() string {

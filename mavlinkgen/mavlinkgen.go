@@ -229,7 +229,11 @@ func (msg *Message) CRCExtra() uint8 {
 
 	fmt.Fprint(hash, msg.Name+" ")
 	for i := range msg.Fields {
-		fmt.Fprint(hash, msg.Fields[i].CType+" "+msg.Fields[i].Name+" ")
+		cType := msg.Fields[i].CType
+		if cType == "uint8_t_mavlink_version" {
+			cType = "uint8_t"
+		}
+		fmt.Fprint(hash, cType+" "+msg.Fields[i].Name+" ")
 		if msg.Fields[i].arrayLength > 0 {
 			hash.WriteByte(byte(msg.Fields[i].arrayLength))
 		}

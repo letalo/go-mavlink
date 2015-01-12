@@ -11,7 +11,7 @@ import (
 
 const (
 	PROTOCOL_NAME    = "{{.Name}}"
-	PROTOCOL_VERSION = {{if .Version}}{{.Version}}{{else}}0{{end}}{{if .Include}}
+	{{if .Version}}PROTOCOL_VERSION = {{.Version}}{{end}}{{if .Include}}
 	PROTOCOL_INCLUDE = {{.IncludeName}}.PROTOCOL_NAME{{end}}
 )
 
@@ -19,7 +19,7 @@ func Init() {
 	{{if .Include}}{{.IncludeName}}.Init(){{else}}for i := range mavlink.MessageFactory { mavlink.MessageFactory[i] = nil }{{end}}
 
 	mavlink.ProtocolName = PROTOCOL_NAME
-	mavlink.ProtocolVersion = PROTOCOL_VERSION
+	{{if .Version}}mavlink.ProtocolVersion = PROTOCOL_VERSION{{end}}
 	
 	{{range .Messages}}
 	mavlink.MessageFactory[{{.ID}}] = func() mavlink.Message { return new({{.Name | UpperCamelCase}}) }{{end}}

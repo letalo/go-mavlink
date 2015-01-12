@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/SpaceLeap/go-mavlink/mavlink"
-	"github.com/SpaceLeap/go-mavlink/mavlink/common"
+	// "github.com/SpaceLeap/go-mavlink/mavlink/common"
+	"github.com/SpaceLeap/go-mavlink/mavlink/ardupilotmega"
 	tarm "github.com/tarm/goserial"
 	"github.com/ungerik/go-dry"
 	"github.com/ungerik/goserial"
@@ -26,7 +27,8 @@ var (
 )
 
 func main() {
-	common.Init()
+	// common.Init()
+	ardupilotmega.Init()
 
 	flag.StringVar(&port, "port", "", "Serial port to connect to")
 	flag.IntVar(&baud, "baud", 115200, "Speed of the connection")
