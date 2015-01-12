@@ -26,6 +26,14 @@ var (
 	DebugLogger            *log.Logger
 )
 
+func LogEverything(logger *log.Logger) {
+	SendLogger = logger
+	ReceiveLogger = logger
+	AllErrorsLogger = logger
+	UnreportedErrorsLogger = logger
+	DebugLogger = logger
+}
+
 func Send(writer io.Writer, systemID, componentID, sequence uint8, message Message) error {
 	_, err := NewPacket(systemID, componentID, sequence, message).WriteTo(writer)
 	return err
