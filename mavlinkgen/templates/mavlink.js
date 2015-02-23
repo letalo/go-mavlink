@@ -12,7 +12,7 @@ export function init() {
 	mavlink.ProtocolVersion = PROTOCOL_VERSION{{end}}
 	
 	{{range .Messages}}
-	mavlink.MessageFactory[{{.ID}}] = function() { return new {{.Name | UpperCamelCase}}(); };{{end}}
+	mavlink.MessageFactory[{{.ID}}] = () => new {{.Name | UpperCamelCase}}();{{end}}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
