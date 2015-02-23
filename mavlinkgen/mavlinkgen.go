@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/format"
 	"os"
+	"os/exec"
 	"path"
 	"sort"
 	"strconv"
@@ -22,9 +23,11 @@ var (
 	definitionsDir = flag.String("defdir", "definitions", "Path of the directory with the protocol definition XML files.")
 	createGo       = flag.Bool("go", true, "Create Go code.")
 	goDir          = flag.String("godir", path.Join("..", "mavlink"), "Path of the directory where the Go packages will be created.")
-	goFormat       = flag.Bool("gofmt", true, "Call gofmt on the result file")
+	goFormat       = flag.Bool("gofmt", true, "Call gofmt on the resulting Go files")
 	createJS       = flag.Bool("js", false, "Create ECMAScript 6 code.")
 	jsDir          = flag.String("jsdir", path.Join("..", "..", "js-mavlink", "src"), "Path of the directory where the ECMAScript 6 modules will be created.")
+	jsBabel        = flag.Bool("jsbabel", true, "Compile ECMAScript 6 files with babel")
+	jsBabelDir     = flag.String("jsbabeldir", path.Join("..", "..", "js-mavlink", "dist"), "Ouput dir for babel compiled ECMAScript 5 files")
 	print          = flag.Bool("print", false, "Print generated files to stdout.")
 
 	funcMap = template.FuncMap{
@@ -34,11 +37,21 @@ var (
 
 	generated = make(map[string]bool)
 
-	templ = template.Must(template.New("mavlink.go").Funcs(funcMap).ParseFiles(path.Join("templates", "mavlink.go")))
+	goTemplate = template.Must(template.New("mavlink.go").Funcs(funcMap).ParseFiles(path.Join("templates", "mavlink.go")))
+	jsTemplate = template.Must(template.New("mavlink.js").Funcs(funcMap).ParseFiles(path.Join("templates", "mavlink.js")))
 )
 
 func main() {
 	flag.Parse()
+
+	if *createJS && *jsBabel {
+		es6filename := path.Join(*jsDir, "mavlink.js")
+		es5filename := path.Join(*jsBabelDir, "mavlink.js")
+		res, err := exec.Command("babel", es6filename, "--out-file", es5filename, "--source-maps").CombinedOutput()
+		if err != nil {
+			panic(string(res))
+		}
+	}
 
 	if *protocolName != "all" {
 		generate(*protocolName)
@@ -117,7 +130,7 @@ func generate(name string) {
 func generateGo(protocol *Protocol) {
 	buf := bytes.NewBuffer(nil)
 
-	err := templ.Execute(buf, protocol)
+	err := goTemplate.Execute(buf, protocol)
 	if err != nil {
 		panic(err)
 	}
@@ -131,13 +144,13 @@ func generateGo(protocol *Protocol) {
 	}
 
 	pkgDir := path.Join(*goDir, protocol.Name)
-	goFilename := path.Join(pkgDir, protocol.Name+".go")
+	filename := path.Join(pkgDir, protocol.Name+".go")
 
-	fmt.Println("Writing", goFilename)
+	fmt.Println("Writing", filename)
 
 	os.Mkdir(pkgDir, 0770)
 
-	err = dry.FileSetBytes(goFilename, data)
+	err = dry.FileSetBytes(filename, data)
 	if err != nil {
 		panic(err)
 	}
@@ -148,6 +161,41 @@ func generateGo(protocol *Protocol) {
 }
 
 func generateJS(protocol *Protocol) {
+	buf := bytes.NewBuffer(nil)
+
+	err := jsTemplate.Execute(buf, protocol)
+	if err != nil {
+		panic(err)
+	}
+
+	data := buf.Bytes()
+
+	filename := path.Join(*jsDir, protocol.Name+".js")
+
+	fmt.Println("Writing", filename)
+
+	err = dry.FileSetBytes(filename, data)
+	if err != nil {
+		panic(err)
+	}
+
+	if *jsBabel {
+		es5filename := path.Join(*jsBabelDir, protocol.Name+".js")
+		res, err := exec.Command("babel", filename, "--out-file", es5filename, "--source-maps").CombinedOutput()
+		if err != nil {
+			panic(string(res))
+		}
+		if *print {
+			data, err = dry.FileGetBytes(es5filename)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
+	if *print {
+		fmt.Println(string(data))
+	}
 }
 
 func goType(cType string) (name string, bitSize int, arrayLength int) {
@@ -216,15 +264,6 @@ type Message struct {
 	Name        string         `xml:"name,attr"`
 	Description string         `xml:"description"`
 	Fields      []MessageField `xml:"field"`
-}
-
-type MessageField struct {
-	CType       string `xml:"type,attr"`
-	Name        string `xml:"name,attr"`
-	Description string `xml:",innerxml"`
-	GoType      string
-	bitSize     int
-	arrayLength int
 }
 
 func (msg *Message) Size() (size int) {
@@ -302,4 +341,27 @@ func (msg *Message) Less(i, j int) bool {
 
 func (msg *Message) Swap(i, j int) {
 	msg.Fields[i], msg.Fields[j] = msg.Fields[j], msg.Fields[i]
+}
+
+type MessageField struct {
+	CType       string `xml:"type,attr"`
+	Name        string `xml:"name,attr"`
+	Description string `xml:",innerxml"`
+	GoType      string
+	bitSize     int
+	arrayLength int
+}
+
+func (field *MessageField) JSDefaultValue() string {
+	switch {
+	case strings.HasPrefix(field.CType, "char["):
+		return `""`
+	case strings.HasSuffix(field.CType, "]"):
+		return "[]"
+	case strings.HasPrefix(field.CType, "int"), strings.HasPrefix(field.CType, "uint"), field.CType == "char":
+		return "0"
+	case field.CType == "float", field.CType == "double":
+		return "0.0"
+	}
+	panic("Unsupported CType: " + field.CType)
 }

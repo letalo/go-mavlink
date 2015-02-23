@@ -1,7 +1,5 @@
 package {{.Name}}
 
-{{$version := .Version}}
-
 import (
 	"fmt"
 
