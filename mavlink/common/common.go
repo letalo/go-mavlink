@@ -121,6 +121,9 @@ func Init() {
 	mavlink.MessageFactory[135] = func() mavlink.Message { return new(TerrainCheck) }
 	mavlink.MessageFactory[136] = func() mavlink.Message { return new(TerrainReport) }
 	mavlink.MessageFactory[137] = func() mavlink.Message { return new(ScaledPressure2) }
+	mavlink.MessageFactory[138] = func() mavlink.Message { return new(AttPosMocap) }
+	mavlink.MessageFactory[139] = func() mavlink.Message { return new(SetActuatorControlTarget) }
+	mavlink.MessageFactory[140] = func() mavlink.Message { return new(ActuatorControlTarget) }
 	mavlink.MessageFactory[147] = func() mavlink.Message { return new(BatteryStatus) }
 	mavlink.MessageFactory[148] = func() mavlink.Message { return new(AutopilotVersion) }
 	mavlink.MessageFactory[248] = func() mavlink.Message { return new(V2Extension) }
@@ -181,6 +184,12 @@ const (
 	MAV_TYPE_ONBOARD_CONTROLLER = 18 // Onboard companion controller
 	MAV_TYPE_VTOL_DUOROTOR      = 19 // Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter.
 	MAV_TYPE_VTOL_QUADROTOR     = 20 // Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter.
+	MAV_TYPE_VTOL_RESERVED1     = 21 // VTOL reserved 1
+	MAV_TYPE_VTOL_RESERVED2     = 22 // VTOL reserved 2
+	MAV_TYPE_VTOL_RESERVED3     = 23 // VTOL reserved 3
+	MAV_TYPE_VTOL_RESERVED4     = 24 // VTOL reserved 4
+	MAV_TYPE_VTOL_RESERVED5     = 25 // VTOL reserved 5
+	MAV_TYPE_GIMBAL             = 26 // Onboard gimbal
 )
 
 // MAV_MODE_FLAG: These flags encode the MAV mode.
@@ -271,6 +280,7 @@ const (
 	MAV_COMP_ID_SERVO12        = 151 //
 	MAV_COMP_ID_SERVO13        = 152 //
 	MAV_COMP_ID_SERVO14        = 153 //
+	MAV_COMP_ID_GIMBAL         = 154 //
 )
 
 // MAV_SYS_STATUS_SENSOR: These encode the sensors whose status is sent as part of the SYS_STATUS message.
@@ -302,15 +312,18 @@ const (
 
 // MAV_FRAME:
 const (
-	MAV_FRAME_GLOBAL              = 0  // Global coordinate frame, WGS84 coordinate system. First value / x: latitude, second value / y: longitude, third value / z: positive altitude over mean sea level (MSL)
-	MAV_FRAME_LOCAL_NED           = 1  // Local coordinate frame, Z-up (x: north, y: east, z: down).
-	MAV_FRAME_MISSION             = 2  // NOT a coordinate frame, indicates a mission command.
-	MAV_FRAME_GLOBAL_RELATIVE_ALT = 3  // Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude, second value / y: longitude, third value / z: positive altitude with 0 being at the altitude of the home location.
-	MAV_FRAME_LOCAL_ENU           = 4  // Local coordinate frame, Z-down (x: east, y: north, z: up)
-	MAV_FRAME_LOCAL_OFFSET_NED    = 7  // Offset to the current local frame. Anything expressed in this frame should be added to the current local frame position.
-	MAV_FRAME_BODY_NED            = 8  // Setpoint in body NED frame. This makes sense if all position control is externalized - e.g. useful to command 2 m/s^2 acceleration to the right.
-	MAV_FRAME_BODY_OFFSET_NED     = 9  // Offset in body NED frame. This makes sense if adding setpoints to the current flight path, to avoid an obstacle - e.g. useful to command 2 m/s^2 acceleration to the east.
-	MAV_FRAME_GLOBAL_TERRAIN_ALT  = 10 // Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model.
+	MAV_FRAME_GLOBAL                  = 0  // Global coordinate frame, WGS84 coordinate system. First value / x: latitude, second value / y: longitude, third value / z: positive altitude over mean sea level (MSL)
+	MAV_FRAME_LOCAL_NED               = 1  // Local coordinate frame, Z-up (x: north, y: east, z: down).
+	MAV_FRAME_MISSION                 = 2  // NOT a coordinate frame, indicates a mission command.
+	MAV_FRAME_GLOBAL_RELATIVE_ALT     = 3  // Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude, second value / y: longitude, third value / z: positive altitude with 0 being at the altitude of the home location.
+	MAV_FRAME_LOCAL_ENU               = 4  // Local coordinate frame, Z-down (x: east, y: north, z: up)
+	MAV_FRAME_GLOBAL_INT              = 5  // Global coordinate frame, WGS84 coordinate system. First value / x: latitude in degrees*1.0e-7, second value / y: longitude in degrees*1.0e-7, third value / z: positive altitude over mean sea level (MSL)
+	MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6  // Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude with 0 being at the altitude of the home location.
+	MAV_FRAME_LOCAL_OFFSET_NED        = 7  // Offset to the current local frame. Anything expressed in this frame should be added to the current local frame position.
+	MAV_FRAME_BODY_NED                = 8  // Setpoint in body NED frame. This makes sense if all position control is externalized - e.g. useful to command 2 m/s^2 acceleration to the right.
+	MAV_FRAME_BODY_OFFSET_NED         = 9  // Offset in body NED frame. This makes sense if adding setpoints to the current flight path, to avoid an obstacle - e.g. useful to command 2 m/s^2 acceleration to the east.
+	MAV_FRAME_GLOBAL_TERRAIN_ALT      = 10 // Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model.
+	MAV_FRAME_GLOBAL_TERRAIN_ALT_INT  = 11 // Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude in meters with 0 being at ground level in terrain model.
 )
 
 // MAVLINK_DATA_STREAM_TYPE:
@@ -350,66 +363,67 @@ const (
 
 // MAV_CMD: Commands to be executed by the MAV. They can be executed on user request, or as part of a mission script. If the action is used in a mission, the parameter mapping to the waypoint/mission message is as follows: Param 1, Param 2, Param 3, Param 4, X: Param 5, Y:Param 6, Z:Param 7. This command list is similar what ARINC 424 is for commercial aircraft: A data format how to interpret waypoint/mission data.
 const (
-	MAV_CMD_NAV_WAYPOINT                 = 16  // Navigate to MISSION.
-	MAV_CMD_NAV_LOITER_UNLIM             = 17  // Loiter around this MISSION an unlimited amount of time
-	MAV_CMD_NAV_LOITER_TURNS             = 18  // Loiter around this MISSION for X turns
-	MAV_CMD_NAV_LOITER_TIME              = 19  // Loiter around this MISSION for X seconds
-	MAV_CMD_NAV_RETURN_TO_LAUNCH         = 20  // Return to launch location
-	MAV_CMD_NAV_LAND                     = 21  // Land at location
-	MAV_CMD_NAV_TAKEOFF                  = 22  // Takeoff from ground / hand
-	MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT  = 30  // Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached.
-	MAV_CMD_NAV_ROI                      = 80  // Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.
-	MAV_CMD_NAV_PATHPLANNING             = 81  // Control autonomous path planning on the MAV.
-	MAV_CMD_NAV_SPLINE_WAYPOINT          = 82  // Navigate to MISSION using a spline path.
-	MAV_CMD_NAV_GUIDED_ENABLE            = 92  // hand control over to an external controller
-	MAV_CMD_NAV_LAST                     = 95  // NOP - This command is only used to mark the upper limit of the NAV/ACTION commands in the enumeration
-	MAV_CMD_CONDITION_DELAY              = 112 // Delay mission state machine.
-	MAV_CMD_CONDITION_CHANGE_ALT         = 113 // Ascend/descend at rate.  Delay mission state machine until desired altitude reached.
-	MAV_CMD_CONDITION_DISTANCE           = 114 // Delay mission state machine until within desired distance of next NAV point.
-	MAV_CMD_CONDITION_YAW                = 115 // Reach a certain target angle.
-	MAV_CMD_CONDITION_LAST               = 159 // NOP - This command is only used to mark the upper limit of the CONDITION commands in the enumeration
-	MAV_CMD_DO_SET_MODE                  = 176 // Set system mode.
-	MAV_CMD_DO_JUMP                      = 177 // Jump to the desired command in the mission list.  Repeat this action only the specified number of times
-	MAV_CMD_DO_CHANGE_SPEED              = 178 // Change speed and/or throttle set points.
-	MAV_CMD_DO_SET_HOME                  = 179 // Changes the home location either to the current location or a specified location.
-	MAV_CMD_DO_SET_PARAMETER             = 180 // Set a system parameter.  Caution!  Use of this command requires knowledge of the numeric enumeration value of the parameter.
-	MAV_CMD_DO_SET_RELAY                 = 181 // Set a relay to a condition.
-	MAV_CMD_DO_REPEAT_RELAY              = 182 // Cycle a relay on and off for a desired number of cyles with a desired period.
-	MAV_CMD_DO_SET_SERVO                 = 183 // Set a servo to a desired PWM value.
-	MAV_CMD_DO_REPEAT_SERVO              = 184 // Cycle a between its nominal setting and a desired PWM for a desired number of cycles with a desired period.
-	MAV_CMD_DO_FLIGHTTERMINATION         = 185 // Terminate flight immediately
-	MAV_CMD_DO_LAND_START                = 189 // Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts. It may also be sent via a COMMAND_LONG to trigger a landing, in which case the nearest (geographically) landing sequence in the mission will be used. The Latitude/Longitude is optional, and may be set to 0/0 if not needed. If specified then it will be used to help find the closest landing sequence.
-	MAV_CMD_DO_RALLY_LAND                = 190 // Mission command to perform a landing from a rally point.
-	MAV_CMD_DO_GO_AROUND                 = 191 // Mission command to safely abort an autonmous landing.
-	MAV_CMD_DO_CONTROL_VIDEO             = 200 // Control onboard camera system.
-	MAV_CMD_DO_SET_ROI                   = 201 // Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.
-	MAV_CMD_DO_DIGICAM_CONFIGURE         = 202 // Mission command to configure an on-board camera controller system.
-	MAV_CMD_DO_DIGICAM_CONTROL           = 203 // Mission command to control an on-board camera controller system.
-	MAV_CMD_DO_MOUNT_CONFIGURE           = 204 // Mission command to configure a camera or antenna mount
-	MAV_CMD_DO_MOUNT_CONTROL             = 205 // Mission command to control a camera or antenna mount
-	MAV_CMD_DO_SET_CAM_TRIGG_DIST        = 206 // Mission command to set CAM_TRIGG_DIST for this flight
-	MAV_CMD_DO_FENCE_ENABLE              = 207 // Mission command to enable the geofence
-	MAV_CMD_DO_PARACHUTE                 = 208 // Mission command to trigger a parachute
-	MAV_CMD_DO_INVERTED_FLIGHT           = 210 // Change to/from inverted flight
-	MAV_CMD_DO_MOUNT_CONTROL_QUAT        = 220 // Mission command to control a camera or antenna mount, using a quaternion as reference.
-	MAV_CMD_DO_GUIDED_MASTER             = 221 // set id of master controller
-	MAV_CMD_DO_GUIDED_LIMITS             = 222 // set limits for external control
-	MAV_CMD_DO_LAST                      = 240 // NOP - This command is only used to mark the upper limit of the DO commands in the enumeration
-	MAV_CMD_PREFLIGHT_CALIBRATION        = 241 // Trigger calibration. This command will be only accepted if in pre-flight mode.
-	MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = 242 // Set sensor offsets. This command will be only accepted if in pre-flight mode.
-	MAV_CMD_PREFLIGHT_STORAGE            = 245 // Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.
-	MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN    = 246 // Request the reboot or shutdown of system components.
-	MAV_CMD_OVERRIDE_GOTO                = 252 // Hold / continue the current action
-	MAV_CMD_MISSION_START                = 0   // start running a mission
-	MAV_CMD_COMPONENT_ARM_DISARM         = 0   // Arms / Disarms a component
-	MAV_CMD_START_RX_PAIR                = 0   // Starts receiver pairing
-	MAV_CMD_IMAGE_START_CAPTURE          = 0   // Start image capture sequence
-	MAV_CMD_IMAGE_STOP_CAPTURE           = 0   // Stop image capture sequence
-	MAV_CMD_VIDEO_START_CAPTURE          = 0   // Starts video capture
-	MAV_CMD_VIDEO_STOP_CAPTURE           = 0   // Stop the current video capture
-	MAV_CMD_PANORAMA_CREATE              = 0   // Create a panorama at the current position
-	MAV_CMD_PAYLOAD_PREPARE_DEPLOY       = 0   // Deploy payload on a Lat / Lon / Alt position. This includes the navigation to reach the required release position and velocity.
-	MAV_CMD_PAYLOAD_CONTROL_DEPLOY       = 0   // Control the payload deployment.
+	MAV_CMD_NAV_WAYPOINT                   = 16  // Navigate to MISSION.
+	MAV_CMD_NAV_LOITER_UNLIM               = 17  // Loiter around this MISSION an unlimited amount of time
+	MAV_CMD_NAV_LOITER_TURNS               = 18  // Loiter around this MISSION for X turns
+	MAV_CMD_NAV_LOITER_TIME                = 19  // Loiter around this MISSION for X seconds
+	MAV_CMD_NAV_RETURN_TO_LAUNCH           = 20  // Return to launch location
+	MAV_CMD_NAV_LAND                       = 21  // Land at location
+	MAV_CMD_NAV_TAKEOFF                    = 22  // Takeoff from ground / hand
+	MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT    = 30  // Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached.
+	MAV_CMD_NAV_ROI                        = 80  // Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.
+	MAV_CMD_NAV_PATHPLANNING               = 81  // Control autonomous path planning on the MAV.
+	MAV_CMD_NAV_SPLINE_WAYPOINT            = 82  // Navigate to MISSION using a spline path.
+	MAV_CMD_NAV_GUIDED_ENABLE              = 92  // hand control over to an external controller
+	MAV_CMD_NAV_LAST                       = 95  // NOP - This command is only used to mark the upper limit of the NAV/ACTION commands in the enumeration
+	MAV_CMD_CONDITION_DELAY                = 112 // Delay mission state machine.
+	MAV_CMD_CONDITION_CHANGE_ALT           = 113 // Ascend/descend at rate.  Delay mission state machine until desired altitude reached.
+	MAV_CMD_CONDITION_DISTANCE             = 114 // Delay mission state machine until within desired distance of next NAV point.
+	MAV_CMD_CONDITION_YAW                  = 115 // Reach a certain target angle.
+	MAV_CMD_CONDITION_LAST                 = 159 // NOP - This command is only used to mark the upper limit of the CONDITION commands in the enumeration
+	MAV_CMD_DO_SET_MODE                    = 176 // Set system mode.
+	MAV_CMD_DO_JUMP                        = 177 // Jump to the desired command in the mission list.  Repeat this action only the specified number of times
+	MAV_CMD_DO_CHANGE_SPEED                = 178 // Change speed and/or throttle set points.
+	MAV_CMD_DO_SET_HOME                    = 179 // Changes the home location either to the current location or a specified location.
+	MAV_CMD_DO_SET_PARAMETER               = 180 // Set a system parameter.  Caution!  Use of this command requires knowledge of the numeric enumeration value of the parameter.
+	MAV_CMD_DO_SET_RELAY                   = 181 // Set a relay to a condition.
+	MAV_CMD_DO_REPEAT_RELAY                = 182 // Cycle a relay on and off for a desired number of cyles with a desired period.
+	MAV_CMD_DO_SET_SERVO                   = 183 // Set a servo to a desired PWM value.
+	MAV_CMD_DO_REPEAT_SERVO                = 184 // Cycle a between its nominal setting and a desired PWM for a desired number of cycles with a desired period.
+	MAV_CMD_DO_FLIGHTTERMINATION           = 185 // Terminate flight immediately
+	MAV_CMD_DO_LAND_START                  = 189 // Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts. It may also be sent via a COMMAND_LONG to trigger a landing, in which case the nearest (geographically) landing sequence in the mission will be used. The Latitude/Longitude is optional, and may be set to 0/0 if not needed. If specified then it will be used to help find the closest landing sequence.
+	MAV_CMD_DO_RALLY_LAND                  = 190 // Mission command to perform a landing from a rally point.
+	MAV_CMD_DO_GO_AROUND                   = 191 // Mission command to safely abort an autonmous landing.
+	MAV_CMD_DO_CONTROL_VIDEO               = 200 // Control onboard camera system.
+	MAV_CMD_DO_SET_ROI                     = 201 // Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.
+	MAV_CMD_DO_DIGICAM_CONFIGURE           = 202 // Mission command to configure an on-board camera controller system.
+	MAV_CMD_DO_DIGICAM_CONTROL             = 203 // Mission command to control an on-board camera controller system.
+	MAV_CMD_DO_MOUNT_CONFIGURE             = 204 // Mission command to configure a camera or antenna mount
+	MAV_CMD_DO_MOUNT_CONTROL               = 205 // Mission command to control a camera or antenna mount
+	MAV_CMD_DO_SET_CAM_TRIGG_DIST          = 206 // Mission command to set CAM_TRIGG_DIST for this flight
+	MAV_CMD_DO_FENCE_ENABLE                = 207 // Mission command to enable the geofence
+	MAV_CMD_DO_PARACHUTE                   = 208 // Mission command to trigger a parachute
+	MAV_CMD_DO_INVERTED_FLIGHT             = 210 // Change to/from inverted flight
+	MAV_CMD_DO_MOUNT_CONTROL_QUAT          = 220 // Mission command to control a camera or antenna mount, using a quaternion as reference.
+	MAV_CMD_DO_GUIDED_MASTER               = 221 // set id of master controller
+	MAV_CMD_DO_GUIDED_LIMITS               = 222 // set limits for external control
+	MAV_CMD_DO_LAST                        = 240 // NOP - This command is only used to mark the upper limit of the DO commands in the enumeration
+	MAV_CMD_PREFLIGHT_CALIBRATION          = 241 // Trigger calibration. This command will be only accepted if in pre-flight mode.
+	MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS   = 242 // Set sensor offsets. This command will be only accepted if in pre-flight mode.
+	MAV_CMD_PREFLIGHT_STORAGE              = 245 // Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.
+	MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN      = 246 // Request the reboot or shutdown of system components.
+	MAV_CMD_OVERRIDE_GOTO                  = 252 // Hold / continue the current action
+	MAV_CMD_MISSION_START                  = 0   // start running a mission
+	MAV_CMD_COMPONENT_ARM_DISARM           = 0   // Arms / Disarms a component
+	MAV_CMD_START_RX_PAIR                  = 0   // Starts receiver pairing
+	MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES = 0   // Request autopilot capabilities
+	MAV_CMD_IMAGE_START_CAPTURE            = 0   // Start image capture sequence
+	MAV_CMD_IMAGE_STOP_CAPTURE             = 0   // Stop image capture sequence
+	MAV_CMD_VIDEO_START_CAPTURE            = 0   // Starts video capture
+	MAV_CMD_VIDEO_STOP_CAPTURE             = 0   // Stop the current video capture
+	MAV_CMD_PANORAMA_CREATE                = 0   // Create a panorama at the current position
+	MAV_CMD_PAYLOAD_PREPARE_DEPLOY         = 0   // Deploy payload on a Lat / Lon / Alt position. This includes the navigation to reach the required release position and velocity.
+	MAV_CMD_PAYLOAD_CONTROL_DEPLOY         = 0   // Control the payload deployment.
 )
 
 // MAV_DATA_STREAM: Data stream IDs. A data stream is not a fixed set of messages, but rather a
@@ -550,6 +564,7 @@ const (
 	MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED  = 128 // Autopilot supports commanding position and velocity targets in local NED frame.
 	MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_GLOBAL_INT = 0   // Autopilot supports commanding position and velocity targets in global scaled integers.
 	MAV_PROTOCOL_CAPABILITY_TERRAIN                        = 0   // Autopilot supports terrain protocol / data handling.
+	MAV_PROTOCOL_CAPABILITY_SET_ACTUATOR_TARGET            = 0   // Autopilot supports direct actuator control.
 )
 
 // MAV_ESTIMATOR_TYPE: Enumeration of estimator types
@@ -3276,15 +3291,15 @@ func (self *SimState) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
-// Status generated by radio
+// Status generated by radio and injected into MAVLink stream.
 type RadioStatus struct {
-	Rxerrors uint16 // receive errors
-	Fixed    uint16 // count of error corrected packets
-	Rssi     uint8  // local signal strength
-	Remrssi  uint8  // remote signal strength
-	Txbuf    uint8  // how full the tx buffer is as a percentage
-	Noise    uint8  // background noise level
-	Remnoise uint8  // remote background noise level
+	Rxerrors uint16 // Receive errors
+	Fixed    uint16 // Count of error corrected packets
+	Rssi     uint8  // Local signal strength
+	Remrssi  uint8  // Remote signal strength
+	Txbuf    uint8  // Remaining free buffer space in percent.
+	Noise    uint8  // Background noise level
+	Remnoise uint8  // Remote background noise level
 }
 
 func (self *RadioStatus) TypeID() uint8 {
@@ -4206,6 +4221,103 @@ func (self *ScaledPressure2) FieldsString() string {
 }
 
 func (self *ScaledPressure2) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Motion capture attitude and position
+type AttPosMocap struct {
+	TimeUsec uint64     // Timestamp (micros since boot or Unix epoch)
+	Q        [4]float32 // Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+	X        float32    // X position in meters (NED)
+	Y        float32    // Y position in meters (NED)
+	Z        float32    // Z position in meters (NED)
+}
+
+func (self *AttPosMocap) TypeID() uint8 {
+	return 138
+}
+
+func (self *AttPosMocap) TypeName() string {
+	return "ATT_POS_MOCAP"
+}
+
+func (self *AttPosMocap) TypeSize() uint8 {
+	return 36
+}
+
+func (self *AttPosMocap) TypeCRCExtra() uint8 {
+	return 119
+}
+
+func (self *AttPosMocap) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Q=%v X=%f Y=%f Z=%f", self.TimeUsec, self.Q, self.X, self.Y, self.Z)
+}
+
+func (self *AttPosMocap) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Set the vehicle attitude and body angular rates.
+type SetActuatorControlTarget struct {
+	TimeUsec        uint64     // Timestamp (micros since boot or Unix epoch)
+	Controls        [8]float32 // Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.
+	GroupMlx        uint8      // Actuator group. The "_mlx" indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.
+	TargetSystem    uint8      // System ID
+	TargetComponent uint8      // Component ID
+}
+
+func (self *SetActuatorControlTarget) TypeID() uint8 {
+	return 139
+}
+
+func (self *SetActuatorControlTarget) TypeName() string {
+	return "SET_ACTUATOR_CONTROL_TARGET"
+}
+
+func (self *SetActuatorControlTarget) TypeSize() uint8 {
+	return 43
+}
+
+func (self *SetActuatorControlTarget) TypeCRCExtra() uint8 {
+	return 9
+}
+
+func (self *SetActuatorControlTarget) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Controls=%v GroupMlx=%d TargetSystem=%d TargetComponent=%d", self.TimeUsec, self.Controls, self.GroupMlx, self.TargetSystem, self.TargetComponent)
+}
+
+func (self *SetActuatorControlTarget) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Set the vehicle attitude and body angular rates.
+type ActuatorControlTarget struct {
+	TimeUsec uint64     // Timestamp (micros since boot or Unix epoch)
+	Controls [8]float32 // Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.
+	GroupMlx uint8      // Actuator group. The "_mlx" indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.
+}
+
+func (self *ActuatorControlTarget) TypeID() uint8 {
+	return 140
+}
+
+func (self *ActuatorControlTarget) TypeName() string {
+	return "ACTUATOR_CONTROL_TARGET"
+}
+
+func (self *ActuatorControlTarget) TypeSize() uint8 {
+	return 41
+}
+
+func (self *ActuatorControlTarget) TypeCRCExtra() uint8 {
+	return 101
+}
+
+func (self *ActuatorControlTarget) FieldsString() string {
+	return fmt.Sprintf("TimeUsec=%d Controls=%v GroupMlx=%d", self.TimeUsec, self.Controls, self.GroupMlx)
+}
+
+func (self *ActuatorControlTarget) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 

@@ -20,9 +20,12 @@ import (
 var (
 	protocolName   = flag.String("protocol", "all", "Protocol name. One of the XML definitions, or 'all' for all definitions.")
 	definitionsDir = flag.String("defdir", "definitions", "Path of the directory with the protocol definition XML files.")
+	createGo       = flag.Bool("go", true, "Create Go code.")
 	goDir          = flag.String("godir", path.Join("..", "mavlink"), "Path of the directory where the Go packages will be created.")
-	goFormat       = flag.Bool("go_fmt", true, "Call go fmt on the result file")
-	print          = flag.Bool("print", false, "Print generated files to stdout")
+	goFormat       = flag.Bool("gofmt", true, "Call gofmt on the result file")
+	createJS       = flag.Bool("js", false, "Create ECMAScript 6 code.")
+	jsDir          = flag.String("jsdir", path.Join("..", "..", "js-mavlink", "src"), "Path of the directory where the ECMAScript 6 modules will be created.")
+	print          = flag.Bool("print", false, "Print generated files to stdout.")
 
 	funcMap = template.FuncMap{
 		"UpperCamelCase": dry.StringToUpperCamelCase,
@@ -101,9 +104,20 @@ func generate(name string) {
 		sort.Stable(sort.Reverse(message))
 	}
 
+	generated[protocol.Name] = true
+
+	if *createGo {
+		generateGo(protocol)
+	}
+	if *createJS {
+		generateJS(protocol)
+	}
+}
+
+func generateGo(protocol *Protocol) {
 	buf := bytes.NewBuffer(nil)
 
-	err = templ.Execute(buf, &protocol)
+	err := templ.Execute(buf, protocol)
 	if err != nil {
 		panic(err)
 	}
@@ -116,7 +130,6 @@ func generate(name string) {
 		}
 	}
 
-	// todo path.Join
 	pkgDir := path.Join(*goDir, protocol.Name)
 	goFilename := path.Join(pkgDir, protocol.Name+".go")
 
@@ -129,11 +142,12 @@ func generate(name string) {
 		panic(err)
 	}
 
-	generated[protocol.Name] = true
-
 	if *print {
 		fmt.Println(string(data))
 	}
+}
+
+func generateJS(protocol *Protocol) {
 }
 
 func goType(cType string) (name string, bitSize int, arrayLength int) {

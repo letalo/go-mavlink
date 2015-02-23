@@ -50,6 +50,9 @@ func Init() {
 	mavlink.MessageFactory[180] = func() mavlink.Message { return new(CameraFeedback) }
 	mavlink.MessageFactory[181] = func() mavlink.Message { return new(Battery2) }
 	mavlink.MessageFactory[182] = func() mavlink.Message { return new(Ahrs3) }
+	mavlink.MessageFactory[183] = func() mavlink.Message { return new(AutopilotVersionRequest) }
+	mavlink.MessageFactory[184] = func() mavlink.Message { return new(GimbalReport) }
+	mavlink.MessageFactory[185] = func() mavlink.Message { return new(GimbalControl) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,7 +448,7 @@ func (self *MountStatus) String() string {
 }
 
 // A fence point. Used to set a point when from
-// 	      GCS -> MAV. Also used to return a point from MAV -> GCS
+//         GCS -> MAV. Also used to return a point from MAV -> GCS
 type FencePoint struct {
 	Lat             float32 // Latitude of point
 	Lng             float32 // Longitude of point
@@ -511,7 +514,7 @@ func (self *FenceFetchPoint) String() string {
 }
 
 // Status of geo-fencing. Sent in extended
-// 	    status stream when fencing enabled
+//       status stream when fencing enabled
 type FenceStatus struct {
 	BreachTime   uint32 // time of last breach in milliseconds since boot
 	BreachCount  uint16 // number of fence breaches
@@ -683,7 +686,7 @@ func (self *Radio) String() string {
 }
 
 // Status of AP_Limits. Sent in extended
-// 	    status stream when AP_Limits is enabled
+//       status stream when AP_Limits is enabled
 type LimitsStatus struct {
 	LastTrigger   uint32 // time of last breach in milliseconds since boot
 	LastAction    uint32 // time of last recovery action in milliseconds since boot
@@ -1225,6 +1228,112 @@ func (self *Ahrs3) FieldsString() string {
 }
 
 func (self *Ahrs3) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Request the autopilot version from the system/component.
+type AutopilotVersionRequest struct {
+	TargetSystem    uint8 // System ID
+	TargetComponent uint8 // Component ID
+}
+
+func (self *AutopilotVersionRequest) TypeID() uint8 {
+	return 183
+}
+
+func (self *AutopilotVersionRequest) TypeName() string {
+	return "AUTOPILOT_VERSION_REQUEST"
+}
+
+func (self *AutopilotVersionRequest) TypeSize() uint8 {
+	return 2
+}
+
+func (self *AutopilotVersionRequest) TypeCRCExtra() uint8 {
+	return 85
+}
+
+func (self *AutopilotVersionRequest) FieldsString() string {
+	return fmt.Sprintf("TargetSystem=%d TargetComponent=%d", self.TargetSystem, self.TargetComponent)
+}
+
+func (self *AutopilotVersionRequest) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Report from MAVLink enabled gimbal to vehicle. The deltas are in gimbal sensor frame. Joint measurements assume a 312 ordering (azimuth, roll, pitch).
+type GimbalReport struct {
+	DeltaTime       float32 // Time since last update (seconds)
+	DeltaAngleX     float32 // Delta angle X, radians
+	DeltaAngleY     float32 // Delta angle Y, radians
+	DeltaAngleZ     float32 // Delta angle Z, radians
+	DeltaVelocityX  float32 // Delta velocity X, m/s
+	DeltaVelocityY  float32 // Delta velocity Y, m/s
+	DeltaVelocityZ  float32 // Delta velocity Z, m/s
+	JointRoll       float32 // Joint roll, radians
+	JointPitch      float32 // Joint pitch, radians
+	JointYaw        float32 // Joint yaw, radians
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+}
+
+func (self *GimbalReport) TypeID() uint8 {
+	return 184
+}
+
+func (self *GimbalReport) TypeName() string {
+	return "GIMBAL_REPORT"
+}
+
+func (self *GimbalReport) TypeSize() uint8 {
+	return 42
+}
+
+func (self *GimbalReport) TypeCRCExtra() uint8 {
+	return 97
+}
+
+func (self *GimbalReport) FieldsString() string {
+	return fmt.Sprintf("DeltaTime=%f DeltaAngleX=%f DeltaAngleY=%f DeltaAngleZ=%f DeltaVelocityX=%f DeltaVelocityY=%f DeltaVelocityZ=%f JointRoll=%f JointPitch=%f JointYaw=%f TargetSystem=%d TargetComponent=%d", self.DeltaTime, self.DeltaAngleX, self.DeltaAngleY, self.DeltaAngleZ, self.DeltaVelocityX, self.DeltaVelocityY, self.DeltaVelocityZ, self.JointRoll, self.JointPitch, self.JointYaw, self.TargetSystem, self.TargetComponent)
+}
+
+func (self *GimbalReport) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Control packet from vehicle to MAVLink enabled gimbal. All values in gimbal sensor frame
+type GimbalControl struct {
+	DemandedRateX   float32 // Demanded angular rate X, radians/s
+	DemandedRateY   float32 // Demanded angular rate Y, radians/s
+	DemandedRateZ   float32 // Demanded angular rate Z, radians/s
+	GyroBiasX       float32 // Gyro bias X, radians/s
+	GyroBiasY       float32 // Gyro bias Y, radians/s
+	GyroBiasZ       float32 // Gyro bias Z, radians/s
+	TargetSystem    uint8   // System ID
+	TargetComponent uint8   // Component ID
+}
+
+func (self *GimbalControl) TypeID() uint8 {
+	return 185
+}
+
+func (self *GimbalControl) TypeName() string {
+	return "GIMBAL_CONTROL"
+}
+
+func (self *GimbalControl) TypeSize() uint8 {
+	return 26
+}
+
+func (self *GimbalControl) TypeCRCExtra() uint8 {
+	return 239
+}
+
+func (self *GimbalControl) FieldsString() string {
+	return fmt.Sprintf("DemandedRateX=%f DemandedRateY=%f DemandedRateZ=%f GyroBiasX=%f GyroBiasY=%f GyroBiasZ=%f TargetSystem=%d TargetComponent=%d", self.DemandedRateX, self.DemandedRateY, self.DemandedRateZ, self.GyroBiasX, self.GyroBiasY, self.GyroBiasZ, self.TargetSystem, self.TargetComponent)
+}
+
+func (self *GimbalControl) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 

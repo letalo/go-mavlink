@@ -23,6 +23,9 @@ func Init() {
 	mavlink.MessageFactory[203] = func() mavlink.Message { return new(AslctrlData) }
 	mavlink.MessageFactory[204] = func() mavlink.Message { return new(AslctrlDebug) }
 	mavlink.MessageFactory[205] = func() mavlink.Message { return new(AsluavStatus) }
+	mavlink.MessageFactory[206] = func() mavlink.Message { return new(EkfExt) }
+	mavlink.MessageFactory[207] = func() mavlink.Message { return new(AslObctrl) }
+	mavlink.MessageFactory[208] = func() mavlink.Message { return new(SensAtmos) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,6 +230,107 @@ func (self *AsluavStatus) FieldsString() string {
 }
 
 func (self *AsluavStatus) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Extended EKF state estimates for ASLUAVs
+type EkfExt struct {
+	Timestamp uint64  //  Time since system start [us]
+	Windspeed float32 //  Magnitude of wind velocity (in lateral inertial plane) [m/s]
+	Winddir   float32 //  Wind heading angle from North [rad]
+	Windz     float32 //  Z (Down) component of inertial wind velocity [m/s]
+	Airspeed  float32 //  Magnitude of air velocity [m/s]
+	Beta      float32 //  Sideslip angle [rad]
+	Alpha     float32 //  Angle of attack [rad]
+}
+
+func (self *EkfExt) TypeID() uint8 {
+	return 206
+}
+
+func (self *EkfExt) TypeName() string {
+	return "EKF_EXT"
+}
+
+func (self *EkfExt) TypeSize() uint8 {
+	return 32
+}
+
+func (self *EkfExt) TypeCRCExtra() uint8 {
+	return 64
+}
+
+func (self *EkfExt) FieldsString() string {
+	return fmt.Sprintf("Timestamp=%d Windspeed=%f Winddir=%f Windz=%f Airspeed=%f Beta=%f Alpha=%f", self.Timestamp, self.Windspeed, self.Winddir, self.Windz, self.Airspeed, self.Beta, self.Alpha)
+}
+
+func (self *EkfExt) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Off-board controls/commands for ASLUAVs
+type AslObctrl struct {
+	Timestamp    uint64  //  Time since system start [us]
+	Uelev        float32 //  Elevator command [~]
+	Uthrot       float32 //  Throttle command [~]
+	Uthrot2      float32 //  Throttle 2 command [~]
+	Uaill        float32 //  Left aileron command [~]
+	Uailr        float32 //  Right aileron command [~]
+	Urud         float32 //  Rudder command [~]
+	ObctrlStatus uint8   //  Off-board computer status
+}
+
+func (self *AslObctrl) TypeID() uint8 {
+	return 207
+}
+
+func (self *AslObctrl) TypeName() string {
+	return "ASL_OBCTRL"
+}
+
+func (self *AslObctrl) TypeSize() uint8 {
+	return 33
+}
+
+func (self *AslObctrl) TypeCRCExtra() uint8 {
+	return 234
+}
+
+func (self *AslObctrl) FieldsString() string {
+	return fmt.Sprintf("Timestamp=%d Uelev=%f Uthrot=%f Uthrot2=%f Uaill=%f Uailr=%f Urud=%f ObctrlStatus=%d", self.Timestamp, self.Uelev, self.Uthrot, self.Uthrot2, self.Uaill, self.Uailr, self.Urud, self.ObctrlStatus)
+}
+
+func (self *AslObctrl) String() string {
+	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
+}
+
+// Atmospheric sensors (temperature, humidity, ...)
+type SensAtmos struct {
+	Tempambient float32 //  Ambient temperature [degrees Celsius]
+	Humidity    float32 //  Relative humidity [%]
+}
+
+func (self *SensAtmos) TypeID() uint8 {
+	return 208
+}
+
+func (self *SensAtmos) TypeName() string {
+	return "SENS_ATMOS"
+}
+
+func (self *SensAtmos) TypeSize() uint8 {
+	return 8
+}
+
+func (self *SensAtmos) TypeCRCExtra() uint8 {
+	return 175
+}
+
+func (self *SensAtmos) FieldsString() string {
+	return fmt.Sprintf("Tempambient=%f Humidity=%f", self.Tempambient, self.Humidity)
+}
+
+func (self *SensAtmos) String() string {
 	return mavlink.NameIDFromMessage(self) + "{" + self.FieldsString() + "}"
 }
 
