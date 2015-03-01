@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = {{.IncludeName}}.PROTOCOL_NAME{{end}}
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	{{if .Include}}{{.IncludeName}}.Init(){{else}}for i := range mavlink.MessageFactory { mavlink.MessageFactory[i] = nil }{{end}}
 
@@ -21,6 +22,13 @@ func Init() {
 	
 	{{range .Messages}}
 	mavlink.MessageFactory[{{.ID}}] = func() mavlink.Message { return new({{.Name | UpperCamelCase}}) }{{end}}
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int { {{range .Messages}}
+		"{{.Name}}": {{.ID}},{{end}}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +50,7 @@ const ({{range .Entries}}
 {{$name := .Name | UpperCamelCase}}
 // {{.Description}}
 type {{$name}} struct { {{range .Fields}}
-	{{.Name | UpperCamelCase}} {{.GoType}} // {{.Description}}{{end}}
+	{{.Name | UpperCamelCase}} {{.GoType}}{{if .Enum}} `enum:"{{.Enum}}"`{{end}} // {{.Description}}{{end}}
 }
 
 {{if eq $name "Heartbeat"}}

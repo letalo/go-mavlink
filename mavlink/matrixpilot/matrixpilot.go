@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -39,6 +40,33 @@ func Init() {
 	mavlink.MessageFactory[180] = func() mavlink.Message { return new(SerialUdbExtraF16) }
 	mavlink.MessageFactory[181] = func() mavlink.Message { return new(Altitudes) }
 	mavlink.MessageFactory[182] = func() mavlink.Message { return new(Airspeeds) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"FLEXIFUNCTION_SET":                 150,
+		"FLEXIFUNCTION_READ_REQ":            151,
+		"FLEXIFUNCTION_BUFFER_FUNCTION":     152,
+		"FLEXIFUNCTION_BUFFER_FUNCTION_ACK": 153,
+		"FLEXIFUNCTION_DIRECTORY":           155,
+		"FLEXIFUNCTION_DIRECTORY_ACK":       156,
+		"FLEXIFUNCTION_COMMAND":             157,
+		"FLEXIFUNCTION_COMMAND_ACK":         158,
+		"SERIAL_UDB_EXTRA_F2_A":             170,
+		"SERIAL_UDB_EXTRA_F2_B":             171,
+		"SERIAL_UDB_EXTRA_F4":               172,
+		"SERIAL_UDB_EXTRA_F5":               173,
+		"SERIAL_UDB_EXTRA_F6":               174,
+		"SERIAL_UDB_EXTRA_F7":               175,
+		"SERIAL_UDB_EXTRA_F8":               176,
+		"SERIAL_UDB_EXTRA_F13":              177,
+		"SERIAL_UDB_EXTRA_F14":              178,
+		"SERIAL_UDB_EXTRA_F15":              179,
+		"SERIAL_UDB_EXTRA_F16":              180,
+		"ALTITUDES":                         181,
+		"AIRSPEEDS":                         182,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

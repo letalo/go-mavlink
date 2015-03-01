@@ -11,6 +11,7 @@ const (
 	PROTOCOL_VERSION = 2
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	for i := range mavlink.MessageFactory {
 		mavlink.MessageFactory[i] = nil
@@ -20,6 +21,13 @@ func Init() {
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
 	mavlink.MessageFactory[0] = func() mavlink.Message { return new(Heartbeat) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"HEARTBEAT": 0,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

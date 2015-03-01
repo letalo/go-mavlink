@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -26,6 +27,20 @@ func Init() {
 	mavlink.MessageFactory[206] = func() mavlink.Message { return new(EkfExt) }
 	mavlink.MessageFactory[207] = func() mavlink.Message { return new(AslObctrl) }
 	mavlink.MessageFactory[208] = func() mavlink.Message { return new(SensAtmos) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"SENS_POWER":    201,
+		"SENS_MPPT":     202,
+		"ASLCTRL_DATA":  203,
+		"ASLCTRL_DEBUG": 204,
+		"ASLUAV_STATUS": 205,
+		"EKF_EXT":       206,
+		"ASL_OBCTRL":    207,
+		"SENS_ATMOS":    208,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

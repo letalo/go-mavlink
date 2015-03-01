@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -20,6 +21,13 @@ func Init() {
 	mavlink.ProtocolVersion = PROTOCOL_VERSION
 
 	mavlink.MessageFactory[150] = func() mavlink.Message { return new(AqTelemetryF) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"AQ_TELEMETRY_F": 150,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

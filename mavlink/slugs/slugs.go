@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -38,6 +39,32 @@ func Init() {
 	mavlink.MessageFactory[195] = func() mavlink.Message { return new(NovatelDiag) }
 	mavlink.MessageFactory[196] = func() mavlink.Message { return new(SensorDiag) }
 	mavlink.MessageFactory[197] = func() mavlink.Message { return new(Boot) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"CPU_LOAD":                   170,
+		"SENSOR_BIAS":                172,
+		"DIAGNOSTIC":                 173,
+		"SLUGS_NAVIGATION":           176,
+		"DATA_LOG":                   177,
+		"GPS_DATE_TIME":              179,
+		"MID_LVL_CMDS":               180,
+		"CTRL_SRFC_PT":               181,
+		"SLUGS_CAMERA_ORDER":         184,
+		"CONTROL_SURFACE":            185,
+		"SLUGS_MOBILE_LOCATION":      186,
+		"SLUGS_CONFIGURATION_CAMERA": 188,
+		"ISR_LOCATION":               189,
+		"VOLT_SENSOR":                191,
+		"PTZ_STATUS":                 192,
+		"UAV_STATUS":                 193,
+		"STATUS_GPS":                 194,
+		"NOVATEL_DIAG":               195,
+		"SENSOR_DIAG":                196,
+		"BOOT":                       197,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

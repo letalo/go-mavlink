@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -53,6 +54,47 @@ func Init() {
 	mavlink.MessageFactory[183] = func() mavlink.Message { return new(AutopilotVersionRequest) }
 	mavlink.MessageFactory[184] = func() mavlink.Message { return new(GimbalReport) }
 	mavlink.MessageFactory[185] = func() mavlink.Message { return new(GimbalControl) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"SENSOR_OFFSETS":            150,
+		"SET_MAG_OFFSETS":           151,
+		"MEMINFO":                   152,
+		"AP_ADC":                    153,
+		"DIGICAM_CONFIGURE":         154,
+		"DIGICAM_CONTROL":           155,
+		"MOUNT_CONFIGURE":           156,
+		"MOUNT_CONTROL":             157,
+		"MOUNT_STATUS":              158,
+		"FENCE_POINT":               160,
+		"FENCE_FETCH_POINT":         161,
+		"FENCE_STATUS":              162,
+		"AHRS":                      163,
+		"SIMSTATE":                  164,
+		"HWSTATUS":                  165,
+		"RADIO":                     166,
+		"LIMITS_STATUS":             167,
+		"WIND":                      168,
+		"DATA16":                    169,
+		"DATA32":                    170,
+		"DATA64":                    171,
+		"DATA96":                    172,
+		"RANGEFINDER":               173,
+		"AIRSPEED_AUTOCAL":          174,
+		"RALLY_POINT":               175,
+		"RALLY_FETCH_POINT":         176,
+		"COMPASSMOT_STATUS":         177,
+		"AHRS2":                     178,
+		"CAMERA_STATUS":             179,
+		"CAMERA_FEEDBACK":           180,
+		"BATTERY2":                  181,
+		"AHRS3":                     182,
+		"AUTOPILOT_VERSION_REQUEST": 183,
+		"GIMBAL_REPORT":             184,
+		"GIMBAL_CONTROL":            185,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -350,7 +392,7 @@ func (self *DigicamControl) String() string {
 type MountConfigure struct {
 	TargetSystem    uint8 // System ID
 	TargetComponent uint8 // Component ID
-	MountMode       uint8 // mount operating mode (see MAV_MOUNT_MODE enum)
+	MountMode       uint8 `enum:"MAV_MOUNT_MODE"` // mount operating mode (see MAV_MOUNT_MODE enum)
 	StabRoll        uint8 // (1 = yes, 0 = no)
 	StabPitch       uint8 // (1 = yes, 0 = no)
 	StabYaw         uint8 // (1 = yes, 0 = no)
@@ -519,7 +561,7 @@ type FenceStatus struct {
 	BreachTime   uint32 // time of last breach in milliseconds since boot
 	BreachCount  uint16 // number of fence breaches
 	BreachStatus uint8  // 0 if currently inside fence, 1 if outside
-	BreachType   uint8  // last breach type (see FENCE_BREACH_* enum)
+	BreachType   uint8  `enum:"FENCE_BREACH"` // last breach type (see FENCE_BREACH_* enum)
 }
 
 func (self *FenceStatus) TypeID() uint8 {
@@ -693,7 +735,7 @@ type LimitsStatus struct {
 	LastRecovery  uint32 // time of last successful recovery in milliseconds since boot
 	LastClear     uint32 // time of last all-clear in milliseconds since boot
 	BreachCount   uint16 // number of fence breaches
-	LimitsState   uint8  // state of AP_Limits, (see enum LimitState, LIMITS_STATE)
+	LimitsState   uint8  `enum:"LIMITS_STATE"` // state of AP_Limits, (see enum LimitState, LIMITS_STATE)
 	ModsEnabled   uint8  // AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
 	ModsRequired  uint8  // AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
 	ModsTriggered uint8  // AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)

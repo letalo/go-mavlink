@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -21,6 +22,15 @@ func Init() {
 	mavlink.MessageFactory[220] = func() mavlink.Message { return new(NavFilterBias) }
 	mavlink.MessageFactory[221] = func() mavlink.Message { return new(RadioCalibration) }
 	mavlink.MessageFactory[222] = func() mavlink.Message { return new(UalbertaSysStatus) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"NAV_FILTER_BIAS":     220,
+		"RADIO_CALIBRATION":   221,
+		"UALBERTA_SYS_STATUS": 222,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

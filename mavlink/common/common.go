@@ -11,6 +11,7 @@ const (
 	PROTOCOL_VERSION = 3
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	for i := range mavlink.MessageFactory {
 		mavlink.MessageFactory[i] = nil
@@ -133,6 +134,126 @@ func Init() {
 	mavlink.MessageFactory[252] = func() mavlink.Message { return new(NamedValueInt) }
 	mavlink.MessageFactory[253] = func() mavlink.Message { return new(Statustext) }
 	mavlink.MessageFactory[254] = func() mavlink.Message { return new(Debug) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"HEARTBEAT":   0,
+		"SYS_STATUS":  1,
+		"SYSTEM_TIME": 2,
+		"PING":        4,
+		"CHANGE_OPERATOR_CONTROL":                 5,
+		"CHANGE_OPERATOR_CONTROL_ACK":             6,
+		"AUTH_KEY":                                7,
+		"SET_MODE":                                11,
+		"PARAM_REQUEST_READ":                      20,
+		"PARAM_REQUEST_LIST":                      21,
+		"PARAM_VALUE":                             22,
+		"PARAM_SET":                               23,
+		"GPS_RAW_INT":                             24,
+		"GPS_STATUS":                              25,
+		"SCALED_IMU":                              26,
+		"RAW_IMU":                                 27,
+		"RAW_PRESSURE":                            28,
+		"SCALED_PRESSURE":                         29,
+		"ATTITUDE":                                30,
+		"ATTITUDE_QUATERNION":                     31,
+		"LOCAL_POSITION_NED":                      32,
+		"GLOBAL_POSITION_INT":                     33,
+		"RC_CHANNELS_SCALED":                      34,
+		"RC_CHANNELS_RAW":                         35,
+		"SERVO_OUTPUT_RAW":                        36,
+		"MISSION_REQUEST_PARTIAL_LIST":            37,
+		"MISSION_WRITE_PARTIAL_LIST":              38,
+		"MISSION_ITEM":                            39,
+		"MISSION_REQUEST":                         40,
+		"MISSION_SET_CURRENT":                     41,
+		"MISSION_CURRENT":                         42,
+		"MISSION_REQUEST_LIST":                    43,
+		"MISSION_COUNT":                           44,
+		"MISSION_CLEAR_ALL":                       45,
+		"MISSION_ITEM_REACHED":                    46,
+		"MISSION_ACK":                             47,
+		"SET_GPS_GLOBAL_ORIGIN":                   48,
+		"GPS_GLOBAL_ORIGIN":                       49,
+		"PARAM_MAP_RC":                            50,
+		"SAFETY_SET_ALLOWED_AREA":                 54,
+		"SAFETY_ALLOWED_AREA":                     55,
+		"ATTITUDE_QUATERNION_COV":                 61,
+		"NAV_CONTROLLER_OUTPUT":                   62,
+		"GLOBAL_POSITION_INT_COV":                 63,
+		"LOCAL_POSITION_NED_COV":                  64,
+		"RC_CHANNELS":                             65,
+		"REQUEST_DATA_STREAM":                     66,
+		"DATA_STREAM":                             67,
+		"MANUAL_CONTROL":                          69,
+		"RC_CHANNELS_OVERRIDE":                    70,
+		"MISSION_ITEM_INT":                        73,
+		"VFR_HUD":                                 74,
+		"COMMAND_INT":                             75,
+		"COMMAND_LONG":                            76,
+		"COMMAND_ACK":                             77,
+		"MANUAL_SETPOINT":                         81,
+		"SET_ATTITUDE_TARGET":                     82,
+		"ATTITUDE_TARGET":                         83,
+		"SET_POSITION_TARGET_LOCAL_NED":           84,
+		"POSITION_TARGET_LOCAL_NED":               85,
+		"SET_POSITION_TARGET_GLOBAL_INT":          86,
+		"POSITION_TARGET_GLOBAL_INT":              87,
+		"LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET": 89,
+		"HIL_STATE":                               90,
+		"HIL_CONTROLS":                            91,
+		"HIL_RC_INPUTS_RAW":                       92,
+		"OPTICAL_FLOW":                            100,
+		"GLOBAL_VISION_POSITION_ESTIMATE":         101,
+		"VISION_POSITION_ESTIMATE":                102,
+		"VISION_SPEED_ESTIMATE":                   103,
+		"VICON_POSITION_ESTIMATE":                 104,
+		"HIGHRES_IMU":                             105,
+		"OPTICAL_FLOW_RAD":                        106,
+		"HIL_SENSOR":                              107,
+		"SIM_STATE":                               108,
+		"RADIO_STATUS":                            109,
+		"FILE_TRANSFER_PROTOCOL":                  110,
+		"TIMESYNC":                                111,
+		"HIL_GPS":                                 113,
+		"HIL_OPTICAL_FLOW":                        114,
+		"HIL_STATE_QUATERNION":                    115,
+		"SCALED_IMU2":                             116,
+		"LOG_REQUEST_LIST":                        117,
+		"LOG_ENTRY":                               118,
+		"LOG_REQUEST_DATA":                        119,
+		"LOG_DATA":                                120,
+		"LOG_ERASE":                               121,
+		"LOG_REQUEST_END":                         122,
+		"GPS_INJECT_DATA":                         123,
+		"GPS2_RAW":                                124,
+		"POWER_STATUS":                            125,
+		"SERIAL_CONTROL":                          126,
+		"GPS_RTK":                                 127,
+		"GPS2_RTK":                                128,
+		"DATA_TRANSMISSION_HANDSHAKE":             130,
+		"ENCAPSULATED_DATA":                       131,
+		"DISTANCE_SENSOR":                         132,
+		"TERRAIN_REQUEST":                         133,
+		"TERRAIN_DATA":                            134,
+		"TERRAIN_CHECK":                           135,
+		"TERRAIN_REPORT":                          136,
+		"SCALED_PRESSURE2":                        137,
+		"ATT_POS_MOCAP":                           138,
+		"SET_ACTUATOR_CONTROL_TARGET":             139,
+		"ACTUATOR_CONTROL_TARGET":                 140,
+		"BATTERY_STATUS":                          147,
+		"AUTOPILOT_VERSION":                       148,
+		"V2_EXTENSION":                            248,
+		"MEMORY_VECT":                             249,
+		"DEBUG_VECT":                              250,
+		"NAMED_VALUE_FLOAT":                       251,
+		"NAMED_VALUE_INT":                         252,
+		"STATUSTEXT":                              253,
+		"DEBUG":                                   254,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -835,7 +956,7 @@ func (self *AuthKey) String() string {
 type SetMode struct {
 	CustomMode   uint32 // The new autopilot-specific mode. This field can be ignored by an autopilot.
 	TargetSystem uint8  // The system setting the mode
-	BaseMode     uint8  // The new base mode
+	BaseMode     uint8  `enum:"MAV_MODE"` // The new base mode
 }
 
 func (self *SetMode) TypeID() uint8 {
@@ -930,7 +1051,7 @@ type ParamValue struct {
 	ParamCount uint16  // Total number of onboard parameters
 	ParamIndex uint16  // Index of this onboard parameter
 	ParamId    Char16  // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
-	ParamType  uint8   // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
+	ParamType  uint8   `enum:"MAV_PARAM_TYPE"` // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
 }
 
 func (self *ParamValue) TypeID() uint8 {
@@ -963,7 +1084,7 @@ type ParamSet struct {
 	TargetSystem    uint8   // System ID
 	TargetComponent uint8   // Component ID
 	ParamId         Char16  // Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
-	ParamType       uint8   // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
+	ParamType       uint8   `enum:"MAV_PARAM_TYPE"` // Onboard parameter type: see the MAV_PARAM_TYPE enum for supported data types.
 }
 
 func (self *ParamSet) TypeID() uint8 {
@@ -1786,7 +1907,7 @@ func (self *MissionItemReached) String() string {
 type MissionAck struct {
 	TargetSystem    uint8 // System ID
 	TargetComponent uint8 // Component ID
-	Type            uint8 // See MAV_MISSION_RESULT enum
+	Type            uint8 `enum:"MAV_MISSION_RESULT"` // See MAV_MISSION_RESULT enum
 }
 
 func (self *MissionAck) TypeID() uint8 {
@@ -1923,7 +2044,7 @@ type SafetySetAllowedArea struct {
 	P2z             float32 // z position 2 / Altitude 2
 	TargetSystem    uint8   // System ID
 	TargetComponent uint8   // Component ID
-	Frame           uint8   // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
+	Frame           uint8   `enum:"MAV_FRAME"` // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
 }
 
 func (self *SafetySetAllowedArea) TypeID() uint8 {
@@ -1958,7 +2079,7 @@ type SafetyAllowedArea struct {
 	P2x   float32 // x position 2 / Latitude 2
 	P2y   float32 // y position 2 / Longitude 2
 	P2z   float32 // z position 2 / Altitude 2
-	Frame uint8   // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
+	Frame uint8   `enum:"MAV_FRAME"` // Coordinate frame, as defined by MAV_FRAME enum in mavlink_types.h. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
 }
 
 func (self *SafetyAllowedArea) TypeID() uint8 {
@@ -2067,7 +2188,7 @@ type GlobalPositionIntCov struct {
 	Vy            float32     // Ground Y Speed (Longitude), expressed as m/s
 	Vz            float32     // Ground Z Speed (Altitude), expressed as m/s
 	Covariance    [36]float32 // Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
-	EstimatorType uint8       // Class id of the estimator this estimate originated from.
+	EstimatorType uint8       `enum:"MAV_ESTIMATOR_TYPE"` // Class id of the estimator this estimate originated from.
 }
 
 func (self *GlobalPositionIntCov) TypeID() uint8 {
@@ -2105,7 +2226,7 @@ type LocalPositionNedCov struct {
 	Vy            float32     // Y Speed
 	Vz            float32     // Z Speed
 	Covariance    [36]float32 // Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
-	EstimatorType uint8       // Class id of the estimator this estimate originated from.
+	EstimatorType uint8       `enum:"MAV_ESTIMATOR_TYPE"` // Class id of the estimator this estimate originated from.
 }
 
 func (self *LocalPositionNedCov) TypeID() uint8 {
@@ -2444,7 +2565,7 @@ type CommandLong struct {
 	Param5          float32 // Parameter 5, as defined by MAV_CMD enum.
 	Param6          float32 // Parameter 6, as defined by MAV_CMD enum.
 	Param7          float32 // Parameter 7, as defined by MAV_CMD enum.
-	Command         uint16  // Command ID, as defined by MAV_CMD enum.
+	Command         uint16  `enum:"MAV_CMD"` // Command ID, as defined by MAV_CMD enum.
 	TargetSystem    uint8   // System which should execute the command
 	TargetComponent uint8   // Component which should execute the command, 0 for all components
 	Confirmation    uint8   // 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command)
@@ -2476,7 +2597,7 @@ func (self *CommandLong) String() string {
 
 // Report status of a command. Includes feedback wether the command was executed.
 type CommandAck struct {
-	Command uint16 // Command ID, as defined by MAV_CMD enum.
+	Command uint16 `enum:"MAV_CMD"` // Command ID, as defined by MAV_CMD enum.
 	Result  uint8  // See MAV_RESULT enum
 }
 
@@ -2628,7 +2749,7 @@ type SetPositionTargetLocalNed struct {
 	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
 	TargetSystem    uint8   // System ID
 	TargetComponent uint8   // Component ID
-	CoordinateFrame uint8   // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+	CoordinateFrame uint8   `enum:"MAV_FRAME"` // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
 }
 
 func (self *SetPositionTargetLocalNed) TypeID() uint8 {
@@ -2670,7 +2791,7 @@ type PositionTargetLocalNed struct {
 	Yaw             float32 // yaw setpoint in rad
 	YawRate         float32 // yaw rate setpoint in rad/s
 	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
-	CoordinateFrame uint8   // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+	CoordinateFrame uint8   `enum:"MAV_FRAME"` // Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
 }
 
 func (self *PositionTargetLocalNed) TypeID() uint8 {
@@ -2714,7 +2835,7 @@ type SetPositionTargetGlobalInt struct {
 	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
 	TargetSystem    uint8   // System ID
 	TargetComponent uint8   // Component ID
-	CoordinateFrame uint8   // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+	CoordinateFrame uint8   `enum:"MAV_FRAME"` // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
 }
 
 func (self *SetPositionTargetGlobalInt) TypeID() uint8 {
@@ -2756,7 +2877,7 @@ type PositionTargetGlobalInt struct {
 	Yaw             float32 // yaw setpoint in rad
 	YawRate         float32 // yaw rate setpoint in rad/s
 	TypeMask        uint16  // Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
-	CoordinateFrame uint8   // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+	CoordinateFrame uint8   `enum:"MAV_FRAME"` // Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
 }
 
 func (self *PositionTargetGlobalInt) TypeID() uint8 {
@@ -4329,8 +4450,8 @@ type BatteryStatus struct {
 	Voltages         [10]uint16 // Battery voltage of cells, in millivolts (1 = 1 millivolt)
 	CurrentBattery   int16      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
 	Id               uint8      // Battery ID
-	BatteryFunction  uint8      // Function of the battery
-	Type             uint8      // Type (chemistry) of the battery
+	BatteryFunction  uint8      `enum:"MAV_BATTERY_FUNCTION"` // Function of the battery
+	Type             uint8      `enum:"MAV_BATTERY_TYPE"`     // Type (chemistry) of the battery
 	BatteryRemaining int8       // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot does not estimate the remaining battery
 }
 
@@ -4559,7 +4680,7 @@ func (self *NamedValueInt) String() string {
 
 // Status text message. These messages are printed in yellow in the COMM console of QGroundControl. WARNING: They consume quite some bandwidth, so use only for important status and error messages. If implemented wisely, these messages are buffered on the MCU and sent only at a limited rate (e.g. 10 Hz).
 type Statustext struct {
-	Severity uint8  // Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
+	Severity uint8  `enum:"MAV_SEVERITY"` // Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
 	Text     Char50 // Status text message, without null termination character
 }
 

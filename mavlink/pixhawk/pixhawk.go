@@ -13,6 +13,7 @@ const (
 	PROTOCOL_INCLUDE = common.PROTOCOL_NAME
 )
 
+// Init initializes mavlink.ProtocolName, mavlink.ProtocolVersion, and mavlink.MessageFactory.
 func Init() {
 	common.Init()
 
@@ -37,6 +38,31 @@ func Init() {
 	mavlink.MessageFactory[200] = func() mavlink.Message { return new(AttitudeControl) }
 	mavlink.MessageFactory[205] = func() mavlink.Message { return new(DetectionStats) }
 	mavlink.MessageFactory[206] = func() mavlink.Message { return new(OnboardHealth) }
+}
+
+// MessageNameIDMap returns a map from message name to message ID.
+func MessageNameIDMap() map[string]int {
+	return map[string]int{
+		"SET_CAM_SHUTTER":              151,
+		"IMAGE_TRIGGERED":              152,
+		"IMAGE_TRIGGER_CONTROL":        153,
+		"IMAGE_AVAILABLE":              154,
+		"SET_POSITION_CONTROL_OFFSET":  160,
+		"POSITION_CONTROL_SETPOINT":    170,
+		"MARKER":                       171,
+		"RAW_AUX":                      172,
+		"WATCHDOG_HEARTBEAT":           180,
+		"WATCHDOG_PROCESS_INFO":        181,
+		"WATCHDOG_PROCESS_STATUS":      182,
+		"WATCHDOG_COMMAND":             183,
+		"PATTERN_DETECTED":             190,
+		"POINT_OF_INTEREST":            191,
+		"POINT_OF_INTEREST_CONNECTION": 192,
+		"BRIEF_FEATURE":                195,
+		"ATTITUDE_CONTROL":             200,
+		"DETECTION_STATS":              205,
+		"ONBOARD_HEALTH":               206,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

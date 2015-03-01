@@ -346,6 +346,7 @@ func (msg *Message) Swap(i, j int) {
 type MessageField struct {
 	CType       string `xml:"type,attr"`
 	Name        string `xml:"name,attr"`
+	Enum        string `xml:"enum,attr"`
 	Description string `xml:",innerxml"`
 	GoType      string
 	bitSize     int
