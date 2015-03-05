@@ -55,5 +55,13 @@ class {{$name}} extends mavlink.Message {
 	fieldsString() {
 		return `{{range $i, $val := .Fields}}{{if gt $i 0}} {{end}}{{$val.Name | LowerCamelCase}}=${this.{{$val.Name | LowerCamelCase}}}{{end}}`;
 	}
+
+	encodeBinary(dataView) {
+
+	}
+
+	decodeBinary(dataView) { {{range .Fields}}		
+		this.{{.Name | LowerCamelCase}} = {{if .IsString}}String.fromCharCode.apply(null, new Uint8Array(dataView.buffer, {{.ByteOffset}}, {{.ArrayLength}})){{else if .ArrayLength}}new {{.JSElementType}}Array(dataView.buffer, {{.ByteOffset}}, {{.ArrayLength}}){{else}}dataView.get{{.JSElementType}}({{.ByteOffset}}){{end}};{{end}}
+	}
 }
 {{end}}
