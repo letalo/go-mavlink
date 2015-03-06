@@ -106,15 +106,28 @@ func generate(name string) {
 	for i := range protocol.Messages {
 		message := &protocol.Messages[i]
 		message.Description = strings.Replace(message.Description, "\n", "\n// ", -1)
+
 		for j := range message.Fields {
 			field := &message.Fields[j]
 			field.Description = strings.Replace(field.Description, "\n", " ", -1)
-			field.GoType, field.bitSize, field.arrayLength = goType(field.CType)
-			if field.arrayLength > 0 {
-				protocol.StringSizes[field.arrayLength] = true
+			field.GoType, field.BitSize, field.ArrayLength = goType(field.CType)
+			if field.ArrayLength > 0 {
+				protocol.StringSizes[field.ArrayLength] = true
 			}
 		}
+
 		sort.Stable(sort.Reverse(message))
+
+		offset := 0
+		for j := range message.Fields {
+			field := &message.Fields[j]
+			field.ByteOffset = offset
+			byteSize := field.BitSize / 8
+			if field.ArrayLength > 0 {
+				byteSize *= field.ArrayLength
+			}
+			offset += byteSize
+		}
 	}
 
 	generated[protocol.Name] = true
@@ -268,9 +281,9 @@ type Message struct {
 
 func (msg *Message) Size() (size int) {
 	for i := range msg.Fields {
-		bitSize := msg.Fields[i].bitSize
-		if msg.Fields[i].arrayLength > 0 {
-			bitSize *= msg.Fields[i].arrayLength
+		bitSize := msg.Fields[i].BitSize
+		if msg.Fields[i].ArrayLength > 0 {
+			bitSize *= msg.Fields[i].ArrayLength
 		}
 		size += bitSize
 	}
@@ -287,8 +300,8 @@ func (msg *Message) CRCExtra() uint8 {
 			cType = "uint8_t"
 		}
 		fmt.Fprint(hash, cType+" "+msg.Fields[i].Name+" ")
-		if msg.Fields[i].arrayLength > 0 {
-			hash.WriteByte(byte(msg.Fields[i].arrayLength))
+		if msg.Fields[i].ArrayLength > 0 {
+			hash.WriteByte(byte(msg.Fields[i].ArrayLength))
 		}
 	}
 
@@ -304,7 +317,7 @@ func (msg *Message) FieldsString() string {
 		switch {
 		case strings.HasPrefix(t, "Char"):
 			placeholder = `\"%s\"`
-		case msg.Fields[i].arrayLength > 0:
+		case msg.Fields[i].ArrayLength > 0:
 			placeholder = "%v"
 		case strings.Contains(t, "int"), t == "byte":
 			placeholder = "%d"
@@ -336,7 +349,7 @@ func (msg *Message) Len() int {
 }
 
 func (msg *Message) Less(i, j int) bool {
-	return msg.Fields[i].bitSize < msg.Fields[j].bitSize
+	return msg.Fields[i].BitSize < msg.Fields[j].BitSize
 }
 
 func (msg *Message) Swap(i, j int) {
@@ -349,16 +362,29 @@ type MessageField struct {
 	Enum        string `xml:"enum,attr"`
 	Description string `xml:",innerxml"`
 	GoType      string
-	bitSize     int
-	arrayLength int
+	BitSize     int
+	ArrayLength int
+	ByteOffset  int
+}
+
+func (field *MessageField) IsString() bool {
+	return strings.HasPrefix(field.CType, "char[")
+}
+
+func (field *MessageField) JSElementType() string {
+	t := dry.StringReplaceMulti(field.CType, "_t", "", "_mavlink_version", "", "char", "uint8", "float", "float32", "double", "float64")
+	if field.ArrayLength > 0 {
+		t = t[:strings.IndexByte(t, '[')]
+	}
+	return dry.StringToUpperCamelCase(t)
 }
 
 func (field *MessageField) JSDefaultValue() string {
 	switch {
-	case strings.HasPrefix(field.CType, "char["):
+	case field.IsString():
 		return `""`
-	case strings.HasSuffix(field.CType, "]"):
-		return "[]"
+	case field.ArrayLength > 0:
+		return fmt.Sprintf("new %sArray(%d)", field.JSElementType(), field.ArrayLength)
 	case strings.HasPrefix(field.CType, "int"), strings.HasPrefix(field.CType, "uint"), field.CType == "char":
 		return "0"
 	case field.CType == "float", field.CType == "double":

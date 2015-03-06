@@ -32,23 +32,24 @@ export const {{.Name}} = {{.Value}}; // {{.Description}}{{end}}
 {{$name := .Name | UpperCamelCase}}
 // {{.Description}}
 class {{$name}} extends mavlink.Message {
-	constructor() { {{range .Fields}}
-		this.{{.Name | LowerCamelCase}} = {{if eq .CType "uint8_t_mavlink_version"}}PROTOCOL_VERSION{{else}}{{.JSDefaultValue}}{{end}}; // {{.Description}}{{end}}
+	constructor(buffer = new ArrayBuffer({{.Size}})) {
+		this.data = new DataView(buffer);{{range .Fields}}{{if eq .CType "uint8_t_mavlink_version"}}
+		this.{{.Name | LowerCamelCase}} = PROTOCOL_VERSION;{{end}}{{end}}
 	}
 
-	get typeID() {
+	static get typeID() {
 		return {{.ID}};
 	}
 
-	get typeName() {
+	static get typeName() {
 		return "{{.Name}}";
 	}
 
-	get typeSize() {
+	static get typeSize() {
 		return {{.Size}};
 	}
 
-	get typeCRCExtra() {
+	static get typeCRCExtra() {
 		return {{.CRCExtra}};
 	}
 
@@ -56,12 +57,38 @@ class {{$name}} extends mavlink.Message {
 		return `{{range $i, $val := .Fields}}{{if gt $i 0}} {{end}}{{$val.Name | LowerCamelCase}}=${this.{{$val.Name | LowerCamelCase}}}{{end}}`;
 	}
 
-	encodeBinary(dataView) {
-
+	{{range .Fields}}
+	{{if .IsString}}
+	// {{.Description}}
+	get {{.Name | LowerCamelCase}}() {
+		return new DataView(this.data.buffer, {{.ByteOffset}}, {{.ArrayLength}}).getStringNT(0);
 	}
 
-	decodeBinary(dataView) { {{range .Fields}}		
-		this.{{.Name | LowerCamelCase}} = {{if .IsString}}String.fromCharCode.apply(null, new Uint8Array(dataView.buffer, {{.ByteOffset}}, {{.ArrayLength}})){{else if .ArrayLength}}new {{.JSElementType}}Array(dataView.buffer, {{.ByteOffset}}, {{.ArrayLength}}){{else}}dataView.get{{.JSElementType}}({{.ByteOffset}}){{end}};{{end}}
+	// {{.Description}}
+	set {{.Name | LowerCamelCase}}(value) {
+		return new DataView(this.data.buffer, {{.ByteOffset}}, {{.ArrayLength}}).setStringNT(0, value);
 	}
+	{{else if .ArrayLength}}
+	// {{.Description}}
+	get{{.Name | UpperCamelCase}}(index) {
+		return this.data.get{{.JSElementType}}({{.ByteOffset}} + {{.BitSize}}/8*index{{if ne .BitSize 8}}, true{{end}});
+	}
+
+	// {{.Description}}
+	set{{.Name | UpperCamelCase}}(index, value) {
+		return this.data.set{{.JSElementType}}({{.ByteOffset}} + {{.BitSize}}/8*index, value{{if ne .BitSize 8}}, true{{end}});
+	}
+	{{else}}
+	// {{.Description}}
+	get {{.Name | LowerCamelCase}}() {
+		return this.data.get{{.JSElementType}}({{.ByteOffset}}{{if ne .BitSize 8}}, true{{end}});
+	}
+
+	// {{.Description}}
+	set {{.Name | LowerCamelCase}}(value) {
+		return this.data.set{{.JSElementType}}({{.ByteOffset}}, value{{if ne .BitSize 8}}, true{{end}});
+	}
+	{{end}}
+	{{end}}
 }
 {{end}}
