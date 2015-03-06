@@ -47,7 +47,7 @@ func main() {
 	if *createJS && *jsBabel {
 		es6filename := path.Join(*jsDir, "mavlink.js")
 		es5filename := path.Join(*jsBabelDir, "mavlink.js")
-		res, err := exec.Command("babel", es6filename, "--out-file", es5filename, "--source-maps").CombinedOutput()
+		res, err := exec.Command("babel", es6filename, "--out-file", es5filename, "--source-maps", "--modules", "umd").CombinedOutput()
 		if err != nil {
 			panic(string(res))
 		}
@@ -194,7 +194,7 @@ func generateJS(protocol *Protocol) {
 
 	if *jsBabel {
 		es5filename := path.Join(*jsBabelDir, protocol.Name+".js")
-		res, err := exec.Command("babel", filename, "--out-file", es5filename, "--source-maps").CombinedOutput()
+		res, err := exec.Command("babel", filename, "--out-file", es5filename, "--source-maps", "--modules", "umd").CombinedOutput()
 		if err != nil {
 			panic(string(res))
 		}
