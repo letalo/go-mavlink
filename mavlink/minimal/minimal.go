@@ -3,7 +3,7 @@ package minimal
 import (
 	"fmt"
 
-	"github.com/SpaceLeap/go-mavlink/mavlink"
+	"github.com/letalo/go-mavlink/mavlink"
 )
 
 const (

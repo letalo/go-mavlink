@@ -3,8 +3,8 @@ package ardupilotmega
 import (
 	"fmt"
 
-	"github.com/SpaceLeap/go-mavlink/mavlink"
-	"github.com/SpaceLeap/go-mavlink/mavlink/common"
+	"github.com/letalo/go-mavlink/mavlink"
+	"github.com/letalo/go-mavlink/mavlink/common"
 )
 
 const (
