@@ -14,8 +14,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/SpaceLeap/go-mavlink/x25"
-	"github.com/ungerik/go-dry"
+	"github.com/letalo/go-mavlink/x25"
 )
 
 var (
